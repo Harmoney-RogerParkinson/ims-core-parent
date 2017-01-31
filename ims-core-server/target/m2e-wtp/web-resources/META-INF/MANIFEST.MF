@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Implementation-Title: ims-core-server
-Implementation-Version: 0.0.1-SNAPSHOT
-Built-By: roger
-implementation-build: 
-Implementation-Vendor-Id: com.harmoney
-Build-Jdk: 1.8.0_45
-Created-By: Maven Integration for Eclipse
-
