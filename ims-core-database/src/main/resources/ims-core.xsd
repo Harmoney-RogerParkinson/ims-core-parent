@@ -1,0 +1,50 @@
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.harmoney.com/ims-core"
+	xmlns:tns="http://www.harmoney.com/ims-core" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"
+	xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+	jaxb:extensionBindingPrefixes="xjc hj annox"
+	xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
+	xmlns:annox="http://annox.dev.java.net"
+	elementFormDefault="qualified">
+
+	<xsd:annotation>
+		<xsd:appinfo>
+			<jaxb:schemaBindings>
+				<jaxb:package name="com.harmoney.ims.core.instances" />
+			</jaxb:schemaBindings>
+		</xsd:appinfo>
+	</xsd:annotation>
+
+	<complexType name="InvestorLoanTransaction">
+		<sequence>
+			<element name="id" type="long">
+				<xsd:annotation>
+					<xsd:appinfo>
+						<hj:id>
+							<hj:generated-value strategy="AUTO" />
+						</hj:id>
+					</xsd:appinfo>
+				</xsd:annotation>
+			</element>
+			<element name="version" type="long">
+				<annotation>
+					<appinfo>
+						<hj:version />
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="accountId" type="long"/>
+			<element name="netAmount" type="double"/>
+			<element name="transactionType" type="tns:ItemType"/>
+		</sequence>
+	</complexType>
+    <xsd:simpleType name="ItemType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Interest"/>
+			<xsd:enumeration value="Invest"/>
+			<xsd:enumeration value="Return"/>
+			<xsd:enumeration value="Tax"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+</schema>
