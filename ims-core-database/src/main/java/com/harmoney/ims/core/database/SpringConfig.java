@@ -49,7 +49,7 @@ public class SpringConfig {
 
 	    DriverManagerDataSource driver = new DriverManagerDataSource();
 	    driver.setDriverClassName(datasourceClass);
-	    driver.setUrl("jdbc:postgresql:imscore");
+	    driver.setUrl(datasourceURL);
 	    driver.setUsername(user);
 	    driver.setPassword(password);
 	    return driver;	  
