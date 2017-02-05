@@ -63,7 +63,9 @@ public class SpringConfig {
 
 		BayeuxParameters params = null;
 		try {
+			log.debug("starting login: {} {}",bayeuxURL,username);
 			params = login(new URL(bayeuxURL), username, password);
+			log.debug("login successful: {} {}",bayeuxURL,username);
 		} catch (Exception e) {
 			throw new MessageHandlerException("failed to login",e);
 		}
@@ -74,6 +76,7 @@ public class SpringConfig {
 
 		try {
 			connector.start().get(timeout, TimeUnit.SECONDS);
+			log.debug("connector started");
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			throw new MessageHandlerException("failed to start", e);
 		}
@@ -82,6 +85,7 @@ public class SpringConfig {
 		try {
 			subscription = connector.subscribe(topic, replayFrom,
 					consumer).get(5, TimeUnit.SECONDS);
+			log.debug("subscription created: {} replayFrom {}",topic, replayFrom);
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			throw new MessageHandlerException("faild to subscribe",e);
 		}

@@ -14,9 +14,12 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.client.HttpRequest;
 import org.eclipse.jetty.client.api.ContentResponse;
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.client.util.ByteBufferContentProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -28,6 +31,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class LoginHelper {
 
+    private static final Logger log = LoggerFactory.getLogger(LoginHelper.class);
     private static class LoginResponseParser extends DefaultHandler {
 
         private boolean reading = false;
@@ -82,10 +86,10 @@ public class LoginHelper {
     private static final String ENV_END = "</soapenv:Body></soapenv:Envelope>";
     private static final String ENV_START = "<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' "
             + "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' "
-            + "xmlns:urn='urn:partner.soap.sforce.com'><soapenv:Body>";
+            + "xmlns:urn='urn:enterprise.soap.sforce.com'><soapenv:Body>";
 
     // The enterprise SOAP API endpoint used for the login call
-    private static final String SERVICES_SOAP_PARTNER_ENDPOINT = "/services/Soap/u/22.0/";
+    private static final String SERVICES_SOAP_PARTNER_ENDPOINT = "/services/Soap/c/38.0/0DFN0000000CbeW";
 
     public static BayeuxParameters login(String username, String password) throws Exception {
         return login(new URL(LOGIN_ENDPOINT), username, password);
@@ -119,6 +123,13 @@ public class LoginHelper {
         post.content(new ByteBufferContentProvider("text/xml", ByteBuffer.wrap(soapXmlForLogin(username, password))));
         post.header("SOAPAction", "''");
         post.header("PrettyPrint", "Yes");
+//        ByteBufferContentProvider contentProvider = (ByteBufferContentProvider)((HttpRequest)post).getContent();
+//        log.debug("login request: {}",post);
+//        for (ByteBuffer bb: contentProvider) {
+//        	log.debug("login request body: {}",new String(bb.array()));
+//        }
+//        log.debug("login request attributes: {}",post.getAttributes());
+//        log.debug("login request headers: \n{}",post.getHeaders());
         ContentResponse response = post.send();
         SAXParserFactory spf = SAXParserFactory.newInstance();
         spf.setFeature("http://xml.org/sax/features/external-general-entities", false);

@@ -7,7 +7,8 @@
 				%F:%L %msg%n</pattern>
 		</encoder>
 	</appender>
-
+	<logger name="com.salesforce.emp.connector" level="debug" />
+	<logger name="com.harmoney.ims.core.messages.SpringConfig" level="debug" />
 	<logger name="com.harmoney.ims" level="warn" />
 	<root level="warn">
 		<appender-ref ref="STDOUT" />
