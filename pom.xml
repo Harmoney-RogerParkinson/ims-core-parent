@@ -11,6 +11,7 @@
   <name>ims-core-parent</name>
   <packaging>pom</packaging>
   <modules>
+  	<module>EMP-Connector</module>
   	<module>ims-core-server</module>
   	<module>ims-core-queue-handler</module>
   	<module>ims-core-message-processor</module>

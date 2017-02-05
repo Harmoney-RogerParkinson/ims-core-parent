@@ -23,6 +23,12 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
 		</dependency>
+    <dependency> 
+        <groupId>com.salesforce.conduit</groupId>
+        <artifactId>emp-connector</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+<!-- 
 		<dependency>
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-client</artifactId>
@@ -33,6 +39,7 @@
 			<artifactId>cometd-java-client</artifactId>
 			<version>3.1.1</version>
 		</dependency>
+ -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jcl-over-slf4j</artifactId>
