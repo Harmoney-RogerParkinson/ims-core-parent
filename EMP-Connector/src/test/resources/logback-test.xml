@@ -9,7 +9,6 @@
         </layout>
     </appender>
 
-	<logger name="com.salesforce.emp.connector" level="debug" />
     <root level="TRACE">
         <appender-ref ref="INFO" />
     </root>
