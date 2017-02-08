@@ -15,7 +15,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.harmoney.ims.core.database.InvestorLoanTransactionDAO;
-import com.harmoney.ims.core.database.SpringConfig;
 import com.harmoney.ims.core.instances.InvestorLoanTransaction;
 
 /**
@@ -27,7 +26,7 @@ import com.harmoney.ims.core.instances.InvestorLoanTransaction;
  * 
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={SpringConfig.class})
+@ContextConfiguration(classes={DatabaseSpringConfig.class})
 @Transactional // needed for rollback
 @Rollback // rollback all db changes
 public class InvestorLoanTransactionIT {

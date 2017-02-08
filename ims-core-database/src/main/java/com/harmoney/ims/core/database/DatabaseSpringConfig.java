@@ -26,13 +26,13 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Configuration
 @EnableTransactionManagement
 @ComponentScan("com.harmoney.ims.core.database")
-public class SpringConfig {
+public class DatabaseSpringConfig {
 	
 	@Value("${database.dialect:org.hibernate.dialect.PostgreSQLDialect}")
 	public String dialect;
 	@Value("${database.datasource.class:org.postgresql.Driver}")
 	public String datasourceClass;
-	@Value("${database.url:jdbc:postgresql:localhost:imscore}")
+	@Value("${database.url:jdbc:postgresql:imscore}")
 	public String datasourceURL;
 	@Value("${database.user:postgres}")
 	public String user;
@@ -73,8 +73,6 @@ public class SpringConfig {
 	    jpaProperties.put("hibernate.connection.autocommit", false);
 	    factory.setJpaProperties(jpaProperties);
 	    return factory;
-//	    factory.afterPropertiesSet();
-//	    return factory.getObject();
 	  }
 
 	  @Bean
