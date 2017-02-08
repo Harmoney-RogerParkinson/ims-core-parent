@@ -47,3 +47,4 @@ Example usage:
     connector.stop();
 
 See [Login Example](src/main/java/com/salesforce/emp/connector/example/LoginExample.java) for full example.
+...
