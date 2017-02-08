@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @Profile("prod")
 public class MessageHandlerImpl implements MessageHandler {
 	
-    private static final Logger log = LoggerFactory.getLogger(SpringConfig.class);
+    private static final Logger log = LoggerFactory.getLogger(MessageProcessorSpringConfig.class);
 
 	@Override
 	public void processMessage(Map<String,Object> message) {
