@@ -1,7 +1,8 @@
 package com.harmoney.ims.core.messages;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,13 +51,8 @@ public class SubscriptionIT {
 	@Test
 	public void testSubscription() throws ConnectionException, InterruptedException {
 		assertNotNull(empConnector);
-		messageHandler.setOwnerThread(Thread.currentThread());
 		createInvoiceStatement();
-		try {
-			Thread.sleep(100000);
-		} catch (InterruptedException e) {
-		}
-		assertEquals(1,messageHandler.getMessageCount());
+		messageHandler.getLatch().await(10000, TimeUnit.MILLISECONDS);
 	}
 
 	private void createInvoiceStatement() throws ConnectionException {
