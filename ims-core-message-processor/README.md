@@ -15,3 +15,17 @@ The Message Processor does not process the messages directly. It will probably s
 
 The Investor Fund Transaction is like the Account Summary and Investment Order, they all extend a 'virtul' parent, which means they *ought* to extend one but it doesn't exist. The goal is to get these to a flat single table which eliminates duplicate fields but contains potentially empty fields when those fields belong to a different 'type'.
 
+---
+#Queuing Decisions
+
+The choice comes down to using Amazon's SQS or ActiveMQ both behind a JMS API, specifically Spring's jacket for it, so the underlying mechanism should have little effect on the software design. Except for the caveat that SQS is inclined to deliver duplicate messges and out-of-order messages on rare occaisions. This means the message receiver has to cater for that possibility (but not with ActiveMQ). So assume ActiveMQ for now but keep an eye on SQS.
+
+[SQS tutorial (lite)](https://dzone.com/articles/aws-sqs-and-spring-jmsintegration)
+[Setting up ActiveMQ in AWS](https://github.com/compomics/compomics-crowd/wiki/Setting-up-ActiveMQ-in-AWS)
+[ActiveMQ powered by Bitnami](https://aws.amazon.com/marketplace/pp/B01K0IWOQO) This is a prepackaged AWS ActiveMQ solution
+
+MessageReceiver only needs to implement javax.jms.MessageListener from /org/apache/geronimo/specs/geronimo-jms_1.1_spec/1.1.1/geronimo-jms_1.1_spec-1.1.1.jar, ie doesn't need the rest of the JMS dependencies.
+
+
+
+

@@ -12,11 +12,12 @@
   <packaging>pom</packaging>
   <modules>
   	<module>EMP-Connector</module>
-  	<module>ims-enterprise</module>
-  	<module>ims-core-server</module>
-  	<module>ims-core-queue-handler</module>
-  	<module>ims-core-message-processor</module>
+  	<module>ims-core-enterprise</module>
+  	<module>ims-core-partner</module>
   	<module>ims-core-database</module>
+  	<module>ims-core-message-processor</module>
+  	<module>ims-core-queue-handler</module>
+  	<module>ims-core-server</module>
   </modules>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
