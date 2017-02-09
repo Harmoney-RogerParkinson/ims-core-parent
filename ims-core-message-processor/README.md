@@ -15,6 +15,11 @@ The Message Processor does not process the messages directly. It will probably s
 
 The Investor Fund Transaction is like the Account Summary and Investment Order, they all extend a 'virtul' parent, which means they *ought* to extend one but it doesn't exist. The goal is to get these to a flat single table which eliminates duplicate fields but contains potentially empty fields when those fields belong to a different 'type'.
 
+## Connecting to Salesforce
+The topics (not the SOAP API) need to know your IP addess for security reasons. Use Quick Find to search for Network and open up 'Network Access'
+Make sure your current IP is in one of those ranges.
+To find your current ip address Google: my ip address
+
 ---
 #Queuing Decisions
 
