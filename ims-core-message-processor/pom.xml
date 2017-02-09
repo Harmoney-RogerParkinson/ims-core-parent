@@ -47,13 +47,9 @@
 		</dependency>
 		<dependency>
 			<groupId>com.harmoney</groupId>
-			<artifactId>ims-core-database</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.harmoney</groupId>
 			<artifactId>ims-core-enterprise</artifactId>
 			<version>${project.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

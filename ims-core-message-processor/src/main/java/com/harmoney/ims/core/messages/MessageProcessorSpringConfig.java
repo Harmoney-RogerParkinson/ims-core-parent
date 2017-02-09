@@ -16,11 +16,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
-import com.harmoney.ims.core.database.DatabaseSpringConfig;
 import com.salesforce.emp.connector.BayeuxParameters;
 import com.salesforce.emp.connector.EmpConnector;
 import com.salesforce.emp.connector.TopicSubscription;
@@ -38,7 +36,6 @@ import com.sforce.ws.ConnectorConfig;
  */
 @Configuration
 @ComponentScan("com.harmoney.ims.core.messages")
-@Import(DatabaseSpringConfig.class)
 @PropertySource(value={"classpath:test.properties"},ignoreResourceNotFound = true)
 public class MessageProcessorSpringConfig {
 
