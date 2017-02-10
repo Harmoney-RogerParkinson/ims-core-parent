@@ -37,7 +37,7 @@ import com.sforce.ws.ConnectionException;
  * 
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={MessageProcessorSpringConfig.class})
+@ContextConfiguration(classes={MessageProcessorSpringConfig.class,SpringConfig.class})
 @PropertySource("classpath:test.properties")
 @ActiveProfiles("dev")
 public class SubscriptionIT {

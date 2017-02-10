@@ -22,10 +22,6 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import com.salesforce.emp.connector.BayeuxParameters;
 import com.salesforce.emp.connector.EmpConnector;
 import com.salesforce.emp.connector.TopicSubscription;
-import com.sforce.soap.enterprise.Connector;
-import com.sforce.soap.enterprise.EnterpriseConnection;
-import com.sforce.ws.ConnectionException;
-import com.sforce.ws.ConnectorConfig;
 
 /**
  * This is a Spring Configuration class that defines the beans needed for the
@@ -96,23 +92,6 @@ public class MessageProcessorSpringConfig {
 			throw new MessageHandlerException("failed to subscribe",e);
 		}
 		return connector;
-	}
-	@Bean(destroyMethod="logout")
-	public EnterpriseConnection enterpriseConnection() throws ConnectionException {
-
-        EnterpriseConnection connection = null;
-		ConnectorConfig config = new ConnectorConfig();
-		config.setUsername(username);
-		config.setPassword(password+securityToken);
-		connection = Connector.newConnection(config);
-
-		// display some current settings
-		log.info("Auth EndPoint:{}",config.getAuthEndpoint());
-		log.info("Service EndPoint: {}", config.getServiceEndpoint());
-		log.info("Username: {}", config.getUsername());
-		log.info("SessionId: {}", config.getSessionId());
-		log.info("Service endpoint: {}",config.getServiceEndpoint());
-		return connection;
 	}
 
 }

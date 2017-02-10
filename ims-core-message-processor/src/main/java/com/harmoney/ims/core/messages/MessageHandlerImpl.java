@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 public class MessageHandlerImpl implements MessageHandler {
 
 	private static final Logger log = LoggerFactory
-			.getLogger(MessageProcessorSpringConfig.class);
+			.getLogger(MessageHandlerImpl.class);
 	@Value("${rabbitmq.queue:transaction-queue}")
 	public String queueName;
 	@Autowired ConfigurableApplicationContext context;
