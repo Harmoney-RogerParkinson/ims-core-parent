@@ -2,7 +2,9 @@
     <wb-module deploy-name="harmoney-ims-core-server">
         <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/java"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/resources"/>
         <property name="java-output-path" value="/harmoney-ims-core-server/build/classes"/>
         <property name="component.exclusion.patterns" value="WEB-INF/classes/VAADIN/gwt-unitCache/**,WEB-INF/classes/VAADIN/widgetsets/WEB-INF/**"/>
         <property name="context-root" value="ims-core-server"/>
