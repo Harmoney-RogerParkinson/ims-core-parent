@@ -20,6 +20,30 @@ The topics (not the SOAP API) need to know your IP address for security reasons.
 Make sure your current IP is in one of those ranges.
 To find your current ip address Google: my ip address
 
+## Creating a Topic
+
+```
+trigger insertInvestorLoanTransaction on InvestorLoanTransaction(after insert) {
+		PushTopic pushTopic = new PushTopic();
+		pushTopic.Name = 'InvestorLoanTransactionInserts';
+		pushTopic.Query = 'SELECT Id, 
+			Name, 
+			Status__c, 
+			Description__c 
+			FROM loan__Investor_Loan_Account_Txns__c	';
+		pushTopic.ApiVersion = 38.0;
+		pushTopic.NotifyForOperationCreate = true;
+		pushTopic.NotifyForOperationUpdate = true;
+		pushTopic.NotifyForOperationUndelete = true;
+		pushTopic.NotifyForOperationDelete = true;
+		pushTopic.NotifyForFields = 'Referenced';
+		insert pushTopic;
+	}
+}
+```
+
+
+
 
 
 
