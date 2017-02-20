@@ -2,6 +2,7 @@ package com.harmoney.ims.core.database;
 
 import static org.junit.Assert.assertEquals;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.junit.Test;
@@ -14,7 +15,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.harmoney.ims.core.database.InvestorLoanTransactionDAO;
 import com.harmoney.ims.core.instances.InvestorLoanTransaction;
 
 /**
@@ -40,7 +40,7 @@ public class InvestorLoanTransactionIT {
 	public void createTransactionTest() {
 		InvestorLoanTransaction ilt = new InvestorLoanTransaction();
 		ilt.setAccountId(100);
-		ilt.setNetAmount(123.456);
+		ilt.setNetAmount(new BigDecimal(123.456));
 		investorLoanTransactionDAO.createTransaction(ilt);
 		List<InvestorLoanTransaction> transactions = investorLoanTransactionDAO.getAllTransactions();
 		assertEquals(1,transactions.size());
@@ -50,7 +50,7 @@ public class InvestorLoanTransactionIT {
 	public void deleteTransactionTest() {
 		InvestorLoanTransaction ilt = new InvestorLoanTransaction();
 		ilt.setAccountId(200);
-		ilt.setNetAmount(123.456);
+		ilt.setNetAmount(new BigDecimal(123.456));
 		investorLoanTransactionDAO.createTransaction(ilt);
 		List<InvestorLoanTransaction> transactions = investorLoanTransactionDAO.getAllTransactions();
 		assertEquals(1,transactions.size());

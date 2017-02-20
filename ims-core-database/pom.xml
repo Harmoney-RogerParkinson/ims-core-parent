@@ -72,6 +72,11 @@
 			<artifactId>postgresql</artifactId>
 			<version>9.4-1203-jdbc41</version>
 		</dependency>
+		<dependency>
+			<groupId>org.jvnet.hyperjaxb3</groupId>
+			<artifactId>hyperjaxb3-ejb-runtime</artifactId>
+			<version>0.5.6</version>
+		</dependency>
   </dependencies>
   <build>
   	<plugins>
