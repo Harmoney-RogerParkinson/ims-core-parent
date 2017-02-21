@@ -20,7 +20,7 @@ public class Receiver {
     
     private CountDownLatch latch = new CountDownLatch(1);
 
-    public void receiveMessage(String message) {
+    public void receiveMessage(Object message) {
         log.debug("Received <{}>", message);
         latch.countDown();
     }

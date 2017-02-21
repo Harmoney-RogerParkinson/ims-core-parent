@@ -1,4 +1,6 @@
 package com.harmoney.ims.core.queuehandler;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
@@ -30,7 +32,14 @@ public class MessageSenderIT {
 	@Test
 	public void test() throws Exception {
         System.out.println("Sending message...");
-        rabbitTemplate.convertAndSend(queueName, "Hello from RabbitMQ!");
+        Map<String,Object> map = new HashMap<>();
+        Map<String,Object> map2 = new HashMap<>();
+        map.put("sobject", map2);
+        map2.put("Description__c", "whatever");
+        map2.put("Id", "a6fN00000008giLIAQ");
+        map2.put("Status__c", "Open");
+        map2.put("Name", "INV-0033");
+        rabbitTemplate.convertAndSend(queueName, map);
         receiver.getLatch().await(10000, TimeUnit.MILLISECONDS);
         context.close();
         }
