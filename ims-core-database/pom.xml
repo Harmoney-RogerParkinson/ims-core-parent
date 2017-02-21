@@ -7,6 +7,9 @@
   </parent>
   <artifactId>ims-core-database</artifactId>
   <name>ims-core-database</name>
+	<properties>
+		<postgres.version>9.4-1203-jdbc41</postgres.version>
+	</properties>
   	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -110,7 +113,6 @@
 		        </execution>
 		    </executions>
 		</plugin>
-
   	</plugins>
   	<pluginManagement>
   		<plugins>
@@ -135,6 +137,26 @@
   									</versionRange>
   									<goals>
   										<goal>generate</goal>
+  									</goals>
+  								</pluginExecutionFilter>
+  								<action>
+  									<ignore></ignore>
+  								</action>
+  							</pluginExecution>
+  							<pluginExecution>
+  								<pluginExecutionFilter>
+  									<groupId>
+  										org.codehaus.mojo
+  									</groupId>
+  									<artifactId>
+  										hibernate3-maven-plugin
+  									</artifactId>
+  									<versionRange>
+  										[3.0,)
+  									</versionRange>
+  									<goals>
+  										<goal>run</goal>
+  										<goal>hbm2ddl</goal>
   									</goals>
   								</pluginExecutionFilter>
   								<action>

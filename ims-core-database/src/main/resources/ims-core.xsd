@@ -71,7 +71,15 @@
 			<element name="Full_investor_statement__c" type="boolean"/>
 			<element name="loan__Tax_Percentage__c" type="long"/> <!-- loan__Investor_Tax_Configuration__r.loan__Tax_Percentage__c -->
 			<element name="IRD_Number__c" type="string"/>
-			<element name="Account_Summary__c" type="tns:AccountSummary" maxOccurs="1" minOccurs="0"/>
+			<element name="Account_Summary__c" type="tns:AccountSummary" maxOccurs="1" minOccurs="0">
+			    <xsd:annotation>
+			        <xsd:appinfo>
+			            <hj:one-to-one>
+			                <orm:join-column name="ID"/>
+			            </hj:one-to-one>
+			        </xsd:appinfo>
+			    </xsd:annotation>
+			</element>
 			<element name="investmentOrders" type="tns:InvestmentOrder" maxOccurs="unbounded" minOccurs="0"/>
 			<element name="investorFundTransactions" type="tns:InvestorFundTransaction" maxOccurs="unbounded" minOccurs="0"/>
 		</sequence>
