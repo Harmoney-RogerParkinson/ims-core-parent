@@ -2,6 +2,7 @@ package com.harmoney.ims.core.messages;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.util.GregorianCalendar;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
@@ -52,7 +53,7 @@ public class SubscriptionIT {
 	public void testSubscription() throws ConnectionException, InterruptedException {
 		assertNotNull(empConnector);
 		createInvoiceStatement();
-		messageHandler.getLatch().await(10000, TimeUnit.MILLISECONDS);
+		messageHandler.getLatch().await(100000, TimeUnit.MILLISECONDS);
 	}
 
 	private void createInvoiceStatement() throws ConnectionException {
@@ -60,6 +61,11 @@ public class SubscriptionIT {
 		Invoice_Statement__c record = new Invoice_Statement__c();
 		record.setDescription__c("whatever");
 		record.setStatus__c("Open");
+		record.setMycurrencyfield__c(200D);
+		record.setMynumber__c(400D);
+		record.setMypercent__c(20D);
+		record.setMydatetime__c(new GregorianCalendar());
+		record.setMydate__c(new GregorianCalendar());
 		records[0] = record;
 		SaveResult[] saveResults = enterpriseConnection.create(records);
 		// check the returned results for any errors
