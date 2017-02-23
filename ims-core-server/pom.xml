@@ -63,17 +63,15 @@
             <artifactId>jstl</artifactId>
             <version>1.2</version>
         </dependency>
-        <!-- 
    		<dependency>
 			<groupId>com.harmoney</groupId>
 			<artifactId>ims-core-message-processor</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.harmoney</groupId>
 			<artifactId>ims-core-queue-handler</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
-		 -->
 	</dependencies>
 </project>
