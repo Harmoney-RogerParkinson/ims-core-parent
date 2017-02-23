@@ -63,5 +63,10 @@
 			<artifactId>ims-core-database</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+		    <groupId>nz.co.senanque</groupId>
+		    <artifactId>madura-ampq</artifactId>
+		    <version>0.0.2-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 </project>

@@ -1,24 +1,15 @@
 package com.harmoney.ims.core.queuehandler;
 
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.harmoney.ims.core.queuehandler.unpacker.Unpacker;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={UnpackerConfig.class})
-@PropertySource("classpath:test.properties")
 public class UnpackerTest {
 
 	@Test

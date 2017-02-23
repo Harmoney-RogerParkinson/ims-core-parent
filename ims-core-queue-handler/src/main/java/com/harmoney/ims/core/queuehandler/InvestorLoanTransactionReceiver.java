@@ -1,3 +1,6 @@
+/**
+ * 
+ */
 package com.harmoney.ims.core.queuehandler;
 
 import java.math.BigDecimal;
@@ -21,10 +24,10 @@ import com.harmoney.ims.core.queuehandler.unpacker.Unpacker;
  *
  */
 @Component
-@Profile("dev")
-public class ReceiverMock {
+@Profile("prod")
+public class InvestorLoanTransactionReceiver {
 
-    private static final Logger log = LoggerFactory.getLogger(ReceiverMock.class);
+    private static final Logger log = LoggerFactory.getLogger(InvestorLoanTransactionReceiver.class);
     
     private CountDownLatch latch = new CountDownLatch(1);
     @Autowired private Unpacker unpacker;
