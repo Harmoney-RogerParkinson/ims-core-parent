@@ -3,6 +3,7 @@ package com.harmoney.ims.core.database;
 import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.Test;
@@ -39,8 +40,10 @@ public class InvestorLoanTransactionIT {
 	@Test
 	public void createTransactionTest() {
 		InvestorLoanTransaction ilt = new InvestorLoanTransaction();
+		ilt.setId("ILT_100");
 		ilt.setName("ILT_100");
 		ilt.setNetAmount(new BigDecimal(123.456));
+		ilt.setCreatedDate(java.sql.Date.valueOf("2017-02-23"));
 		investorLoanTransactionDAO.createTransaction(ilt);
 		List<InvestorLoanTransaction> transactions = investorLoanTransactionDAO.getAllTransactions();
 		assertEquals(1,transactions.size());
@@ -49,6 +52,7 @@ public class InvestorLoanTransactionIT {
 	@Test
 	public void deleteTransactionTest() {
 		InvestorLoanTransaction ilt = new InvestorLoanTransaction();
+		ilt.setId("ILT_200");
 		ilt.setName("ILT_200");
 		ilt.setNetAmount(new BigDecimal(123.456));
 		investorLoanTransactionDAO.createTransaction(ilt);

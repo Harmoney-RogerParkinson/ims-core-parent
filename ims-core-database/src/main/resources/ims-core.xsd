@@ -1,11 +1,10 @@
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.harcurrency.com/ims-core"
-	xmlns:tns="http://www.harcurrency.com/ims-core" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"
-	xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
-	xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
-	jaxb:extensionBindingPrefixes="xjc hj annox orm"
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:annox="http://annox.dev.java.net"
 	xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
-	xmlns:annox="http://annox.dev.java.net"
+	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
+	xmlns:tns="http://www.harcurrency.com/ims-core" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.harcurrency.com/ims-core"
+	jaxb:version="2.0" jaxb:extensionBindingPrefixes="xjc hj annox orm"
 	elementFormDefault="qualified">
 
 	<xsd:annotation>
@@ -15,9 +14,11 @@
 				<jaxb:javaType name="java.math.BigDecimal" xmlType="tns:currency"
 					parseMethod="com.harmoney.ims.core.database.ConvertUtils.parseCurrency"
 					printMethod="com.harmoney.ims.core.database.ConvertUtils.printCurrency" />
-				<jaxb:javaType name="java.util.Date" xmlType="xsd:dateTime"
-					parseMethod="com.harmoney.ims.core.database.ConvertUtils.parseDateTime"
-					printMethod="com.harmoney.ims.core.database.ConvertUtils.printDateTime" />
+<!-- 
+				<jaxb:javaType name="java.sql.Timestamp" xmlType="xsd:dateTime"
+					parseMethod="com.harmoney.ims.core.database.ConvertUtils.parseTimestamp"
+					printMethod="com.harmoney.ims.core.database.ConvertUtils.printTimestamp" />
+ -->					
 				<jaxb:javaType name="java.util.Date" xmlType="xsd:date"
 					parseMethod="com.harmoney.ims.core.database.ConvertUtils.parseDate"
 					printMethod="com.harmoney.ims.core.database.ConvertUtils.printDate" />
@@ -29,64 +30,12 @@
 		</xsd:appinfo>
 	</xsd:annotation>
 	<complexType name="Account">
-		<sequence>
-			<element name="version" type="long">
-				<annotation>
-					<appinfo>
-						<hj:version />
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="Harmoney_Account_Number__c" type="long" maxOccurs="1" minOccurs="1">
-				<annotation>
-					<appinfo>
-						<hj:id>
-							<orm:unique-constraint/>
-						</hj:id>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="Name" type="string" >
-				<annotation>
-					<appinfo>
-						<hj:basic>
-							<orm:column nullable="false"/>
-						</hj:basic>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="Outstanding_Principal__c" type="tns:currency" />
-			<element name="loan__Deployed_Funds__c" type="tns:currency"/>
-			<element name="loan__Undeployed_Funds__c" type="tns:currency"/>
-			<element name="Total_Paid_Off_Amount__c" type="tns:currency"/>
-			<element name="Interests_Recived__c" type="tns:currency"/>
-			<element name="Late_Fees__c" type="tns:currency"/>
+		<annotation>
+			<documentation>Salesforce name: loan__Account__c</documentation>
+		</annotation>
 
-			<element name="Service_Fees__c" type="tns:currency"/>
-			<element name="Total_Tax__c" type="tns:currency"/>
-			<element name="Total_Charged_Off_Principal__c" type="tns:currency"/>
-			<element name="Total_Deposit__c" type="tns:currency"/>
-			<element name="Total_Withdrawal__c" type="tns:currency"/>
-
-			<element name="Full_investor_statement__c" type="boolean"/>
-			<element name="loan__Tax_Percentage__c" type="long"/> <!-- loan__Investor_Tax_Configuration__r.loan__Tax_Percentage__c -->
-			<element name="IRD_Number__c" type="string"/>
-			<element name="Account_Summary__c" type="tns:AccountSummary" maxOccurs="1" minOccurs="0">
-			    <xsd:annotation>
-			        <xsd:appinfo>
-			            <hj:one-to-one>
-			                <orm:join-column name="ID"/>
-			            </hj:one-to-one>
-			        </xsd:appinfo>
-			    </xsd:annotation>
-			</element>
-			<element name="investmentOrders" type="tns:InvestmentOrder" maxOccurs="unbounded" minOccurs="0"/>
-			<element name="investorFundTransactions" type="tns:InvestorFundTransaction" maxOccurs="unbounded" minOccurs="0"/>
-		</sequence>
-	</complexType>
-	<complexType name="AccountSummary">
 		<sequence>
-			<element name="id" type="long">
+			<element name="imsid" type="long">
 				<xsd:annotation>
 					<xsd:appinfo>
 						<hj:id>
@@ -94,6 +43,166 @@
 						</hj:id>
 					</xsd:appinfo>
 				</xsd:annotation>
+			</element>
+			<element name="id" type="string" nillable="false">
+				<annotation>
+					<appinfo>
+						<hj:basic>
+							<orm:column nullable="false" unique="true" insertable="false" updatable="false"/>
+						</hj:basic>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="name" type="string" nillable="false">
+				<annotation>
+					<appinfo>
+						<hj:basic>
+							<orm:column nullable="false" unique="true" />
+						</hj:basic>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="version" type="long">
+				<annotation>
+					<appinfo>
+						<hj:version />
+					</appinfo>
+				</annotation>
+			</element>
+
+			<element name="outstandingPrincipal" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: Outstanding_Principal__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="deployedFunds" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: loan__Deployed_Funds__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="undeployedFunds" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: loan__Undeployed_Funds__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="totalPaidOffAmount" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: Total_Paid_Off_Amount__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="interestsRecived" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: Interests_Recived__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="lateFees" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: Late_Fees__c</documentation>
+				</annotation>
+			</element>
+
+			<element name="serviceFees" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: Service_Fees__c</documentation>
+				</annotation>
+			</element>
+			<element name="totalTax" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: Total_Tax__c</documentation>
+				</annotation>
+			</element>
+			<element name="totalChargedOffPrincipal" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: Total_Charged_Off_Principal__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="totalDeposit" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: Total_Deposit__c</documentation>
+				</annotation>
+			</element>
+			<element name="totalWithdrawal" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: Total_Withdrawal__c</documentation>
+				</annotation>
+			</element>
+
+			<element name="fullInvestorStatement" type="boolean">
+				<annotation>
+					<documentation>Salesforce name: Full_investor_statement__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="taxPercentage" type="long">
+				<annotation>
+					<documentation>Salesforce name: loan__Tax_Percentage__c
+					</documentation>
+				</annotation>
+			</element> <!-- loan__Investor_Tax_Configuration__r.loan__Tax_Percentage__c -->
+			<element name="IRDNumber" type="string">
+				<annotation>
+					<documentation>Salesforce name: IRD_Number__c</documentation>
+				</annotation>
+			</element>
+			<element name="accountStatus" type="string">
+				<annotation>
+					<documentation>Salesforce name: Account_Status__c</documentation>
+				</annotation>
+			</element>
+			<element name="accountSummary" type="tns:AccountSummary"
+				maxOccurs="1" minOccurs="0">
+				<annotation>
+					<xsd:appinfo>
+						<hj:one-to-one>
+							<orm:join-column name="imsid" />
+						</hj:one-to-one>
+					</xsd:appinfo>
+					<documentation>Salesforce name: Account_Summary__c</documentation>
+				</annotation>
+			</element>
+			<element name="investmentOrders" type="tns:InvestmentOrder"
+				maxOccurs="unbounded" minOccurs="0" />
+			<element name="investorFundTransactions" type="tns:InvestorFundTransaction"
+				maxOccurs="unbounded" minOccurs="0" />
+		</sequence>
+	</complexType>
+	<complexType name="AccountSummary">
+		<annotation>
+			<documentation>Salesforce name: account_summary__c</documentation>
+		</annotation>
+		<sequence>
+			<element name="imsid" type="long">
+				<xsd:annotation>
+					<xsd:appinfo>
+						<hj:id>
+							<orm:generated-value strategy="AUTO" />
+						</hj:id>
+					</xsd:appinfo>
+				</xsd:annotation>
+			</element>
+			<element name="id" type="string" nillable="false">
+				<annotation>
+					<appinfo>
+						<hj:basic>
+							<orm:column nullable="false" unique="true" />
+						</hj:basic>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="name" type="string" nillable="false">
+				<annotation>
+					<appinfo>
+						<hj:basic>
+							<orm:column nullable="false" unique="true" />
+						</hj:basic>
+					</appinfo>
+				</annotation>
 			</element>
 			<element name="version" type="long">
 				<annotation>
@@ -105,8 +214,12 @@
 		</sequence>
 	</complexType>
 	<complexType name="InvestorFundTransaction">
+		<annotation>
+			<documentation>Salesforce name: loan__Investor_Fund_Transaction__c
+			</documentation>
+		</annotation>
 		<sequence>
-			<element name="id" type="long">
+			<element name="imsid" type="long">
 				<xsd:annotation>
 					<xsd:appinfo>
 						<hj:id>
@@ -115,6 +228,24 @@
 					</xsd:appinfo>
 				</xsd:annotation>
 			</element>
+			<element name="id" type="string" nillable="false">
+				<annotation>
+					<appinfo>
+						<hj:basic>
+							<orm:column nullable="false" unique="true" />
+						</hj:basic>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="name" type="string" nillable="false">
+				<annotation>
+					<appinfo>
+						<hj:basic>
+							<orm:column nullable="false" unique="true" />
+						</hj:basic>
+					</appinfo>
+				</annotation>
+			</element>
 			<element name="version" type="long">
 				<annotation>
 					<appinfo>
@@ -122,27 +253,50 @@
 					</appinfo>
 				</annotation>
 			</element>
-			<element name="Name" type="string" nillable="false" >
+			<element name="transactionDate" type="date">
 				<annotation>
-					<appinfo>
-						<hj:basic>
-							<orm:column nullable="false"/>
-						</hj:basic>
-					</appinfo>
+					<documentation>Salesforce name: loan__Transaction_Date__c
+					</documentation>
 				</annotation>
 			</element>
-			<element name="loan__Transaction_Date__c" type="date"/>
-			<element name="loan__Transaction_Type__c" type="string"/>
-			<element name="loan__transaction_amount__c" type="tns:currency"/>
-			<element name="loan__Cleared__c" type="boolean"/>
-			<element name="loan__Rejected__c" type="boolean"/>		
-			<element name="Account" type="tns:Account" maxOccurs="1" minOccurs="1"/>
+			<element name="transactionType" type="string">
+				<annotation>
+					<documentation>Salesforce name: loan__Transaction_Type__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="transactionAmount" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: loan__transaction_amount__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="cleared" type="boolean">
+				<annotation>
+					<documentation>Salesforce name: loan__Cleared__c</documentation>
+				</annotation>
+			</element>
+			<element name="rejected" type="boolean">
+				<annotation>
+					<documentation>Salesforce name: loan__Rejected__c</documentation>
+				</annotation>
+			</element>
+			<element name="account" type="tns:Account" maxOccurs="1"
+				minOccurs="1">
+				<annotation>
+					<documentation>Salesforce name: Account</documentation>
+				</annotation>
+			</element>
 		</sequence>
 	</complexType>
- 
+
 	<complexType name="InvestmentOrder">
+		<annotation>
+			<documentation>Salesforce name: loan__Investor_Loan__c
+			</documentation>
+		</annotation>
 		<sequence>
-			<element name="id" type="long">
+			<element name="imsid" type="long">
 				<xsd:annotation>
 					<xsd:appinfo>
 						<hj:id>
@@ -151,6 +305,24 @@
 					</xsd:appinfo>
 				</xsd:annotation>
 			</element>
+			<element name="id" type="string" nillable="false">
+				<annotation>
+					<appinfo>
+						<hj:basic>
+							<orm:column nullable="false" unique="true" />
+						</hj:basic>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="name" type="string" nillable="false">
+				<annotation>
+					<appinfo>
+						<hj:basic>
+							<orm:column nullable="false" unique="true" />
+						</hj:basic>
+					</appinfo>
+				</annotation>
+			</element>
 			<element name="version" type="long">
 				<annotation>
 					<appinfo>
@@ -158,35 +330,105 @@
 					</appinfo>
 				</annotation>
 			</element>
-			<element name="Name" type="string" nillable="false" >
+			<element name="loan" type="string" nillable="false">
 				<annotation>
-					<appinfo>
-						<hj:basic>
-							<orm:column nullable="false"/>
-						</hj:basic>
-					</appinfo>
+					<documentation>Salesforce name: loan__Loan__c</documentation>
 				</annotation>
 			</element>
-			<element name="CreatedDate" type="date" nillable="false" />
-			<element name="loan__Investment_Amount__c" type="tns:currency"/>
-			<element name="HM_Investment_Amount__c" type="tns:currency"/>
-			<element name="Protect_Investment_Amount__c" type="tns:currency"/>
-			<element name="loan__Charged_Off_Principal__c" type="tns:currency"/>
-			<element name="loan__Charged_Off_Date__c" type="date"/>
-			<element name="loan__Loan_Status__c" type="string"/>
-			<element name="Payment_Protect_Management_Fees__c" type="tns:currency"/>
-			<element name="Payment_Protect_Sales_Commission_Fees__c" type="tns:currency"/>
-			<element name="Payment_Protect_Fee__c" type="tns:currency"/>
-			<element name="Payment_Protect_Rebated_Amount__c" type="tns:currency"/>
-			<element name="HM_Rollup_Outstanding_Principal__c" type="tns:currency"/>
-			<element name="Account" type="tns:Account" maxOccurs="1" minOccurs="1"/>
-			<element name="InvestorLoanTransactions" type="tns:InvestorLoanTransaction" maxOccurs="unbounded" minOccurs="0"/>
+			<element name="account" type="tns:Account" maxOccurs="1"
+				minOccurs="1">
+				<annotation>
+					<documentation>Salesforce name: Account</documentation>
+				</annotation>
+			</element>
+			<element name="createdDate" type="date" nillable="false">
+				<annotation>
+					<documentation>Salesforce name: CreatedDate</documentation>
+				</annotation>
+			</element>
+			<element name="investmentAmount" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: loan__Investment_Amount__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="HMInvestmentAmount" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: HM_Investment_Amount__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="protectInvestmentAmount" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: Protect_Investment_Amount__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="chargedOffPrincipal" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: loan__Charged_Off_Principal__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="chargedOffDate" type="date">
+				<annotation>
+					<documentation>Salesforce name: loan__Charged_Off_Date__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="loanStatus" type="string">
+				<annotation>
+					<documentation>Salesforce name: loan__Loan_Status__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="paymentProtectManagementFees" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: Payment_Protect_Management_Fees__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="paymentProtectSalesCommissionFees" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name:
+						Payment_Protect_Sales_Commission_Fees__c</documentation>
+				</annotation>
+			</element>
+			<element name="paymentProtectFee" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: Payment_Protect_Fee__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="paymentProtectRebatedAmount" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: Payment_Protect_Rebated_Amount__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="HMRollupOutstandingPrincipal" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: HM_Rollup_Outstanding_Principal__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="investorLoanTransactions" type="tns:InvestorLoanTransaction"
+				maxOccurs="unbounded" minOccurs="0">
+				<annotation>
+					<documentation>Salesforce name: InvestorLoanTransactions
+					</documentation>
+				</annotation>
+			</element>
 		</sequence>
 	</complexType>
 
 	<complexType name="InvestorLoanTransaction">
+		<annotation>
+			<documentation>Salesforce name: loan__Investor_Loan_Account_Txns__c
+			</documentation>
+		</annotation>
 		<sequence>
-			<element name="id" type="long">
+			<element name="imsid" type="long">
 				<xsd:annotation>
 					<xsd:appinfo>
 						<hj:id>
@@ -195,6 +437,24 @@
 					</xsd:appinfo>
 				</xsd:annotation>
 			</element>
+			<element name="id" type="string" nillable="false">
+				<annotation>
+					<appinfo>
+						<hj:basic>
+							<orm:column nullable="false" unique="true" />
+						</hj:basic>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="name" type="string" nillable="false">
+				<annotation>
+					<appinfo>
+						<hj:basic>
+							<orm:column nullable="false" unique="true" />
+						</hj:basic>
+					</appinfo>
+				</annotation>
+			</element>
 			<element name="version" type="long">
 				<annotation>
 					<appinfo>
@@ -202,67 +462,152 @@
 					</appinfo>
 				</annotation>
 			</element>
-<!-- 			<element name="owner" type="tns:Owner"/> -->
-			<element name="netAmount" type="tns:currency"/>
-			<element name="transactionType" type="tns:ItemType"/>
-			<element name="Name" type="string" nillable="false" >
+			<element name="txnType" type="tns:ItemType">
 				<annotation>
-					<appinfo>
-						<hj:basic>
-							<orm:column nullable="false"/>
-						</hj:basic>
-					</appinfo>
+					<documentation>Salesforce name: loan__Txn_Type__c</documentation>
 				</annotation>
 			</element>
-			<element name="InvestmentOrder" type="tns:InvestmentOrder" maxOccurs="1" minOccurs="1"/>
-			<element name="CreatedDate" type="date"/>
-			<element name="loan__Principal_Paid__c" type="tns:currency"/>
-			<element name="loan__Interest_Paid__c" type="tns:currency"/>
-			<element name="loan__Late_Fees_Paid__c" type="tns:currency"/>
-			<element name="loan__Tax__c" type="tns:currency"/>
-			<element name="loan__Total_Service_Charge__c" type="tns:currency"/>
-			<element name="loan__Charged_Off_Date__c" type="tns:currency"/>
-			<element name="loan__Charged_Off_Fees__c" type="tns:currency"/>
-			<element name="loan__Charged_Off_Interest__c" type="tns:currency"/>
-			<element name="loan__Charged_Off_Principal__c" type="tns:currency"/>
-			<element name="Investor_Txn_Fee__c" type="tns:currency"/>
-			<element name="loan__Txn_Code__c" type="tns:TxnCode"/>
-			<element name="loan__Waived__c" type="tns:currency"/>
-			<element name="loan__Protect_Principal__c" type="tns:currency"/>
-			<element name="Management_Fee_Realised__c" type="tns:currency"/>
-			<element name="Sales_Commission_Fee_Realised__c" type="tns:currency"/>
-			<element name="loan__Rebate_Amount_On_Payoff__c" type="tns:currency"/>
-			<element name="Protect_Realised__c" type="tns:currency"/>
+			<element name="investorLoan" type="string">
+				<annotation>
+					<documentation>Salesforce name: loan__Investor_Loan__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="investmentOrder" type="tns:InvestmentOrder"
+				maxOccurs="1" minOccurs="1" />
+			<element name="netAmount" type="tns:currency" />
+			<element name="createdDate" type="date">
+				<annotation>
+					<documentation>Salesforce name: CreatedDate</documentation>
+				</annotation>
+			</element>
+			<element name="principalPaid" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: loan__Principal_Paid__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="interestPaid" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: loan__Interest_Paid__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="lateFeesPaid" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: loan__Late_Fees_Paid__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="tax" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: loan__Tax__c</documentation>
+				</annotation>
+			</element>
+			<element name="totalServiceCharge" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: loan__Total_Service_Charge__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="chargedOffDate" type="date">
+				<annotation>
+					<documentation>Salesforce name: loan__Charged_Off_Date__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="chargedOffFees" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: loan__Charged_Off_Fees__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="chargedOffInterest" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: loan__Charged_Off_Interest__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="chargedOffPrincipal" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: loan__Charged_Off_Principal__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="investorTxnFee" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: Investor_Txn_Fee__c</documentation>
+				</annotation>
+			</element>
+			<element name="txnCode" type="tns:TxnCode">
+				<annotation>
+					<documentation>Salesforce name: loan__Txn_Code__c</documentation>
+				</annotation>
+			</element>
+			<element name="waived" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: loan__Waived__c</documentation>
+				</annotation>
+			</element>
+			<element name="protectPrincipal" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: loan__Protect_Principal__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="managementFeeRealised" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: Management_Fee_Realised__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="salesCommissionFeeRealised" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: Sales_Commission_Fee_Realised__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="rebateAmountOnPayoff" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: loan__Rebate_Amount_On_Payoff__c
+					</documentation>
+				</annotation>
+			</element>
+			<element name="protectRealised" type="tns:currency">
+				<annotation>
+					<documentation>Salesforce name: Protect_Realised__c</documentation>
+				</annotation>
+			</element>
 		</sequence>
 	</complexType>
-    <xsd:simpleType name="ItemType">
+	<xsd:simpleType name="ItemType">
 		<xsd:restriction base="xsd:string">
-			<xsd:enumeration value="Interest"/>
-			<xsd:enumeration value="Invest"/>
-			<xsd:enumeration value="Return"/>
-			<xsd:enumeration value="Tax"/>
+			<xsd:enumeration value="Interest" />
+			<xsd:enumeration value="Invest" />
+			<xsd:enumeration value="Return" />
+			<xsd:enumeration value="Tax" />
 		</xsd:restriction>
 	</xsd:simpleType>
-    <xsd:simpleType name="TxnCode">
+	<xsd:simpleType name="TxnCode">
 		<xsd:restriction base="xsd:string">
-			<xsd:enumeration value="ACTIVE"/>
-			<xsd:enumeration value="CERTIFICATE RATE CHANGE"/>
-			<xsd:enumeration value="PAYMENT APPROVAL"/>
-			<xsd:enumeration value="SERVICE RATE CHANGE"/>
-			<xsd:enumeration value="DE-ACTIVE"/>
-			<xsd:enumeration value="PAYMENT RELEASE"/>
-			<xsd:enumeration value="PAYMENT REVERSED"/>
-			<xsd:enumeration value="PRINCIPAL REINVESTED"/>
-			<xsd:enumeration value="INTEREST REINVESTED"/>
-			<xsd:enumeration value="PRINCIPAL &amp; INTEREST REINVESTED"/>
-			<xsd:enumeration value="CHARGE OFF"/>
-			<xsd:enumeration value="TRANSACTION FEE REVERSED"/>
+			<xsd:enumeration value="ACTIVE" />
+			<xsd:enumeration value="CERTIFICATE RATE CHANGE" />
+			<xsd:enumeration value="PAYMENT APPROVAL" />
+			<xsd:enumeration value="SERVICE RATE CHANGE" />
+			<xsd:enumeration value="DE-ACTIVE" />
+			<xsd:enumeration value="PAYMENT RELEASE" />
+			<xsd:enumeration value="PAYMENT REVERSED" />
+			<xsd:enumeration value="PRINCIPAL REINVESTED" />
+			<xsd:enumeration value="INTEREST REINVESTED" />
+			<xsd:enumeration value="PRINCIPAL &amp; INTEREST REINVESTED" />
+			<xsd:enumeration value="CHARGE OFF" />
+			<xsd:enumeration value="TRANSACTION FEE REVERSED" />
 		</xsd:restriction>
 	</xsd:simpleType>
-	<simpleType name='currency'>
-		<restriction base='decimal'>
-			<totalDigits value='8' />
-			<fractionDigits value='2' />
+	<simpleType name="currency">
+		<restriction base="decimal">
+			<totalDigits value="8" />
+			<fractionDigits value="2" />
 		</restriction>
 	</simpleType>
 
