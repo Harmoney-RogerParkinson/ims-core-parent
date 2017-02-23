@@ -20,7 +20,7 @@ import org.springframework.core.convert.support.DefaultConversionService;
 @Configuration
 @ComponentScan("com.harmoney.ims.core.queuehandler")
 @PropertySource(value = { "classpath:test.properties" }, ignoreResourceNotFound = true)
-public class QueueHandlerSpringConfig {
+public class UnpackerConfig {
 
 	 @Value("${rabbitmq.host:localhost}")
 	 public String rabbitMQHost;

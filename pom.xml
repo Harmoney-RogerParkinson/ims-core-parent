@@ -176,6 +176,11 @@
 				</exclusions>
 			</dependency>
 			<dependency>
+			    <groupId>org.hibernate.javax.persistence</groupId>
+			    <artifactId>hibernate-jpa-2.1-api</artifactId>
+			    <version>1.0.0.Final</version>
+			</dependency>
+			<dependency>
 				<groupId>org.jvnet.jaxb2_commons</groupId>
 				<artifactId>jaxb2-basics</artifactId>
 				<version>${jaxb2_commons.version}</version>
