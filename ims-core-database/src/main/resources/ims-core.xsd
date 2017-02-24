@@ -475,7 +475,12 @@
 			</element>
 			<element name="investmentOrder" type="tns:InvestmentOrder"
 				maxOccurs="1" minOccurs="1" />
-			<element name="netAmount" type="tns:currency" />
+			<element name="netAmount" type="tns:currency" >
+				<annotation>
+					<documentation>Salesforce name: Net_Amount__c
+					</documentation>
+				</annotation>
+			</element>
 			<element name="createdDate" type="date">
 				<annotation>
 					<documentation>Salesforce name: CreatedDate</documentation>
