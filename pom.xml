@@ -12,7 +12,6 @@
   <packaging>pom</packaging>
   <modules>
   	<module>EMP-Connector</module>
-  	<module>ims-core-enterprise</module>
   	<module>ims-core-partner</module>
   	<module>ims-core-database</module>
   	<module>ims-core-message-processor</module>
