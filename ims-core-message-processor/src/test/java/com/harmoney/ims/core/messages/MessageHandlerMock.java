@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 @Profile("dev")
 public class MessageHandlerMock implements com.harmoney.ims.core.messages.MessageHandler {
 	
-    private static final Logger log = LoggerFactory.getLogger(SpringConfig.class);
+    private static final Logger log = LoggerFactory.getLogger(MessageHandlerMock.class);
     private CountDownLatch latch = new CountDownLatch(1);
     
 	@Override

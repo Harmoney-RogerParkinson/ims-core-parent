@@ -45,16 +45,7 @@ insert pushTopic;
 ```
 PushTopic pushTopic = new PushTopic();
 pushTopic.Name = 'ILTIMS';
-pushTopic.Query = 'SELECT Id,Name,CreatedDate, \
-	loan__Principal_Paid__c,loan__Interest_Paid__c, \
-	loan__Late_Fees_Paid__c,loan__Tax__c, \
-	loan__Total_Service_Charge__c,loan__Charged_Off_Date__c, \
-	loan__Charged_Off_Fees__c,loan__Charged_Off_Interest__c, \
-	loan__Charged_Off_Principal__c,Investor_Txn_Fee__c, \
-	loan__Txn_Code__c,loan__Waived__c, \
-	loan__Protect_Principal__c,Management_Fee_Realised__c, \
-	Sales_Commission_Fee_Realised__c,loan__Rebate_Amount_On_Payoff__c, \
-	Protect_Realised__c FROM loan__Investor_Loan_Account_Txns__c';
+pushTopic.Query = 'SELECT Id,Name,CreatedDate, test__c, isDeleted, loan__Investor_Loan__c, loan__Principal_Paid__c,loan__Interest_Paid__c, loan__Late_Fees_Paid__c,loan__Tax__c, loan__Total_Service_Charge__c,loan__Charged_Off_Date__c, loan__Charged_Off_Fees__c,loan__Charged_Off_Interest__c, loan__Charged_Off_Principal__c,Investor_Txn_Fee__c, loan__Txn_Code__c,loan__Waived__c, loan__Protect_Principal__c, loan__Rebate_Amount_On_Payoff__c  FROM loan__Investor_Loan_Account_Txns__c';
 pushTopic.ApiVersion = 38.0;
 pushTopic.NotifyForOperationCreate = true;
 pushTopic.NotifyForOperationUpdate = true;
@@ -64,15 +55,22 @@ pushTopic.NotifyForFields = 'Referenced';
 insert pushTopic;
 ```
 
-(note that it does *not* like the query split over multiple lines and it does not like
+note that it does *not* like the query split over multiple lines and it does not like
 references to attached objects, eg querying the account id through the attached account record doesn't work.
+For some reason it also doesn't like these fields:
 
-Format of message is:
+ * Management_Fee_Realised__c, 
+ * Sales_Commission_Fee_Realised__c,
+ * Protect_Realised__c
+ 
+These are all Formula fields, but so is loan__Protect_Principal__c and that is fine. The error suggests it is not finding the field (ie suggests adding a __c to the end etc). Also it must have the test__c field to allow the integration tests to work.
+
+Format of message is (roughly):
 
 {event={createdDate=2017-02-21T08:20:09.181Z, replayId=33, type=created}, 
 sobject={Description__c=whatever, Id=a6fN00000008giLIAQ, Status__c=Open, Name=INV-0033}}
 
-This is a HashMap whose values are hashmaps. All the keys are Strings. The values are whatever datatype is suitable, often a String but could be a Date, Long etc. Currency is a String, number() is a double. What is date? Percentage?
+This is a HashMap whose values are HashMaps. All the keys are Strings. The values are whatever data type is suitable, often a String but could be a Date, Long etc. Currency is a String, number() is a double. What is date? Percentage?
 Date is a string, percentage is double.
 
 Deleting a pushTopic:
