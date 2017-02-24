@@ -16,6 +16,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
 import com.salesforce.emp.connector.EmpConnector;
 import com.sforce.soap.partner.Error;
 import com.sforce.soap.partner.PartnerConnection;

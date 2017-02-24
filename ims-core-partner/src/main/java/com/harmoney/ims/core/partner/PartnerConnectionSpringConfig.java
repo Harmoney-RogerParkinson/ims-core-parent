@@ -1,4 +1,4 @@
-package com.harmoney.ims.core.messages;
+package com.harmoney.ims.core.partner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
