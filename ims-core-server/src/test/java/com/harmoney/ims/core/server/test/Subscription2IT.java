@@ -1,4 +1,4 @@
-package com.harmoney.ims.core.messages;
+package com.harmoney.ims.core.server.test;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -12,13 +12,18 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.StringUtils;
 
+import com.harmoney.ims.core.messages.MessageProcessorSpringConfig;
 import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
+import com.harmoney.ims.core.queuehandler.QueueHandlerSpringConfig;
+import com.harmoney.ims.core.queuehandler.ReceiverMock;
 import com.salesforce.emp.connector.EmpConnector;
 import com.sforce.soap.partner.Error;
 import com.sforce.soap.partner.PartnerConnection;
@@ -45,21 +50,23 @@ import com.sforce.ws.ConnectionException;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource("/test2.properties")
-@ContextConfiguration(classes={MessageProcessorSpringConfig.class,PartnerConnectionSpringConfig.class})
-@ActiveProfiles("message-processor-dev")
+@ContextConfiguration(classes={MessageProcessorSpringConfig.class,PartnerConnectionSpringConfig.class,QueueHandlerSpringConfig.class})
+@ActiveProfiles({"message-processor-prod","server-dev"})
 public class Subscription2IT {
 	
     private static final Logger log = LoggerFactory.getLogger(Subscription2IT.class);
 	@Autowired private EmpConnector empConnector;
-	@Autowired private MessageHandlerMock messageHandler;
-	
+    @Autowired ReceiverMock receiver;
+    @Autowired ConfigurableApplicationContext context;
 	@Autowired private PartnerConnection partnerConnection;
 
 	@Test
 	public void testSubscription() throws ConnectionException, InterruptedException {
 		assertNotNull(empConnector);
 		updateInvestorLoanTransaction();
-		messageHandler.getLatch().await(10000, TimeUnit.MILLISECONDS);
+		"".toCharArray();
+        receiver.getLatch().await(10000, TimeUnit.MILLISECONDS);
+        context.close();
 	}
 
 	private void updateInvestorLoanTransaction() throws ConnectionException {

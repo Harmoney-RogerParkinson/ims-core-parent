@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-@Profile("dev")
+@Profile("message-processor-dev")
 public class MessageHandlerMock implements com.harmoney.ims.core.messages.MessageHandler {
 	
     private static final Logger log = LoggerFactory.getLogger(MessageHandlerMock.class);

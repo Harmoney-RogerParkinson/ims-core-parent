@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-@Profile("prod")
+@Profile("message-processor-prod")
 public class MessageHandlerImpl implements MessageHandler {
 
 	private static final Logger log = LoggerFactory

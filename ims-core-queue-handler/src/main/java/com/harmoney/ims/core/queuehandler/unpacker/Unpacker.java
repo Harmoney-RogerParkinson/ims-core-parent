@@ -64,7 +64,7 @@ public class Unpacker {
 			String fixedFieldName = fixVariableFormat(fieldName);
 			PropertyHolder propertyHolder = propertyMap.get(fixedFieldName);
 			if (propertyHolder == null) {
-				log.error("Trying to unpack to field we don't know about: {}.{}", clazz,fieldName);
+				log.warn("Trying to unpack to field we don't know about: {}.{}", clazz,fieldName);
 				continue;
 			}
 			try {

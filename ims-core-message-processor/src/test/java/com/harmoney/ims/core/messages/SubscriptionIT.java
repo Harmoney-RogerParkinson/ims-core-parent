@@ -44,7 +44,7 @@ import com.sforce.ws.ConnectionException;
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource("/test.properties")
 @ContextConfiguration(classes={MessageProcessorSpringConfig.class,PartnerConnectionSpringConfig.class})
-@ActiveProfiles("dev")
+@ActiveProfiles("message-processor-dev")
 public class SubscriptionIT {
 	
     private static final Logger log = LoggerFactory.getLogger(SubscriptionIT.class);

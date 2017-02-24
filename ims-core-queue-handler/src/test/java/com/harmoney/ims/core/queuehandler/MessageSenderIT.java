@@ -14,13 +14,13 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes={QueueHandlerSpringConfig.class})
-@PropertySource("classpath:test.properties")
-@ActiveProfiles("dev")
+@ActiveProfiles("queue-handler-dev")
 public class MessageSenderIT {
 
     private static final Logger log = LoggerFactory.getLogger(MessageSenderIT.class);
@@ -48,7 +48,7 @@ public class MessageSenderIT {
         map2.put("CreatedDate", "2017-02-23T00:00:00.000Z");
         map2.put("loan__Principal_Paid__c", new Double(200D));
         map2.put("transactionType", "ACTIVE");
-         rabbitTemplate.convertAndSend(queueName, map);
+        rabbitTemplate.convertAndSend(queueName, map);
         receiver.getLatch().await(10000, TimeUnit.MILLISECONDS);
         context.close();
         }
