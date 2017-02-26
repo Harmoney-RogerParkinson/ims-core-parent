@@ -31,22 +31,37 @@ public class ConvertXSDVariables {
 		SAXBuilder builder = new SAXBuilder();
 		org.jdom2.Document doc = builder.build(new FileReader("../ims-core-database/src/main/resources/ims-core.xsd"));
 		Element root = doc.getDocument().getRootElement();
+		org.jdom2.Namespace annoxNamespace = root.getNamespace("annox");
+		org.jdom2.Namespace imsNamespace = root.getNamespace("ims");
 		org.jdom2.Namespace namespace = root.getNamespace();
 		for (Element complexType: root.getChildren("complexType",namespace)) {
 			complexType.toString();
 			for (Element sequence: complexType.getChildren("sequence",namespace)) {
 				sequence.toString();
 				for (Element element: sequence.getChildren("element",namespace)) {
-					Attribute nameAttribute = element.getAttribute("name");
-					if (nameAttribute != null) {
-						String sfValue = nameAttribute.getValue();
-						nameAttribute.setValue(Unpacker.fixVariableFormat(sfValue));
-						if (!sfValue.equals(nameAttribute.getValue())) {
-							Element annotation = new Element("annotation",namespace);
-							Element documentation = new Element("documentation",namespace);
-							documentation.setText("Salesforce name: "+sfValue);
-							annotation.addContent(documentation);
-							element.addContent(annotation);
+					for (Element annotation: element.getChildren("annotation",namespace)) {
+						String salesforceName = null;
+						for (Element documentation: annotation.getChildren("documentation",namespace)) {
+							String documentationText = documentation.getTextTrim();
+							if (documentationText.startsWith("Salesforce name: ")) {
+								salesforceName = documentationText.substring(17);
+							}
+						}
+						if (salesforceName != null) {
+							Element appinfo = null;
+							for (Element e: annotation.getChildren("appinfo",namespace)) {
+								appinfo = e;
+							}
+							if (appinfo == null) {
+								appinfo = new Element("appinfo",namespace);
+								annotation.addContent(appinfo);
+							}
+							Element annotate = new Element("annotate",annoxNamespace);
+							Element sfname = new Element("SalesforceName",imsNamespace);
+							sfname.setAttribute("name", salesforceName, imsNamespace);
+							annotate.addContent(sfname);
+							appinfo.addContent(annotate);
+
 						}
 					}
 				}

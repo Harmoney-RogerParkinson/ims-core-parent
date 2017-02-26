@@ -28,7 +28,7 @@ public class InvestorLoanTransactionReceiver {
     
     @Autowired private Unpacker unpacker;
 
-    @AMPQReceiver(queueName="transaction-queue")
+    @AMPQReceiver(queueName="${rabbitmq.queue:transaction-queue}")
     public void receiveMessage(Map<String, Map<String, Object>> message) {
         log.debug("Received <{}>", message);
         InvestorLoanTransaction target = new InvestorLoanTransaction();
