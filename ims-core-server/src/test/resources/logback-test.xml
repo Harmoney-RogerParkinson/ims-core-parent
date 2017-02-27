@@ -6,7 +6,7 @@
 			<pattern>%-20(%d{HH:mm:ss.SSS} [%thread]) %-5level %logger{35} - %F:%L %msg%n</pattern>
 		</encoder>
 	</appender>
-	<logger name="com.harmoney.ims.core.soapmessages" level="debug"/>
+	<logger name="com.harmoney.ims.core.queuehandler.unpacker.Unpacker" level="debug"/>
 	<logger name="com.harmoney.ims.core.soapmessages.QueryEngine" level="debug"/>
 	<logger name="com.salesforce.emp.connector" level="debug" />
 	<logger name="com.harmoney.ims.core.messages" level="debug" />

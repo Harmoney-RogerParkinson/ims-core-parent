@@ -65,7 +65,7 @@ public class Subscription2IT {
 		assertNotNull(empConnector);
 		updateInvestorLoanTransaction();
 		"".toCharArray();
-        receiver.getLatch().await(10000, TimeUnit.MILLISECONDS);
+        receiver.getLatch().await(100000, TimeUnit.MILLISECONDS);
         context.close();
 	}
 
@@ -86,7 +86,7 @@ public class Subscription2IT {
 				r1.setField("test__c", testValue);
 				r1.setField("Id", id);
 				updates.add(r1);
-				if (count++ > 100) {
+				if (count++ > 5) {
 					saveResults(updates);
 					count = 0;
 					updates.clear();
