@@ -64,6 +64,7 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jvnet.jaxb2_commons</groupId>
@@ -123,6 +124,33 @@
 		            </configuration>
 		        </execution>
 		    </executions>
+		</plugin>
+		<plugin>
+			<groupId>nz.co.senanque</groupId>
+			<artifactId>schema-translator-maven-plugin</artifactId>
+			<version>1.0.0</version>
+			<executions>
+				<execution>
+					<id>sql-generate</id>
+					<phase>package</phase>
+					<goals>
+						<goal>sql</goal>
+					</goals>
+				</execution>
+			</executions>
+			<configuration>
+				<persistenceFile>target/generated-sources/xjc/META-INF/persistence.xml</persistenceFile>
+				<persistenceUnit>com.harmoney.ims.core.instancesw</persistenceUnit>
+				<dialect>org.hibernate.dialect.PostgreSQLDialect</dialect>
+				<drops>false</drops>
+			</configuration>
+			<dependencies>
+				<dependency>
+					<groupId>com.harmoney</groupId>
+					<artifactId>ims-core-partner</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+			</dependencies>
 		</plugin>
   	</plugins>
   	<pluginManagement>
