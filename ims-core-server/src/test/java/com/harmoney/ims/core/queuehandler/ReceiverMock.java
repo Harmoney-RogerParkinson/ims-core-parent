@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import com.harmoney.ims.core.instances.InvestorLoanTransaction;
+import com.harmoney.ims.core.queuehandler.unpacker.Result;
 import com.harmoney.ims.core.queuehandler.unpacker.Unpacker;
 
 /**
@@ -35,8 +36,8 @@ public class ReceiverMock {
     public void receiveMessage(Map<String, Map<String, Object>> message) {
         log.debug("Received <{}>", message);
         InvestorLoanTransaction target = new InvestorLoanTransaction();
-        unpacker.unpack(message, target);
-        target.toString();
+        Result result = unpacker.unpack(message, target);
+        log.debug("{}",result);
     }
     public CountDownLatch getLatch() {
         return latch;

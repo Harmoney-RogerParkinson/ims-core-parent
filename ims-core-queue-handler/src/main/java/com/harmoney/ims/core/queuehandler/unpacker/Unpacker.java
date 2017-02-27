@@ -53,25 +53,26 @@ public class Unpacker {
 	 * @param o (the target object)
 	 * @return the target object
 	 */
-	public Object unpack(Map<String, Map<String, Object>> message, Object o) {
+	public Result unpack(Map<String, Map<String, Object>> message, Object o) {
+		Result ret = new Result();
 		Class<?> clazz = o.getClass();
 		PropertyMap propertyMap = methodMaps.get(clazz);
 		if (propertyMap == null) {
-			log.error("Trying to unpack to an object we don't know about: {}", clazz);
-			return o;
+			log.error(ret.error("Trying to unpack to an object we don't know about: {}", clazz));
+			return ret;
 		}
 		Map<String, Object> sobject = message.get("sobject");
 		Assert.notNull(sobject,"sobject is null");
 		for (PropertyHolder propertyHolder: propertyMap.getAllProperties()) {
 			String salesforceName = propertyHolder.getSalesforceName();
 			if (!sobject.containsKey(salesforceName)) {
-				log.error("property not found in sobject: {}",salesforceName);
+				log.error(ret.error("property not found in sobject: {}",salesforceName));
 				continue;
 			}
 			try {
 				Object value = sobject.get(salesforceName);
 				if (value == null) {
-					log.warn("property {} was null",salesforceName);
+					log.warn(ret.warn("property {} was null",salesforceName));
 					continue;
 				}
 				Class<?> columnType = propertyHolder.getColumnType();
@@ -94,17 +95,13 @@ public class Unpacker {
 					value = propertyHolder.valueOf((String) value);
 				}
 				Method writeMethod = propertyHolder.getWriteMethod();
-				try {
-					writeMethod.invoke(o, new Object[] { value });
-				} catch (IllegalArgumentException e) {
-					throw e;
-				}
+				writeMethod.invoke(o, new Object[] { value });
 			} catch (Exception e) {
-				log.error("Failed to unpack to field: {}.{} {}", clazz,propertyHolder.getName(),e.getMessage());
+				log.error(ret.error("Failed to unpack to field: {}.{} {}", clazz,propertyHolder.getName(),e.getMessage()));
 				continue;
 			}
 		}
-		return o;
+		return ret;
 	}
 
 	@PostConstruct

@@ -65,7 +65,7 @@ public class ServerIT {
 		assertNotNull(empConnector);
 		updateInvestorLoanTransaction();
 		"".toCharArray();
-        receiver.getLatch().await(100000, TimeUnit.MILLISECONDS);
+        receiver.getLatch().await(10000, TimeUnit.MILLISECONDS);
         context.close();
 	}
 
