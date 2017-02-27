@@ -52,9 +52,9 @@ import com.sforce.ws.ConnectionException;
 @TestPropertySource("/test2.properties")
 @ContextConfiguration(classes={MessageProcessorSpringConfig.class,PartnerConnectionSpringConfig.class,QueueHandlerSpringConfig.class})
 @ActiveProfiles({"message-processor-prod","server-dev"})
-public class Subscription2IT {
+public class ServerIT {
 	
-    private static final Logger log = LoggerFactory.getLogger(Subscription2IT.class);
+    private static final Logger log = LoggerFactory.getLogger(ServerIT.class);
 	@Autowired private EmpConnector empConnector;
     @Autowired ReceiverMock receiver;
     @Autowired ConfigurableApplicationContext context;
