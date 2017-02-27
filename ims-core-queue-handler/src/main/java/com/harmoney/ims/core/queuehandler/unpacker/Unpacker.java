@@ -80,7 +80,7 @@ public class Unpacker {
 					//convert double to bigdecimal
 					value = new BigDecimal((Double)value);
 					int scale = propertyHolder.getColumn().scale();
-					((BigDecimal)value).setScale(scale,BigDecimal.ROUND_HALF_DOWN);
+					value = ((BigDecimal)value).setScale(scale,BigDecimal.ROUND_HALF_DOWN);
 				} else if (columnType.equals(Date.class)) {
 					// Dates arrive as strings which we convert to java.sql.Date
 					// but first remove the time component
