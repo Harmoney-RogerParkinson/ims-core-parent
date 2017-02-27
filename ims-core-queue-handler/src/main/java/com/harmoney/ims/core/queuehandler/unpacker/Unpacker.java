@@ -19,6 +19,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.util.Assert;
+
+import com.harmoney.ims.core.annotations.SalesforceName;
+import com.harmoney.ims.core.instances.TxnCode;
 
 /**
  * Stores the classes that the unpacker unpacks to along with their setter methods
@@ -56,38 +60,47 @@ public class Unpacker {
 			log.error("Trying to unpack to an object we don't know about: {}", clazz);
 			return o;
 		}
-		Map<String, Object> o1 = message.get("sobject");
-		for (Map.Entry<String, Object> entry : o1.entrySet()) {
-			String fieldName = entry.getKey();
-			// Translate the Salesforce field name to a
-			// sensible one, then look up the property.
-			String fixedFieldName = fixVariableFormat(fieldName);
-			PropertyHolder propertyHolder = propertyMap.get(fixedFieldName);
-			if (propertyHolder == null) {
-				log.warn("Trying to unpack to field we don't know about: {}.{}", clazz,fieldName);
+		Map<String, Object> sobject = message.get("sobject");
+		Assert.notNull(sobject,"sobject is null");
+		for (PropertyHolder propertyHolder: propertyMap.getAllProperties()) {
+			String salesforceName = propertyHolder.getSalesforceName();
+			if (!sobject.containsKey(salesforceName)) {
+				log.error("property not found in sobject: {}",salesforceName);
 				continue;
 			}
 			try {
-				Object value = entry.getValue();
+				Object value = sobject.get(salesforceName);
+				if (value == null) {
+					log.warn("property {} was null",salesforceName);
+					continue;
+				}
+				Class<?> columnType = propertyHolder.getColumnType();
 				if (value instanceof Double) {
 					//convert double to bigdecimal
 					value = new BigDecimal((Double)value);
 					int scale = propertyHolder.getColumn().scale();
 					((BigDecimal)value).setScale(scale,BigDecimal.ROUND_HALF_DOWN);
-				} else if (propertyHolder.getColumnType().equals(Date.class)) {
+				} else if (columnType.equals(Date.class)) {
 					// Dates arrive as strings which we convert to java.sql.Date
 					// but first remove the time component
 					String d = ((String)value).substring(0, 10);
 					value = java.sql.Date.valueOf(d);
-				} else if (propertyHolder.getColumnType().equals(LocalDate.class)) {
+				} else if (columnType.equals(LocalDate.class)) {
 					// Dates arrive as strings which we convert to java.sql.Date
 					// but first remove the time component
 					String d = ((String)value).substring(0, 10);
 					value = LocalDate.parse(d);
+				} else if (columnType.isEnum()) {
+					value = propertyHolder.valueOf((String) value);
 				}
-				propertyHolder.getWriteMethod().invoke(o, new Object[] { value });
+				Method writeMethod = propertyHolder.getWriteMethod();
+				try {
+					writeMethod.invoke(o, new Object[] { value });
+				} catch (IllegalArgumentException e) {
+					throw e;
+				}
 			} catch (Exception e) {
-				log.error("Failed to unpack to field: {}.{} {}", clazz,fixedFieldName,e.getMessage());
+				log.error("Failed to unpack to field: {}.{} {}", clazz,propertyHolder.getName(),e.getMessage());
 				continue;
 			}
 		}
@@ -109,14 +122,24 @@ public class Unpacker {
 					.getPropertyDescriptors(clazz);
 			PropertyMap propertyMap = new PropertyMap(clazz);
 			for (PropertyDescriptor descriptor : descriptors) {
+				String name = descriptor.getName();
 				Method writeMethod = descriptor.getWriteMethod();
 				if (writeMethod == null) {
 					continue;
 				}
-				Column column = descriptor.getReadMethod().getAnnotation(Column.class);
-				propertyMap.put(descriptor.getName(), descriptor.getWriteMethod(),column);
+				Method readMethod = descriptor.getReadMethod();
+				if (readMethod == null) {
+					continue;
+				}
+				SalesforceName salesforceName = readMethod.getAnnotation(SalesforceName.class);
+				if (salesforceName == null) {
+					continue;
+				}
+				Column column = readMethod.getAnnotation(Column.class);
+				propertyMap.put(name, readMethod, writeMethod,column);
 			}
 			methodMaps.put(clazz, propertyMap);
+			log.debug("{}",propertyMap);
 		}
 	}
 	

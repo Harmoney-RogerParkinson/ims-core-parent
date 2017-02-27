@@ -8,6 +8,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.harmoney.ims.core.instances.TxnCode;
 import com.harmoney.ims.core.queuehandler.unpacker.Unpacker;
 
 public class UnpackerTest {
@@ -30,5 +31,12 @@ public class UnpackerTest {
 //		OffsetDateTime odt = OffsetDateTime.parse(sampleDate);
 //		odt.toString();
 //	}
+	
+	@Test
+	public void testEnum() {
+		TxnCode result = TxnCode.valueOf("CHARGE_OFF");
+		result.toString();
+	}
+	
 
 }
