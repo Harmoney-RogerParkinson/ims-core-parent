@@ -702,6 +702,7 @@
 					<appinfo>
 						<annox:annotate>
 							<ims:SalesforceName fieldName="Net_Amount__c" />
+							<ims:Negateable/>
 						</annox:annotate>
 					</appinfo>
 				</annotation>
@@ -723,6 +724,7 @@
 					<appinfo>
 						<annox:annotate>
 							<ims:SalesforceName fieldName="loan__Principal_Paid__c" />
+							<ims:Negateable/>
 						</annox:annotate>
 					</appinfo>
 				</annotation>
@@ -734,6 +736,7 @@
 					<appinfo>
 						<annox:annotate>
 							<ims:SalesforceName fieldName="loan__Interest_Paid__c" />
+							<ims:Negateable/>
 						</annox:annotate>
 					</appinfo>
 				</annotation>
@@ -745,6 +748,7 @@
 					<appinfo>
 						<annox:annotate>
 							<ims:SalesforceName fieldName="loan__Late_Fees_Paid__c" />
+							<ims:Negateable/>
 						</annox:annotate>
 					</appinfo>
 				</annotation>
@@ -755,6 +759,7 @@
 					<appinfo>
 						<annox:annotate>
 							<ims:SalesforceName fieldName="loan__Tax__c" />
+							<ims:Negateable/>
 						</annox:annotate>
 					</appinfo>
 				</annotation>
@@ -766,6 +771,7 @@
 					<appinfo>
 						<annox:annotate>
 							<ims:SalesforceName fieldName="loan__Total_Service_Charge__c" />
+							<ims:Negateable/>
 						</annox:annotate>
 					</appinfo>
 				</annotation>
@@ -788,6 +794,7 @@
 					<appinfo>
 						<annox:annotate>
 							<ims:SalesforceName fieldName="loan__Charged_Off_Fees__c" />
+							<ims:Negateable/>
 						</annox:annotate>
 					</appinfo>
 				</annotation>
@@ -799,6 +806,7 @@
 					<appinfo>
 						<annox:annotate>
 							<ims:SalesforceName fieldName="loan__Charged_Off_Interest__c" />
+							<ims:Negateable/>
 						</annox:annotate>
 					</appinfo>
 				</annotation>
@@ -810,6 +818,7 @@
 					<appinfo>
 						<annox:annotate>
 							<ims:SalesforceName fieldName="loan__Charged_Off_Principal__c" />
+							<ims:Negateable/>
 						</annox:annotate>
 					</appinfo>
 				</annotation>
@@ -820,6 +829,7 @@
 					<appinfo>
 						<annox:annotate>
 							<ims:SalesforceName fieldName="Investor_Txn_Fee__c" />
+							<ims:Negateable/>
 						</annox:annotate>
 					</appinfo>
 				</annotation>
@@ -851,6 +861,7 @@
 					<appinfo>
 						<annox:annotate>
 							<ims:SalesforceName fieldName="loan__Protect_Principal__c" />
+							<ims:Negateable/>
 						</annox:annotate>
 					</appinfo>
 				</annotation>
@@ -862,6 +873,7 @@
 					<appinfo>
 						<annox:annotate>
 							<ims:SalesforceName fieldName="Management_Fee_Realised__c" />
+							<ims:Negateable/>
 						</annox:annotate>
 					</appinfo>
 				</annotation>
@@ -873,6 +885,7 @@
 					<appinfo>
 						<annox:annotate>
 							<ims:SalesforceName fieldName="Sales_Commission_Fee_Realised__c" />
+							<ims:Negateable/>
 						</annox:annotate>
 					</appinfo>
 				</annotation>
@@ -884,6 +897,7 @@
 					<appinfo>
 						<annox:annotate>
 							<ims:SalesforceName fieldName="loan__Rebate_Amount_On_Payoff__c" />
+							<ims:Negateable/>
 						</annox:annotate>
 					</appinfo>
 				</annotation>
@@ -894,6 +908,7 @@
 					<appinfo>
 						<annox:annotate>
 							<ims:SalesforceName fieldName="Protect_Realised__c" />
+							<ims:Negateable/>
 						</annox:annotate>
 					</appinfo>
 				</annotation>

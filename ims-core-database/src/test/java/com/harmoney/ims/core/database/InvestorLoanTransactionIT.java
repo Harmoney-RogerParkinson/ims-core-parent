@@ -49,6 +49,19 @@ public class InvestorLoanTransactionIT {
 	}
 	
 	@Test
+	public void createReversalTransactionTest() {
+		InvestorLoanTransaction ilt = new InvestorLoanTransaction();
+		ilt.setId("ILT_150");
+		ilt.setName("ILT_150");
+		ilt.setNetAmount(new BigDecimal(123.456).setScale(2, BigDecimal.ROUND_HALF_DOWN));
+		ilt.setCreatedDate(java.sql.Date.valueOf("2017-02-23"));
+		investorLoanTransactionDAO.createReversalTransaction(ilt);
+		List<InvestorLoanTransaction> transactions = investorLoanTransactionDAO.getAllTransactions();
+		assertEquals(1,transactions.size());
+		assertEquals(new BigDecimal(-123.46).setScale(2, BigDecimal.ROUND_HALF_DOWN), transactions.get(0).getNetAmount());
+	}
+	
+	@Test
 	public void deleteTransactionTest() {
 		InvestorLoanTransaction ilt = new InvestorLoanTransaction();
 		ilt.setId("ILT_200");

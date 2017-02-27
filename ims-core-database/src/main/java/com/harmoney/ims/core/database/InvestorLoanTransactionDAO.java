@@ -6,12 +6,16 @@ package com.harmoney.ims.core.database;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
-import javax.persistence.Id;
 import javax.persistence.PersistenceContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import com.harmoney.ims.core.instances.InvestorLoanTransaction;
 
@@ -21,6 +25,10 @@ import com.harmoney.ims.core.instances.InvestorLoanTransaction;
  */
 @Repository
 public class InvestorLoanTransactionDAO {
+	
+	private static final Logger log = LoggerFactory.getLogger(InvestorLoanTransactionDAO.class);
+	@Autowired ObjectDescriptorGenerator objectDescriptorGenerator;
+	private ObjectDescriptor objectDescriptor;
 
 	@PersistenceContext(unitName="com.harmoney.ims.core.instances")
 	private EntityManager entityManager;
@@ -33,13 +41,13 @@ public class InvestorLoanTransactionDAO {
 	@Transactional(readOnly=true)
 	public List<InvestorLoanTransaction> getAllTransactions()
 	{
-	return entityManager.createQuery("from com.harmoney.ims.core.instances.InvestorLoanTransaction", InvestorLoanTransaction.class).getResultList();
+		return entityManager.createQuery("from com.harmoney.ims.core.instances.InvestorLoanTransaction", InvestorLoanTransaction.class).getResultList();
 	}
 
 	@Transactional
 	public void deleteTransaction(InvestorLoanTransaction investorLoanTransaction)
 	{
-	entityManager.remove(investorLoanTransaction);
+		entityManager.remove(investorLoanTransaction);
 	}
 	/**
 	 * Get the id value for this object. Assumes there is a single Id field, not a composite.
@@ -47,18 +55,26 @@ public class InvestorLoanTransactionDAO {
 	 * @param object
 	 */
 	public Object getId(Object object) {
-		assert object != null : "object must not be null";
-		for (Method method: object.getClass().getMethods()) {
-			if (method.isAnnotationPresent(Id.class)) {
-				try {
-					return method.invoke(object, new Object[]{});
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}			
-		}
-		throw new RuntimeException("No Id field found on "+object.getClass().getName());
+		Assert.notNull(object,"object must not be null");
+		return objectDescriptor.getId(object);
+	}
+	@Transactional
+	public void createReversalTransaction(InvestorLoanTransaction target) {
+		objectDescriptor.negate(target);
+		createTransaction(target);
+	}
+	@Transactional
+	public void upateTransaction(InvestorLoanTransaction target) {
+		InvestorLoanTransaction existing = entityManager.createQuery("from com.harmoney.ims.core.instances.InvestorLoanTransaction where id="+target.getId(), InvestorLoanTransaction.class).getSingleResult();
+		target.setImsid(existing.getImsid());
+		// TODO: verify update handling in JPA
+		entityManager.merge(target);
+		entityManager.flush();
 	}
 	
+	@PostConstruct
+	public void init() {
+		objectDescriptor = objectDescriptorGenerator.build(InvestorLoanTransaction.class);
+	}
 
 }
