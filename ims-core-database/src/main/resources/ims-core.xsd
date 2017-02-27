@@ -51,6 +51,9 @@
 							<orm:column nullable="false" unique="true" insertable="false"
 								updatable="false" />
 						</hj:basic>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Id" />
+						</annox:annotate>
 					</appinfo>
 				</annotation>
 			</element>
@@ -60,6 +63,9 @@
 						<hj:basic>
 							<orm:column nullable="false" unique="true" />
 						</hj:basic>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Name" />
+						</annox:annotate>
 					</appinfo>
 				</annotation>
 			</element>
@@ -271,6 +277,9 @@
 						<hj:basic>
 							<orm:column nullable="false" unique="true" />
 						</hj:basic>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Id" />
+						</annox:annotate>
 					</appinfo>
 				</annotation>
 			</element>
@@ -280,6 +289,9 @@
 						<hj:basic>
 							<orm:column nullable="false" unique="true" />
 						</hj:basic>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Name" />
+						</annox:annotate>
 					</appinfo>
 				</annotation>
 			</element>
@@ -313,6 +325,9 @@
 						<hj:basic>
 							<orm:column nullable="false" unique="true" />
 						</hj:basic>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Id" />
+						</annox:annotate>
 					</appinfo>
 				</annotation>
 			</element>
@@ -322,6 +337,9 @@
 						<hj:basic>
 							<orm:column nullable="false" unique="true" />
 						</hj:basic>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Name" />
+						</annox:annotate>
 					</appinfo>
 				</annotation>
 			</element>
@@ -420,6 +438,9 @@
 						<hj:basic>
 							<orm:column nullable="false" unique="true" />
 						</hj:basic>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Id" />
+						</annox:annotate>
 					</appinfo>
 				</annotation>
 			</element>
@@ -429,6 +450,9 @@
 						<hj:basic>
 							<orm:column nullable="false" unique="true" />
 						</hj:basic>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Name" />
+						</annox:annotate>
 					</appinfo>
 				</annotation>
 			</element>
@@ -623,6 +647,9 @@
 						<hj:basic>
 							<orm:column nullable="false" unique="true" />
 						</hj:basic>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Id" />
+						</annox:annotate>
 					</appinfo>
 				</annotation>
 			</element>
@@ -632,6 +659,9 @@
 						<hj:basic>
 							<orm:column nullable="false" unique="true" />
 						</hj:basic>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Name" />
+						</annox:annotate>
 					</appinfo>
 				</annotation>
 			</element>
@@ -804,7 +834,7 @@
 					</appinfo>
 				</annotation>
 			</element>
-			<element name="waived" type="tns:currency">
+			<element name="waived" type="boolean">
 				<annotation>
 					<documentation>Salesforce name: loan__Waived__c</documentation>
 					<appinfo>
