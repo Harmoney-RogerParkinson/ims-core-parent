@@ -29,6 +29,7 @@
 			</jaxb:schemaBindings>
 		</xsd:appinfo>
 	</xsd:annotation>
+
 	<complexType name="Account">
 		<annotation>
 			<documentation>Salesforce name: loan__Account__c</documentation>
@@ -507,7 +508,7 @@
 			</element>
 			<element name="HMInvestmentAmount" type="tns:currency">
 				<annotation>
-					<documentation>Salesforce name: HM_Investment_Amount__c
+					<documentation>IF( loan__Loan__r.loan__Protect_Enabled__c == true, Protect_Investment_Amount__c - HP_Rebate_Amount__c, loan__Investment_Amount__c )
 					</documentation>
 					<appinfo>
 						<annox:annotate>
@@ -551,7 +552,7 @@
 			</element>
 			<element name="loanStatus" type="string">
 				<annotation>
-					<documentation>Salesforce name: loan__Loan_Status__c
+					<documentation>text(loan__Loan__r.loan__Loan_Status__c)
 					</documentation>
 					<appinfo>
 						<annox:annotate>
@@ -562,7 +563,7 @@
 			</element>
 			<element name="paymentProtectManagementFees" type="tns:currency">
 				<annotation>
-					<documentation>Salesforce name: Payment_Protect_Management_Fees__c
+					<documentation>IF( loan__Loan__r.loan__Protect_Enabled__c = True, loan__Loan__r.HP_Management_Fee__c * loan__Share__c, 0 )
 					</documentation>
 					<appinfo>
 						<annox:annotate>
@@ -573,14 +574,13 @@
 			</element>
 			<element name="paymentProtectSalesCommissionFees" type="tns:currency">
 				<annotation>
-					<documentation>Salesforce name:
-						Payment_Protect_Sales_Commission_Fees__c
+					<documentation>IF( loan__Loan__r.loan__Protect_Enabled__c = True, loan__Loan__r.HP_Sale_Commission_Fee__c * loan__Share__c, 0 )
 					</documentation>
 				</annotation>
 			</element>
 			<element name="paymentProtectFee" type="tns:currency">
 				<annotation>
-					<documentation>Salesforce name: Payment_Protect_Fee__c
+					<documentation>IF( loan__Loan__r.loan__Protect_Enabled__c = True, loan__Loan__r.loan__Protect_fee_amount__c * loan__Share__c, 0 )
 					</documentation>
 					<appinfo>
 						<annox:annotate>
@@ -591,7 +591,7 @@
 			</element>
 			<element name="paymentProtectRebatedAmount" type="tns:currency">
 				<annotation>
-					<documentation>Salesforce name: Payment_Protect_Rebated_Amount__c
+					<documentation>IF( loan__Loan__r.loan__Protect_Enabled__c = True, loan__Loan__r.loan__Protect_Borrower_Rebate__c * loan__Share__c, 0 )
 					</documentation>
 					<appinfo>
 						<annox:annotate>
@@ -602,7 +602,13 @@
 			</element>
 			<element name="HMRollupOutstandingPrincipal" type="tns:currency">
 				<annotation>
-					<documentation>Salesforce name: HM_Rollup_Outstanding_Principal__c
+					<documentation>
+					loan__Investment_Amount__c - HM_Rollup_Pricipal_Paid__c - HM_Rollup_Total_Charged_Off_Principal__c - Waived_Principle__c - Payment_Protect_Rebated_Amount__c + HM_Rollup_Recovered_Principal__c
+					HM_Rollup_Pricipal_Paid__c = ILT.Principal filter (Transaction Code==PAYMENT APPROVAL) AND (Waived==False)
+					HM_Rollup_Total_Charged_Off_Principal__c = ILT.Charged off principal filter Transaction Code==CHARGE OFF
+					Waived_Principle__c = ILT.Principal filter (Transaction Code==PAYMENT APPROVAL) AND (Waived==True)
+					Payment_Protect_Rebated_Amount__c = IF( loan__Loan__r.loan__Protect_Enabled__c = True, loan__Loan__r.loan__Protect_Borrower_Rebate__c * loan__Share__c, 0 )
+					HM_Rollup_Recovered_Principal__c = ILT.Principal filter (Transaction Code==PAYMENT APPROVAL) AND (Waived==False) AND (Recovery Payment==True)
 					</documentation>
 					<appinfo>
 						<annox:annotate>
@@ -630,6 +636,21 @@
 		<annotation>
 			<documentation>Salesforce name: loan__Investor_Loan_Account_Txns__c
 			</documentation>
+			<appinfo>
+				<annox:annotate>
+					<annox:annotate annox:class="javax.persistence.NamedQueries">
+						<annox:annotate annox:class="javax.persistence.NamedQuery"
+							name="InvestorLoanTransaction.imsid" query="select i from InvestorLoanTransaction i where i.imsid=:imsid">
+						</annox:annotate>
+						<annox:annotate annox:class="javax.persistence.NamedQuery"
+							name="InvestorLoanTransaction.id" query="select i from InvestorLoanTransaction i where i.id=:id">
+						</annox:annotate>
+						<annox:annotate annox:class="javax.persistence.NamedQuery"
+							name="InvestorLoanTransaction.all" query="select i from InvestorLoanTransaction i">
+						</annox:annotate>
+					</annox:annotate>
+				</annox:annotate> 
+			</appinfo>
 		</annotation>
 		<sequence>
 			<element name="imsid" type="long">
@@ -697,7 +718,7 @@
 				maxOccurs="1" minOccurs="1" />
 			<element name="netAmount" type="tns:currency">
 				<annotation>
-					<documentation>Salesforce name: Net_Amount__c
+					<documentation>loan__Txn_Amount__c - loan__Tax__c - loan__Total_Service_Charge__c
 					</documentation>
 					<appinfo>
 						<annox:annotate>
@@ -856,7 +877,7 @@
 			</element>
 			<element name="protectPrincipal" type="tns:currency">
 				<annotation>
-					<documentation>Salesforce name: loan__Protect_Principal__c
+					<documentation>(loan__Principal_Paid__c * (loan__Loan_Payment_Transaction__r.loan__Loan_Account__r.loan__Protect_fee_amount__c / (loan__Loan_Payment_Transaction__r.loan__Loan_Account__r.loan__Loan_Amount__c - loan__Loan_Payment_Transaction__r.loan__Loan_Account__r.loan__Protect_fee_amount__c )))
 					</documentation>
 					<appinfo>
 						<annox:annotate>
@@ -868,7 +889,8 @@
 			</element>
 			<element name="managementFeeRealised" type="tns:currency">
 				<annotation>
-					<documentation>Salesforce name: Management_Fee_Realised__c
+					<documentation>
+					IF(OR(loan__Loan_Payment_Transaction__r.Remark__c == 'Full waiver', TEXT(loan__Txn_Code__c) == 'CHARGE OFF') ,loan__Investor_Loan__r.loan__Loan__r.Extra_Protect_Realised__c * loan__Investor_Loan__r.loan__Share_rounded__c, IF(OR(loan__Loan_Payment_Transaction__r.Remark__c == 'Early repayment - with waiver', CONTAINS(loan__Loan_Payment_Transaction__r.Remark__c, 'Rewrite')), (loan__Loan_Payment_Transaction__r.Original_Protect_Realised__c + loan__Investor_Loan__r.loan__Loan__r.Extra_Protect_Realised__c) * loan__Investor_Loan__r.loan__Share_rounded__c, Protect_Realised__c)) * loan__Investor_Loan__r.loan__Loan__r.HP_Management_Fee__c / loan__Investor_Loan__r.loan__Loan__r.loan__Protect_fee_amount__c
 					</documentation>
 					<appinfo>
 						<annox:annotate>
@@ -880,7 +902,8 @@
 			</element>
 			<element name="salesCommissionFeeRealised" type="tns:currency">
 				<annotation>
-					<documentation>Salesforce name: Sales_Commission_Fee_Realised__c
+					<documentation>
+					IF(loan__Loan_Payment_Transaction__r.Remark__c == 'Early repayment - no waiver', (loan__Investor_Loan__r.loan__Loan__r.loan__Protect_fee_amount__c - loan__Investor_Loan__r.loan__Loan__r.Protect_Realised_Active__c + loan__Loan_Payment_Transaction__r.Original_Protect_Realised__c) * loan__Investor_Loan__r.loan__Share_rounded__c, IF(CONTAINS(loan__Loan_Payment_Transaction__r.Remark__c, 'Rewrite'), (loan__Loan_Payment_Transaction__r.Original_Protect_Realised__c + loan__Investor_Loan__r.loan__Loan__r.Extra_Protect_Realised__c) * loan__Investor_Loan__r.loan__Share_rounded__c, IF(TEXT(loan__Txn_Code__c) == 'CHARGE OFF', loan__Investor_Loan__r.loan__Loan__r.Protect_Charge_Off__c * loan__Investor_Loan__r.loan__Share_rounded__c, Protect_Realised__c))) * loan__Investor_Loan__r.loan__Loan__r.HP_Sale_Commission_Fee__c / loan__Investor_Loan__r.loan__Loan__r.loan__Protect_fee_amount__c
 					</documentation>
 					<appinfo>
 						<annox:annotate>
@@ -904,7 +927,8 @@
 			</element>
 			<element name="protectRealised" type="tns:currency">
 				<annotation>
-					<documentation>Salesforce name: Protect_Realised__c</documentation>
+					<documentation>IF(loan__Investor_Loan__r.loan__Loan__r.loan__Protect_Enabled__c == TRUE, IF(TEXT(loan__Txn_Code__c) == 'CHARGE OFF', 0, loan__Loan_Payment_Transaction__r.Protect_Realised__c * loan__Investor_Loan__r.loan__Share_rounded__c), 0)
+</documentation>
 					<appinfo>
 						<annox:annotate>
 							<ims:SalesforceName fieldName="Protect_Realised__c" />

@@ -46,6 +46,18 @@ public class InvestorLoanTransactionIT {
 		investorLoanTransactionDAO.createTransaction(ilt);
 		List<InvestorLoanTransaction> transactions = investorLoanTransactionDAO.getAllTransactions();
 		assertEquals(1,transactions.size());
+		// These verify the named queries
+		long imsid = transactions.get(0).getImsid();
+		InvestorLoanTransaction ilt1 = investorLoanTransactionDAO.getByIMSId(imsid);
+		assertEquals(imsid,ilt1.getImsid());
+		String id = transactions.get(0).getId();
+		InvestorLoanTransaction ilt2 = investorLoanTransactionDAO.getById(id);
+		assertEquals(imsid,ilt2.getImsid());
+		// verify the update
+		ilt2.setName("ILT_101");
+		investorLoanTransactionDAO.upateTransaction(ilt2);
+		InvestorLoanTransaction ilt3 = investorLoanTransactionDAO.getById(id);
+		assertEquals("ILT_101",ilt3.getName());
 	}
 	
 	@Test

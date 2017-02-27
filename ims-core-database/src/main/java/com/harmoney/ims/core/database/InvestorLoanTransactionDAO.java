@@ -3,12 +3,12 @@
  */
 package com.harmoney.ims.core.database;
 
-import java.lang.reflect.Method;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,22 +41,27 @@ public class InvestorLoanTransactionDAO {
 	@Transactional(readOnly=true)
 	public List<InvestorLoanTransaction> getAllTransactions()
 	{
-		return entityManager.createQuery("from com.harmoney.ims.core.instances.InvestorLoanTransaction", InvestorLoanTransaction.class).getResultList();
+		TypedQuery<InvestorLoanTransaction> query =
+				  entityManager.createNamedQuery("InvestorLoanTransaction.all", InvestorLoanTransaction.class);
+		return query.getResultList();
+//		return entityManager.createQuery("from com.harmoney.ims.core.instances.InvestorLoanTransaction", InvestorLoanTransaction.class).getResultList();
 	}
 
 	@Transactional
 	public void deleteTransaction(InvestorLoanTransaction investorLoanTransaction)
 	{
 		entityManager.remove(investorLoanTransaction);
+		entityManager.flush();
 	}
 	/**
 	 * Get the id value for this object. Assumes there is a single Id field, not a composite.
 	 * 
 	 * @param object
 	 */
-	public Object getId(Object object) {
+	public long getId(InvestorLoanTransaction object) {
 		Assert.notNull(object,"object must not be null");
-		return objectDescriptor.getId(object);
+		return object.getImsid();
+//		return (Long)objectDescriptor.getId(object);
 	}
 	@Transactional
 	public void createReversalTransaction(InvestorLoanTransaction target) {
@@ -65,12 +70,26 @@ public class InvestorLoanTransactionDAO {
 	}
 	@Transactional
 	public void upateTransaction(InvestorLoanTransaction target) {
-		InvestorLoanTransaction existing = entityManager.createQuery("from com.harmoney.ims.core.instances.InvestorLoanTransaction where id="+target.getId(), InvestorLoanTransaction.class).getSingleResult();
-		target.setImsid(existing.getImsid());
-		// TODO: verify update handling in JPA
 		entityManager.merge(target);
 		entityManager.flush();
 	}
+	@Transactional
+	public InvestorLoanTransaction getByIMSId(Long imsid) {
+		TypedQuery<InvestorLoanTransaction> query =
+				  entityManager.createNamedQuery("InvestorLoanTransaction.imsid", InvestorLoanTransaction.class);
+		query.setParameter("imsid", imsid);
+		InvestorLoanTransaction existing = query.getSingleResult();
+		return existing;
+	}
+	@Transactional
+	public InvestorLoanTransaction getById(String id) {
+		TypedQuery<InvestorLoanTransaction> query =
+				  entityManager.createNamedQuery("InvestorLoanTransaction.id", InvestorLoanTransaction.class);
+		query.setParameter("id", id);
+		InvestorLoanTransaction existing = query.getSingleResult();
+		return existing;
+	}
+
 	
 	@PostConstruct
 	public void init() {
