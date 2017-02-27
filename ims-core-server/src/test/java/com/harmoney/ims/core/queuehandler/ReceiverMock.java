@@ -28,7 +28,7 @@ public class ReceiverMock {
 
     private static final Logger log = LoggerFactory.getLogger(ReceiverMock.class);
     
-    private CountDownLatch latch = new CountDownLatch(100);
+    private CountDownLatch latch = new CountDownLatch(5);
     
     @Autowired private Unpacker unpacker;
 

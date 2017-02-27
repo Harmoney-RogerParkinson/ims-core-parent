@@ -70,7 +70,7 @@ public class ServerIT {
 	}
 
 	private void updateInvestorLoanTransaction() throws ConnectionException {
-		
+		int saved = 0;
 		String testValue = "RJP"+LocalDateTime.now().toLocalTime().toString();
 		QueryResult qr = partnerConnection.query("SELECT Id,test__c FROM loan__Investor_Loan_Account_Txns__c");
 		qr.getSize();
@@ -87,7 +87,7 @@ public class ServerIT {
 				r1.setField("Id", id);
 				updates.add(r1);
 				if (count++ > 5) {
-					saveResults(updates);
+					saved = saved + saveResults(updates);
 					count = 0;
 					updates.clear();
 					break;
@@ -95,17 +95,19 @@ public class ServerIT {
 			}
 		}
 		if (count > 0) {
-			saveResults(updates);
+			saved = saved + saveResults(updates);
 		}
-		
+		log.debug("records updated: {}",saved);
 	}
 	
-	private void saveResults(List<SObject> records) throws ConnectionException {
+	private int saveResults(List<SObject> records) throws ConnectionException {
+		int saved = 0;
 		SObject[] sobjects = records.toArray(new SObject[records.size()]);
 		SaveResult[] saveResults = partnerConnection.update(sobjects);
 		// check the returned results for any errors
 		for (int i = 0; i < saveResults.length; i++) {
 			if (saveResults[i].isSuccess()) {
+				saved++;
 				log.debug(i
 						+ ". Successfully updated record - Id: "
 						+ saveResults[i].getId());
@@ -117,6 +119,7 @@ public class ServerIT {
 				}
 			}
 		}
+		return saved;
 		
 	}
 }
