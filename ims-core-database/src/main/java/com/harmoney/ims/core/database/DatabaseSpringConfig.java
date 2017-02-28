@@ -38,6 +38,8 @@ public class DatabaseSpringConfig {
 	public String user;
 	@Value("${database.password:postgres}")
 	public String password;
+	@Value("${database.hbm2ddl.auto:}")
+	public String hbm2ddlAuto;
 
 	// needed for @PropertySource
 	@Bean
@@ -71,6 +73,7 @@ public class DatabaseSpringConfig {
 	    jpaProperties.put("hibernate.dialect", dialect);
 	    jpaProperties.put("hibernate.format_sql", true);
 	    jpaProperties.put("hibernate.connection.autocommit", false);
+	    jpaProperties.put("hibernate.hbm2ddl.auto", hbm2ddlAuto);
 	    factory.setJpaProperties(jpaProperties);
 	    return factory;
 	  }

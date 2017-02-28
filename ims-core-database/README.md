@@ -13,3 +13,15 @@ In practice the database is a postgres db running on AWS. The default setting as
 |loan__Investor_Loan__c | InvestmentOrder|
 |loan__Investor_Fund_Transaction__c | InvestorFundTransaction|
 |loan__Investor_Loan_Account_Txns__c | InvestorLoanTransaction|
+
+Database properties (including defaults)
+
+database.dialect=org.hibernate.dialect.PostgreSQLDialect
+database.datasource.class=org.postgresql.Driver
+database.url=jdbc:postgresql:imscore
+database.user=postgres
+database.password=postgres
+database.hbm2ddl.auto=
+
+Override these with environment variables as necessary.
+The database.hbm2ddl.auto is for auto creation. Default does nothing but change to create or create-drop for automatic db creation/deletion.
