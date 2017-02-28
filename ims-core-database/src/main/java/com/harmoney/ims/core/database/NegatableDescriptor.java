@@ -3,8 +3,6 @@ package com.harmoney.ims.core.database;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 
-import com.harmoney.ims.core.instances.InvestorLoanTransaction;
-
 public class NegatableDescriptor {
 
 	private final Method writeMethod;
@@ -17,7 +15,7 @@ public class NegatableDescriptor {
 		this.scale = scale;
 	}
 
-	public void negate(InvestorLoanTransaction target) {
+	public void negate(Object target) {
 		try {
 			BigDecimal bigDecimal = (BigDecimal)readMethod.invoke(target);
 			if (bigDecimal != null) {

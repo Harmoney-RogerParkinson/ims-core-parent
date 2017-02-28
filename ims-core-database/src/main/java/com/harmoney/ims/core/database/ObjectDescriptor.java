@@ -35,16 +35,16 @@ public class ObjectDescriptor {
 		
 	}
 
-	protected Object getId(Object object) {
+	protected long getId(Object object) {
 		Assert.notNull(idMethod,"idMethod must not be null");
 		try {
-			return idMethod.invoke(object, new Object[]{});
+			return (long)idMethod.invoke(object, new Object[]{});
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	protected void negate(InvestorLoanTransaction target) {
+	protected void negate(Object target) {
 		for (NegatableDescriptor bigDecimalDescriptor: negatableDescriptors) {
 			bigDecimalDescriptor.negate(target);
 		}
