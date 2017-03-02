@@ -34,6 +34,7 @@ public class ReceiverMock {
     public void receiveMessage(Map<String, Map<String, Object>> message) {
         log.debug("Received <{}>", message);
         investorLoanTransactionProcessor.receiveMessage(message);
+        latch.countDown();
     }
     public CountDownLatch getLatch() {
         return latch;

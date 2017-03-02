@@ -1,6 +1,6 @@
 package com.harmoney.ims.core.messages;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ public class Subscription2IT {
 	public void testSubscription() throws ConnectionException, InterruptedException {
 		assertNotNull(empConnector);
 		updateInvestorLoanTransaction();
-		messageHandler.getLatch().await(10000, TimeUnit.MILLISECONDS);
+		assertTrue("Did not reach expected count",messageHandler.getLatch().await(10000, TimeUnit.MILLISECONDS));
 	}
 
 	private void updateInvestorLoanTransaction() throws ConnectionException {
@@ -79,7 +79,7 @@ public class Subscription2IT {
 				r1.setField("test__c", testValue);
 				r1.setField("Id", id);
 				updates.add(r1);
-				if (count++ > 100) {
+				if (count++ > 0) {
 					saveResults(updates);
 					count = 0;
 					updates.clear();

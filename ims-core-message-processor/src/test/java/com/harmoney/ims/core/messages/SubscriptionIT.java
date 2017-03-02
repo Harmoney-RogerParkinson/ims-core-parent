@@ -1,6 +1,7 @@
 package com.harmoney.ims.core.messages;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.GregorianCalendar;
 import java.util.concurrent.TimeUnit;
@@ -57,7 +58,7 @@ public class SubscriptionIT {
 	public void testSubscription() throws ConnectionException, InterruptedException {
 		assertNotNull(empConnector);
 		createInvoiceStatement();
-		messageHandler.getLatch().await(10000, TimeUnit.MILLISECONDS);
+		assertTrue("Did not reach expected count",messageHandler.getLatch().await(10000, TimeUnit.MILLISECONDS));
 	}
 
 	private void createInvoiceStatement() throws ConnectionException {

@@ -1,4 +1,6 @@
 package com.harmoney.ims.core.queuehandler;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -49,7 +51,7 @@ public class MessageSenderIT {
         map2.put("loan__Principal_Paid__c", new Double(200D));
         map2.put("transactionType", "ACTIVE");
         rabbitTemplate.convertAndSend(queueName, map);
-        receiver.getLatch().await(10000, TimeUnit.MILLISECONDS);
+		assertTrue("Did not reach expected count",receiver.getLatch().await(10000, TimeUnit.MILLISECONDS));
         context.close();
         }
 

@@ -1,6 +1,7 @@
 package com.harmoney.ims.core.server.test;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ public class ServerIT {
 		assertNotNull(empConnector);
 		updateInvestorLoanTransaction();
 		"".toCharArray();
-        receiver.getLatch().await(10000, TimeUnit.MILLISECONDS);
+		assertTrue("Did not reach expected count",receiver.getLatch().await(10000, TimeUnit.MILLISECONDS));
         context.close();
 	}
 
