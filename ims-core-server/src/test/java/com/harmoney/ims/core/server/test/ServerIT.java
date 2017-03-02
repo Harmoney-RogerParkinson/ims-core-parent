@@ -13,13 +13,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.StringUtils;
 
+import com.harmoney.ims.core.database.DatabaseSpringConfig;
 import com.harmoney.ims.core.messages.MessageProcessorSpringConfig;
 import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
 import com.harmoney.ims.core.queuehandler.QueueHandlerSpringConfig;
@@ -50,7 +50,7 @@ import com.sforce.ws.ConnectionException;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource("/test2.properties")
-@ContextConfiguration(classes={MessageProcessorSpringConfig.class,PartnerConnectionSpringConfig.class,QueueHandlerSpringConfig.class})
+@ContextConfiguration(classes={MessageProcessorSpringConfig.class,PartnerConnectionSpringConfig.class,QueueHandlerSpringConfig.class,DatabaseSpringConfig.class})
 @ActiveProfiles({"message-processor-prod","server-dev"})
 public class ServerIT {
 	

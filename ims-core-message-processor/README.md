@@ -72,6 +72,11 @@ sobject={Description__c=whatever, Id=a6fN00000008giLIAQ, Status__c=Open, Name=IN
 
 This is a HashMap whose values are HashMaps. All the keys are Strings. The values are whatever data type is suitable, often a String but could be a Date, Long etc. Currency is a String, number() is a double. What is date? Percentage?
 Date is a string, percentage is double.
+The event section has a type field:
+created, updated
+We do not hear if the record is deleted or undeleted...maybe
+docs are contradictory.
+If we do get a delete we should create a reversal, an undelete should create a new record.
 
 Deleting a pushTopic:
 

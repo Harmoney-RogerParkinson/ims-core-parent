@@ -14,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import com.harmoney.ims.core.instances.InvestorLoanTransaction;
-import com.harmoney.ims.core.queuehandler.unpacker.Result;
-import com.harmoney.ims.core.queuehandler.unpacker.Unpacker;
+import com.harmoney.ims.core.queueprocessor.InvestorLoanTransactionProcessor;
 
 /**
  * @author Roger Parkinson
@@ -28,16 +26,14 @@ public class ReceiverMock {
 
     private static final Logger log = LoggerFactory.getLogger(ReceiverMock.class);
     
-    private CountDownLatch latch = new CountDownLatch(5);
+    private CountDownLatch latch = new CountDownLatch(7);
     
-    @Autowired private Unpacker unpacker;
-
+    @Autowired private InvestorLoanTransactionProcessor investorLoanTransactionProcessor;
+    
     @AMPQReceiver(queueName="${rabbitmq.queue}")
     public void receiveMessage(Map<String, Map<String, Object>> message) {
         log.debug("Received <{}>", message);
-        InvestorLoanTransaction target = new InvestorLoanTransaction();
-        Result result = unpacker.unpack(message, target);
-        log.debug("{}",result);
+        investorLoanTransactionProcessor.receiveMessage(message);
     }
     public CountDownLatch getLatch() {
         return latch;

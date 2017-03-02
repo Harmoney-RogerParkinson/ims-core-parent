@@ -1,13 +1,15 @@
-package com.harmoney.ims.core.queuehandler.unpacker;
+package com.harmoney.ims.core.database.descriptors;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 
 import javax.persistence.Column;
+import javax.persistence.JoinColumn;
 
-import org.slf4j.helpers.MessageFormatter;
 import org.springframework.util.Assert;
 
+import com.harmoney.ims.core.annotations.Negateable;
 import com.harmoney.ims.core.annotations.SalesforceName;
 
 public class PropertyHolder {
@@ -19,6 +21,8 @@ public class PropertyHolder {
 	private Class<?> columnType;
 	private String salesforceName;
 	private Method enumValueOf;
+	private boolean joinColumn;
+	private boolean negateable;
 
 	protected PropertyHolder(String name, Method readMethod,Method writeMethod, Column column, Class<?> clazz) {
 		this.writeMethod = writeMethod;
@@ -36,6 +40,11 @@ public class PropertyHolder {
 			} catch (NoSuchMethodException e) {
 				throw new RuntimeException("Need a 'valueOf' method on enum type "+columnType.getName(),e);
 			}
+		}
+		joinColumn = (readMethod.getAnnotation(JoinColumn.class) != null);
+		negateable = (readMethod.getAnnotation(Negateable.class) != null);
+		if (negateable && !columnType.equals(BigDecimal.class)) {
+			throw new RuntimeException("Column "+name+" is negatable but not BigDecimal");
 		}
 	}
 
@@ -76,6 +85,23 @@ public class PropertyHolder {
 		} catch (IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	protected boolean hasJoinColum() {
+		return joinColumn;
+	}
+
+	protected void negate(Object target) {
+		if (negateable) {
+			try {
+				BigDecimal bigDecimal = (BigDecimal)readMethod.invoke(target);
+				if (bigDecimal != null) {
+					writeMethod.invoke(target, bigDecimal.negate().setScale(column.scale(),BigDecimal.ROUND_HALF_DOWN));
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 

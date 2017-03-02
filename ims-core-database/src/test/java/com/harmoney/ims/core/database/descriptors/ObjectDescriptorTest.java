@@ -1,4 +1,4 @@
-package com.harmoney.ims.core.queuehandler;
+package com.harmoney.ims.core.database.descriptors;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,28 +8,25 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.harmoney.ims.core.database.descriptors.ObjectDescriptor;
+import com.harmoney.ims.core.database.descriptors.Result;
 import com.harmoney.ims.core.instances.InvestorLoanTransaction;
-import com.harmoney.ims.core.queuehandler.unpacker.Result;
-import com.harmoney.ims.core.queuehandler.unpacker.Unpacker;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={UnpackerSpringConfig.class})
-public class UnpackerTest {
+public class ObjectDescriptorTest {
 	
-    private static final Logger log = LoggerFactory.getLogger(UnpackerTest.class);
+    private static final Logger log = LoggerFactory.getLogger(ObjectDescriptorTest.class);
 	
-	@Autowired Unpacker unpacker;
+//	@Autowired Unpacker unpacker;
 
 	@Test
 	public void testFixVariableFormat() {
-		Assert.assertEquals("managementFeeRealised", Unpacker.fixVariableFormat("Management_Fee_Realised__c"));
-		Assert.assertEquals("createdDate", Unpacker.fixVariableFormat("CreatedDate"));
-		Assert.assertEquals("principalPaid", Unpacker.fixVariableFormat("loan__Principal_Paid__c"));
-		Assert.assertEquals("investorLoanTransactions", Unpacker.fixVariableFormat("InvestorLoanTransactions"));
+		Assert.assertEquals("managementFeeRealised", ObjectDescriptor.fixVariableFormat("Management_Fee_Realised__c"));
+		Assert.assertEquals("createdDate", ObjectDescriptor.fixVariableFormat("CreatedDate"));
+		Assert.assertEquals("principalPaid", ObjectDescriptor.fixVariableFormat("loan__Principal_Paid__c"));
+		Assert.assertEquals("investorLoanTransactions", ObjectDescriptor.fixVariableFormat("InvestorLoanTransactions"));
 	}
 //	@Test
 //	public void dates() throws ParseException {
@@ -101,8 +98,10 @@ loan__Txn_Code__c=CHARGE OFF}
 	
 	@Test
 	public void unpack() {
+		ObjectDescriptorGenerator objectDescriptorGenerator = new ObjectDescriptorGenerator();
 		InvestorLoanTransaction target = new InvestorLoanTransaction();
-		Result result = unpacker.unpack(getMap(), target);
+		ObjectDescriptor objectDescriptor = objectDescriptorGenerator.build(InvestorLoanTransaction.class);
+		Result result = objectDescriptor.unpack(getMap().get("sobject"), target);
 		log.debug("{}",result);
 		Assert.assertEquals(4, result.getErrors().size());
 		Assert.assertEquals(2, result.getWarnings().size());

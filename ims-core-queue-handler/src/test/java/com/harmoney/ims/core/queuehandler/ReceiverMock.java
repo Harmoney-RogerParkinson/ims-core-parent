@@ -13,9 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import com.harmoney.ims.core.database.InvestorLoanTransactionDAO;
+import com.harmoney.ims.core.database.descriptors.Result;
 import com.harmoney.ims.core.instances.InvestorLoanTransaction;
-import com.harmoney.ims.core.queuehandler.unpacker.Result;
-import com.harmoney.ims.core.queuehandler.unpacker.Unpacker;
 
 /**
  * @author Roger Parkinson
@@ -28,17 +28,17 @@ public class ReceiverMock {
     private static final Logger log = LoggerFactory.getLogger(ReceiverMock.class);
     
     private CountDownLatch latch = new CountDownLatch(1);
-    @Autowired private Unpacker unpacker;
+    @Autowired private InvestorLoanTransactionDAO investorLoanTransactionDAO;
 
     @AMPQReceiver(queueName="${rabbitmq.queue:transaction-queue}")
     public void receiveMessage(Map<String, Map<String, Object>> message) {
         log.debug("Received <{}>", message);
         InvestorLoanTransaction target = new InvestorLoanTransaction();
-        Result result = unpacker.unpack(message, target);
+        Result result = investorLoanTransactionDAO.unpackMessage(message, target);
         log.debug("{}",result);
         Assert.assertEquals("a6fN00000008giLIAQ",target.getId());
         Assert.assertEquals(java.sql.Date.valueOf("2017-02-23"),target.getCreatedDate());
-        Assert.assertEquals(new BigDecimal(200D),target.getPrincipalPaid());
+        Assert.assertEquals(new BigDecimal(200D).longValue(),target.getPrincipalPaid().longValue());
         latch.countDown();
     }
 

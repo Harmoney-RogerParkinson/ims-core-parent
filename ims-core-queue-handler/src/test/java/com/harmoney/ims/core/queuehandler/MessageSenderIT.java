@@ -11,15 +11,15 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import com.harmoney.ims.core.database.DatabaseSpringConfig;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={QueueHandlerSpringConfig.class})
+@ContextConfiguration(classes={QueueHandlerSpringConfig.class,DatabaseSpringConfig.class})
 @ActiveProfiles("queue-handler-dev")
 public class MessageSenderIT {
 

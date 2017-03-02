@@ -43,8 +43,8 @@ public class InvestorLoanTransactionIT {
 		ilt.setName("ILT_100");
 		ilt.setNetAmount(new BigDecimal(123.456));
 		ilt.setCreatedDate(java.sql.Date.valueOf("2017-02-23"));
-		investorLoanTransactionDAO.createTransaction(ilt);
-		List<InvestorLoanTransaction> transactions = investorLoanTransactionDAO.getAllTransactions();
+		investorLoanTransactionDAO.create(ilt);
+		List<InvestorLoanTransaction> transactions = investorLoanTransactionDAO.getAll();
 		assertEquals(1,transactions.size());
 		// These verify the named queries
 		long imsid = transactions.get(0).getImsid();
@@ -55,7 +55,7 @@ public class InvestorLoanTransactionIT {
 		assertEquals(imsid,ilt2.getImsid());
 		// verify the update
 		ilt2.setName("ILT_101");
-		investorLoanTransactionDAO.upateTransaction(ilt2);
+		investorLoanTransactionDAO.upate(ilt2);
 		InvestorLoanTransaction ilt3 = investorLoanTransactionDAO.getById(id);
 		assertEquals("ILT_101",ilt3.getName());
 	}
@@ -67,8 +67,8 @@ public class InvestorLoanTransactionIT {
 		ilt.setName("ILT_150");
 		ilt.setNetAmount(new BigDecimal(123.456).setScale(2, BigDecimal.ROUND_HALF_DOWN));
 		ilt.setCreatedDate(java.sql.Date.valueOf("2017-02-23"));
-		investorLoanTransactionDAO.createReversalTransaction(ilt);
-		List<InvestorLoanTransaction> transactions = investorLoanTransactionDAO.getAllTransactions();
+		investorLoanTransactionDAO.createReversal(ilt);
+		List<InvestorLoanTransaction> transactions = investorLoanTransactionDAO.getAll();
 		assertEquals(1,transactions.size());
 		assertEquals(new BigDecimal(-123.46).setScale(2, BigDecimal.ROUND_HALF_DOWN), transactions.get(0).getNetAmount());
 	}
@@ -79,12 +79,12 @@ public class InvestorLoanTransactionIT {
 		ilt.setId("ILT_200");
 		ilt.setName("ILT_200");
 		ilt.setNetAmount(new BigDecimal(123.456));
-		investorLoanTransactionDAO.createTransaction(ilt);
-		List<InvestorLoanTransaction> transactions = investorLoanTransactionDAO.getAllTransactions();
+		investorLoanTransactionDAO.create(ilt);
+		List<InvestorLoanTransaction> transactions = investorLoanTransactionDAO.getAll();
 		assertEquals(1,transactions.size());
 		transactions.get(0);
-		investorLoanTransactionDAO.deleteTransaction(transactions.get(0));
-		transactions = investorLoanTransactionDAO.getAllTransactions();
+		investorLoanTransactionDAO.delete(transactions.get(0));
+		transactions = investorLoanTransactionDAO.getAll();
 		assertEquals(0,transactions.size());
 	}
 	

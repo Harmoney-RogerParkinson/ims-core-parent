@@ -17,7 +17,7 @@ import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 @EnableAMPQ
-@ComponentScan("com.harmoney.ims.core.queuehandler")
+@ComponentScan(value={"com.harmoney.ims.core.queuehandler","com.harmoney.ims.core.queueprocessor"})
 @PropertySource(value = { "classpath:test.properties" }, ignoreResourceNotFound = true)
 public class QueueHandlerSpringConfig {
 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.harmoney.ims.core.queuehandler;
+package com.harmoney.ims.core.database.xsdutils;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -13,7 +13,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 
-import com.harmoney.ims.core.queuehandler.unpacker.Unpacker;
+import com.harmoney.ims.core.database.descriptors.ObjectDescriptor;
 
 /**
  * @author Roger Parkinson
@@ -40,7 +40,7 @@ public class ConvertXSDVariables2 {
 					Attribute nameAttribute = element.getAttribute("name");
 					if (nameAttribute != null) {
 						String sfValue = nameAttribute.getValue();
-						nameAttribute.setValue(Unpacker.fixVariableFormat(sfValue));
+						nameAttribute.setValue(ObjectDescriptor.fixVariableFormat(sfValue));
 						if (!sfValue.equals(nameAttribute.getValue())) {
 							Element annotation = new Element("annotation",namespace);
 							Element documentation = new Element("documentation",namespace);

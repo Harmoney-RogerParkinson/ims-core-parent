@@ -6,5 +6,6 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 
 public @interface SalesforceName {
-	String fieldName();
+	String fieldName() default "";
+	String tableName() default "";
 }

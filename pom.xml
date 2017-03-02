@@ -23,7 +23,7 @@
 		<project.source.version>1.8</project.source.version>
 		<project.target.version>1.8</project.target.version>
 		<jaxb22.version>2.2.4-1</jaxb22.version>
-		<spring.framework.version>4.3.3.RELEASE</spring.framework.version>
+		<spring.framework.version>4.3.5.RELEASE</spring.framework.version>
 		<hibernate-version>4.3.10.Final</hibernate-version>
 		<maven-jaxb2-plugin.version>0.8.0</maven-jaxb2-plugin.version>
 		<jaxb2_commons.version>0.6.2</jaxb2_commons.version>
@@ -57,6 +57,11 @@
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>jcl-over-slf4j</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>log4j-over-slf4j</artifactId>
 				<version>${slf4j.version}</version>
 			</dependency>
 			<dependency>
