@@ -30,12 +30,28 @@ public class MessageHandlerImpl implements MessageHandler {
 	public String queueName;
 	@Autowired ConfigurableApplicationContext context;
 	@Autowired RabbitTemplate rabbitTemplate;
-
+	private String name;
+	FieldResolver fieldResolver;
+	
 	@Override
 	public void processMessage(Map<String, Object> message) {
 		log.debug("Received:\n{}", message);
 		rabbitTemplate.convertAndSend(queueName, message);
 
+	}
+
+	@Override
+	public void setTopicName(String name) {
+		this.name = name;
+		
+	}
+
+	public FieldResolver getFieldResolver() {
+		return fieldResolver;
+	}
+
+	public void setFieldResolver(FieldResolver fieldResolver) {
+		this.fieldResolver = fieldResolver;
 	}
 
 }

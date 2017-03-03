@@ -50,6 +50,7 @@ public class MessageProcessorSpringConfig {
 	
     private static final Logger log = LoggerFactory.getLogger(MessageProcessorSpringConfig.class);
 	@Autowired private MessageHandler messageHandler;
+	@Autowired private FieldResolverFactory fieldResolverFactory;
 
 	// needed for @PropertySource
 	@Bean
@@ -90,6 +91,7 @@ public class MessageProcessorSpringConfig {
 				};
 			connector.subscribe(thisTopic, replayFrom,
 					consumer).get(5, TimeUnit.SECONDS);
+			thisMessageHandler.setTopicName(thisTopic);
 			log.debug("subscription created: {} replayFrom {}",thisTopic, replayFrom);
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			throw new MessageHandlerException("failed to subscribe",e);

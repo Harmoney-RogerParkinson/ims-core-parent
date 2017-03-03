@@ -59,7 +59,7 @@ public class Subscription2IT {
 	public void testSubscription() throws ConnectionException, InterruptedException {
 		assertNotNull(empConnector);
 		updateInvestorLoanTransaction();
-		assertTrue("Did not reach expected count",messageHandler.getLatch().await(10000, TimeUnit.MILLISECONDS));
+		assertTrue("Did not reach expected count",messageHandler.getLatch().await(100000, TimeUnit.MILLISECONDS));
 	}
 
 	private void updateInvestorLoanTransaction() throws ConnectionException {

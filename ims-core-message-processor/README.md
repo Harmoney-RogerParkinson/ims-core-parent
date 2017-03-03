@@ -26,27 +26,8 @@ https://developer.salesforce.com/docs/atlas.en-us.api_streaming.meta/api_streami
 
 ```
 PushTopic pushTopic = new PushTopic();
-pushTopic.Name = 'InvestorLoanTransactionInserts';
-pushTopic.Query = 'SELECT Id, 
-	Name, 
-	Status__c, 
-	Description__c 
-	FROM loan__Investor_Loan_Account_Txns__c	';
-pushTopic.ApiVersion = 38.0;
-pushTopic.NotifyForOperationCreate = true;
-pushTopic.NotifyForOperationUpdate = true;
-pushTopic.NotifyForOperationUndelete = true;
-pushTopic.NotifyForOperationDelete = true;
-pushTopic.NotifyForFields = 'Referenced';
-insert pushTopic;
-
-```
-
-```
-PushTopic pushTopic = new PushTopic();
 pushTopic.Name = 'ILTIMS';
-pushTopic.Query = 'SELECT Id,Name,CreatedDate, test__c, isDeleted, loan__Investor_Loan__c, loan__Principal_Paid__c,loan__Interest_Paid__c, loan__Late_Fees_Paid__c,loan__Tax__c, loan__Total_Service_Charge__c,loan__Charged_Off_Date__c, loan__Charged_Off_Fees__c,loan__Charged_Off_Interest__c, loan__Charged_Off_Principal__c,Investor_Txn_Fee__c, loan__Txn_Code__c,loan__Waived__c, loan__Protect_Principal__c, loan__Rebate_Amount_On_Payoff__c  FROM loan__Investor_Loan_Account_Txns__c';
-pushTopic.ApiVersion = 38.0;
+pushTopic.Query = 'SELECT Id,Name,CreatedDate, Loan_Payment_Transaction_Remark__c, Original_Protect_Realised__c, Loan_Payment_Transaction_Protect_Realise__c, Share_Rounded__c, LastModifiedDate, isDeleted, loan__Investor_Loan__c, loan__Principal_Paid__c,loan__Interest_Paid__c, loan__Late_Fees_Paid__c,loan__Tax__c, loan__Total_Service_Charge__c,loan__Charged_Off_Date__c,Extra_Protect_Realised__c,HP_Management_Fee__c, Protect_Fee_Amount__c,Protect_Realised_Active__c,Protect_Charge_Off__c,HP_Sale_Commission_Fee__c,Protect_Enabled__c,loan__Charged_Off_Fees__c,loan__Charged_Off_Interest__c, loan__Charged_Off_Principal__c,Investor_Txn_Fee__c, loan__Txn_Code__c,loan__Waived__c, loan__Protect_Principal__c, loan__Txn_Type__c, loan__Rebate_Amount_On_Payoff__c  FROM loan__Investor_Loan_Account_Txns__c where LastModifiedDate > 1990-10-08T01:02:03Z';pushTopic.ApiVersion = 38.0;
 pushTopic.NotifyForOperationCreate = true;
 pushTopic.NotifyForOperationUpdate = true;
 pushTopic.NotifyForOperationUndelete = true;
@@ -64,6 +45,7 @@ For some reason it also doesn't like these fields:
  * Protect_Realised__c
  
 These are all Formula fields, but so is loan__Protect_Principal__c and that is fine. The error suggests it is not finding the field (ie suggests adding a __c to the end etc). Also it must have the test__c field to allow the integration tests to work.
+...those bad fields have formulae with IF in them. I added more fields to fetch the component fields the formula was referencing and then replicated the formulae in the Java code. Apart from a divide by zero issue (which I 'iffed' out it is working.
 
 Format of message is (roughly):
 
@@ -85,7 +67,38 @@ List<PushTopic> pts = [SELECT Id FROM PushTopic WHERE Name = 'ILTIMS'];
 Database.delete(pts);
 ``` 
 
+for the rjpsandbox there is a new test object created and the pushtopic looks like this:
 
+```
+List<PushTopic> pts = [SELECT Id FROM PushTopic WHERE Name = 'InvoiceStatementUpdates'];
+Database.delete(pts);
+
+PushTopic pushTopic = new PushTopic();
+pushTopic.Name = 'InvoiceStatementUpdates';
+pushTopic.Query = 'SELECT Id, Name, Status__c, Description__c,mycurrencyfield__c,mynumber__c,mypercent__c FROM Invoice_Statement__c where LastModifiedDate > 2005-10-08T01:02:03Z';
+pushTopic.ApiVersion = 38.0;
+pushTopic.NotifyForOperationCreate = true;
+pushTopic.NotifyForOperationUpdate = true;
+pushTopic.NotifyForOperationUndelete = true;
+pushTopic.NotifyForOperationDelete = true;
+pushTopic.NotifyForFields = 'Where';
+insert pushTopic;
+``` 
+extra fields I had to create in SF to overcome the IF in the formulae:
+
+```
+loan__Loan_Payment_Transaction__r.Remark__c Loan_Payment_Transaction_Remark__c
+loan__Loan_Payment_Transaction__r.Original_Protect_Realised__c Payment_Transaction_Original_Protect_Rea__c
+loan__Loan_Payment_Transaction__r.Protect_Realised__c Loan_Payment_Transaction_Protect_Realised__c
+loan__Investor_Loan__r.loan__Share_rounded__c Share_Rounded__c,
+loan__Investor_Loan__r.loan__Loan__r.Extra_Protect_Realised__c	Extra_Protect_Realised__c,
+loan__Investor_Loan__r.loan__Loan__r.HP_Management_Fee__c HP_Management_Fee__c,
+loan__Investor_Loan__r.loan__Loan__r.loan__Protect_fee_amount__c Protect_Fee_Amount__c,
+loan__Investor_Loan__r.loan__Loan__r.Protect_Realised_Active__c Protect_Realised_Active__c,
+loan__Investor_Loan__r.loan__Loan__r.Protect_Charge_Off__c Protect_Charge_Off__c,
+loan__Investor_Loan__r.loan__Loan__r.HP_Sale_Commission_Fee__c HP_Sale_Commission_Fee__c,
+loan__Investor_Loan__r.loan__Loan__r.loan__Protect_Enabled__c Protect_Enabled__c,
+```
 
 
 
