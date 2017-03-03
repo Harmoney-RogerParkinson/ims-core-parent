@@ -4,6 +4,7 @@
 package com.harmoney.ims.core.messages;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 
 import org.slf4j.Logger;
@@ -27,10 +28,23 @@ public class MessageHandlerMock implements com.harmoney.ims.core.messages.Messag
 	@Override
 	public void processMessage(Map<String, Object> message) {
 		log.debug("Received:\n{}", message);
+		Map<String,Object> sobject = (Map<String,Object>)message.get("sobject");
+		log.debug("sobject:\n {}",getSobject(sobject));
 		latch.countDown();
 	}
     public CountDownLatch getLatch() {
         return latch;
+    }
+    
+    private String getSobject(Map<String,Object> sobject) {
+    	StringBuilder ret = new StringBuilder();
+		for (Entry<String,Object> entry: sobject.entrySet()) {
+			ret.append(entry.getKey());
+			ret.append('=');
+			ret.append(entry.getValue());
+			ret.append('\n');
+		}
+		return ret.toString();
     }
 
 }

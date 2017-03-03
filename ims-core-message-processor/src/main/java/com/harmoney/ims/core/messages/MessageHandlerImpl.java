@@ -34,8 +34,6 @@ public class MessageHandlerImpl implements MessageHandler {
 	@Override
 	public void processMessage(Map<String, Object> message) {
 		log.debug("Received:\n{}", message);
-		// TODO: Some message deblocking needs to happen here if incoming messages
-		// have multiple records in a single message.
 		rabbitTemplate.convertAndSend(queueName, message);
 
 	}
