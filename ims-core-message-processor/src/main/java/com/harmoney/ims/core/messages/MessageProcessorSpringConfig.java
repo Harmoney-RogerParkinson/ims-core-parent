@@ -69,9 +69,6 @@ public class MessageProcessorSpringConfig {
 		} catch (Exception e) {
 			throw new MessageHandlerException("failed to login",e);
 		}
-		Consumer<Map<String, Object>> consumer = event -> {
-			messageHandler.processMessage(event);
-		};
 		EmpConnector connector = new EmpConnector(params);
 
 		try {
@@ -80,16 +77,24 @@ public class MessageProcessorSpringConfig {
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			throw new MessageHandlerException("failed to start", e);
 		}
+		
+		subscribe(connector,topic,messageHandler);
+		// we can easily add more subscribers here
 
-		TopicSubscription subscription;
+		return connector;
+	}
+	private void subscribe(EmpConnector connector, String thisTopic, MessageHandler thisMessageHandler) {
 		try {
-			subscription = connector.subscribe(topic, replayFrom,
+			Consumer<Map<String, Object>> consumer = event -> {
+				thisMessageHandler.processMessage(event);
+				};
+			connector.subscribe(thisTopic, replayFrom,
 					consumer).get(5, TimeUnit.SECONDS);
-			log.debug("subscription created: {} replayFrom {}",topic, replayFrom);
+			log.debug("subscription created: {} replayFrom {}",thisTopic, replayFrom);
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			throw new MessageHandlerException("failed to subscribe",e);
 		}
-		return connector;
+		
 	}
 
 }
