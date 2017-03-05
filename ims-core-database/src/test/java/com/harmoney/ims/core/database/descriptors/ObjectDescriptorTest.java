@@ -83,6 +83,10 @@ loan__Txn_Code__c=CHARGE OFF}
 		sobject.put("loan__Charged_Off_Interest__c", new Double(0));
 		sobject.put("Investor_Txn_Fee__c", new Double(0));
 		sobject.put("loan__Principal_Paid__c", new Double(0));
+		sobject.put("Protect_Realised__c", new Double(0));
+		sobject.put("Management_Fee_Realised__c", new Double(0));
+		sobject.put("Sales_Commission_Fee_Realised__c", new Double(0));
+		sobject.put("Net_Amount__c", new Double(0));
 		sobject.put("loan__Tax__c", new Double(0));
 		sobject.put("CreatedDate", "2016-05-17T03:51:23.000Z");
 		sobject.put("loan__Rebate_Amount_On_Payoff__c", new Double(0));
@@ -91,6 +95,10 @@ loan__Txn_Code__c=CHARGE OFF}
 		sobject.put("loan__Protect_Principal__c", null);
 		sobject.put("loan__Txn_Code__c", "CHARGE OFF");
 		sobject.put("loan__Txn_Type__c", null);
+		sobject.put("Rejected__c", new Boolean(false));
+		sobject.put("Reversed__c", new Boolean(false));
+		sobject.put("Reverse_Rejected_Date__c", null);
+		sobject.put("Account_ID__c", "1111");
 		Map<String,Map<String,Object>> ret = new HashMap<>();
 		ret.put("sobject", sobject);
 		return ret;
@@ -103,8 +111,8 @@ loan__Txn_Code__c=CHARGE OFF}
 		ObjectDescriptor objectDescriptor = objectDescriptorGenerator.build(InvestorLoanTransaction.class);
 		Result result = objectDescriptor.unpack(getMap().get("sobject"), target);
 		log.debug("{}",result);
-		Assert.assertEquals(4, result.getErrors().size());
-		Assert.assertEquals(2, result.getWarnings().size());
+		Assert.assertEquals(0, result.getErrors().size());
+		Assert.assertEquals(3, result.getWarnings().size());
 	}
 	
 	

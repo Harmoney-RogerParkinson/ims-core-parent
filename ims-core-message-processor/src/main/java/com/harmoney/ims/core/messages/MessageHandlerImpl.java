@@ -31,11 +31,13 @@ public class MessageHandlerImpl implements MessageHandler {
 	@Autowired ConfigurableApplicationContext context;
 	@Autowired RabbitTemplate rabbitTemplate;
 	private String name;
-	FieldResolver fieldResolver;
+	@Autowired FieldResolverFactory fieldResolverFactory;
 	
 	@Override
 	public void processMessage(Map<String, Object> message) {
 		log.debug("Received:\n{}", message);
+		Map<String,Object> sobject = (Map<String,Object>)message.get("sobject");
+		fieldResolverFactory.processFields(name,sobject);
 		rabbitTemplate.convertAndSend(queueName, message);
 
 	}
@@ -46,12 +48,5 @@ public class MessageHandlerImpl implements MessageHandler {
 		
 	}
 
-	public FieldResolver getFieldResolver() {
-		return fieldResolver;
-	}
-
-	public void setFieldResolver(FieldResolver fieldResolver) {
-		this.fieldResolver = fieldResolver;
-	}
 
 }

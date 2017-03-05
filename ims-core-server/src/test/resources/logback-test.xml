@@ -16,7 +16,7 @@
    </appender>
     -->
 	<logger name="com.harmoney.ims.core.queuehandler.unpacker.Unpacker" level="debug"/>
-	<logger name="com.harmoney.ims.core.soapmessages.QueryEngine" level="debug"/>
+	<logger name="com.harmoney.ims.core.database.descriptors.ObjectDescriptor" level="debug"/>
 	<logger name="com.salesforce.emp.connector" level="debug" />
 	<logger name="com.harmoney.ims.core.messages" level="debug" />
 	<logger name="com.harmoney.ims" level="warn" />

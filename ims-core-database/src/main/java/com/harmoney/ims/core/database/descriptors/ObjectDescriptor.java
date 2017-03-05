@@ -71,6 +71,18 @@ public class ObjectDescriptor {
 					log.warn(ret.warn("property {} was null",salesforceName));
 					continue;
 				}
+				if (salesforceName.equals("Id")) {
+					log.debug("SF Record id={}",value);
+				}
+				if (salesforceName.equals("Protect_Realised__c")) {
+					log.debug("Protect_Realised__c={}",value);
+				}
+				if (salesforceName.equals("Management_Fee_Realised__c")) {
+					log.debug("Management_Fee_Realised__c={}",value);
+				}
+				if (salesforceName.equals("Sales_Commission_Fee_Realised__c")) {
+					log.debug("Sales_Commission_Fee_Realised__c={}",value);
+				}
 				Class<?> columnType = propertyHolder.getColumnType();
 				if (value instanceof Double) {
 					//convert double to bigdecimal

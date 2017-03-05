@@ -725,7 +725,7 @@
 					</appinfo>
 				</annotation>
 			</element>
-			<element name="investorLoan" type="string">
+			<element name="investmentOrderId" type="string">
 				<annotation>
 					<documentation>Salesforce name: loan__Investor_Loan__c
 					</documentation>
@@ -736,8 +736,6 @@
 					</appinfo>
 				</annotation>
 			</element>
-			<element name="investmentOrder" type="tns:InvestmentOrder"
-				maxOccurs="1" minOccurs="1" />
 			<element name="netAmount" type="tns:currency">
 				<annotation>
 					<documentation>loan__Txn_Amount__c - loan__Tax__c - loan__Total_Service_Charge__c
@@ -756,6 +754,16 @@
 					<appinfo>
 						<annox:annotate>
 							<ims:SalesforceName fieldName="CreatedDate" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="accountId" type="string">
+				<annotation>
+					<documentation>Salesforce name: Account_ID__c</documentation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Account_ID__c" />
 						</annox:annotate>
 					</appinfo>
 				</annotation>
@@ -955,6 +963,33 @@
 						<annox:annotate>
 							<ims:SalesforceName fieldName="Protect_Realised__c" />
 							<ims:Negateable/>
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="rejected" type="boolean">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Rejected__c" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="reversed" type="boolean">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Reversed__c" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="reversedOrRejectedDate" type="date">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Reverse_Rejected_Date__c" />
 						</annox:annotate>
 					</appinfo>
 				</annotation>
