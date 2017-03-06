@@ -8,6 +8,7 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,8 +35,10 @@ public class QueueHandlerSpringConfig {
 	 public String rabbitmqPassword;
 	 @Value("${rabbitmq.exchange:transaction-exchange}")
 	 public String exchangeName;
-	 @Value("${rabbitmq.queue:transaction-queue}")
-	 public String queueName;
+//	 @Value("${rabbitmq.queue:transaction-queue}")
+//	 public String queueName;
+	 public static String ILTQUEUE = "ilt-queue"; 
+	 public static String IFTQUEUE = "ift-queue"; 
 	 
 	 /**
 	 * Although this is not used here the only other place the
@@ -57,24 +60,34 @@ public class QueueHandlerSpringConfig {
 
 	    return factory;
 	}
-// Only need this if we want to auto-create the queue and/or exchange
-//	@Bean
-//	RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
-//		return new RabbitAdmin(connectionFactory);
-//	}
+	// Only need this if we want to auto-create the queue and/or exchange
 	@Bean
-	Queue queue() {
-		return new Queue(queueName, true);
+	RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
+		return new RabbitAdmin(connectionFactory);
 	}
-
 	@Bean
 	TopicExchange exchange() {
 		return new TopicExchange(exchangeName);
 	}
 
 	@Bean
-	Binding binding(Queue queue, TopicExchange exchange) {
-		return BindingBuilder.bind(queue).to(exchange).with(queueName);
+	Queue iltqueue() {
+		return new Queue(ILTQUEUE, true);
+	}
+
+	@Bean
+	Binding iltbinding(Queue iltqueue, TopicExchange exchange) {
+		return BindingBuilder.bind(iltqueue).to(exchange).with(ILTQUEUE);
+	}
+
+	@Bean
+	Queue iftqueue() {
+		return new Queue(IFTQUEUE, true);
+	}
+
+	@Bean
+	Binding iftbinding(Queue iftqueue, TopicExchange exchange) {
+		return BindingBuilder.bind(iftqueue).to(exchange).with(IFTQUEUE);
 	}
 
 //	@Bean

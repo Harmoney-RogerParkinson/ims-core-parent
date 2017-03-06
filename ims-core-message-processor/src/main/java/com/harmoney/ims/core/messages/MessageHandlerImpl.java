@@ -21,13 +21,13 @@ public class MessageHandlerImpl implements MessageHandler {
 
 	private static final Logger log = LoggerFactory
 			.getLogger(MessageHandlerImpl.class);
-	public String rabbbitQueue;
+	public String rabbitQueue;
 	private final RabbitTemplate rabbitTemplate;
 	private final FieldResolver fieldResolver;
 	
 	public MessageHandlerImpl(RabbitTemplate rabbitTemplate, String rabbitQueue,
 			FieldResolver fieldResolver) {
-		this.rabbbitQueue = rabbitQueue;
+		this.rabbitQueue = rabbitQueue;
 		this.fieldResolver = fieldResolver;
 		this.rabbitTemplate = rabbitTemplate;
 	}
@@ -38,7 +38,8 @@ public class MessageHandlerImpl implements MessageHandler {
 		Map<String,Object> sobject = (Map<String,Object>)message.get("sobject");
 		fieldResolver.resolve(sobject);
 		if (rabbitTemplate != null) {
-			rabbitTemplate.convertAndSend(rabbbitQueue, message);
+			rabbitTemplate.convertAndSend(rabbitQueue, message);
+			log.debug("Sent to: {}", rabbitQueue);
 		}
 	}
 }

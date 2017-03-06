@@ -45,8 +45,8 @@ public class MessageHandlerMap {
 	}
 	@PostConstruct
 	public void init() {
-		subscribe(empConnector,ILTIMS,getMessageHandler("transaction-queue",new FieldResolverILT()));
-//		subscribe(connector,"/topic/IFTIMS",getMessageHandler("ift-queue",new FieldResolverIFT()));
+		subscribe(empConnector,ILTIMS,getMessageHandler("ilt-queue",new FieldResolverILT()));
+		subscribe(empConnector,IFTIMS,getMessageHandler("ift-queue",new FieldResolverIFT()));
 
 	}
 	private MessageHandler getMessageHandler(String rabbitQueue, FieldResolver fieldResolver) {
@@ -68,7 +68,8 @@ public class MessageHandlerMap {
 			log.debug("subscription created: {} replayFrom {}",thisTopic, replayFrom);
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			throw new MessageHandlerException("failed to subscribe",e);
-		}map.put(thisTopic, thisMessageHandler);
+		}
+		map.put(thisTopic, thisMessageHandler);
 		
 	}
 

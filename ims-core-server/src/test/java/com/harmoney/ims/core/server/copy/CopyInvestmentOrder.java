@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.harmoney.ims.core.database.DatabaseSpringConfig;
 import com.harmoney.ims.core.database.InvestmentOrderDAO;
 import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
-import com.harmoney.ims.core.server.test.ServerIT;
+import com.harmoney.ims.core.server.test.ILTServerIT;
 import com.sforce.ws.ConnectionException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -23,7 +23,7 @@ import com.sforce.ws.ConnectionException;
 @ActiveProfiles({ "message-processor-dev", "server-dev" })
 public class CopyInvestmentOrder {
 
-	private static final Logger log = LoggerFactory.getLogger(ServerIT.class);
+	private static final Logger log = LoggerFactory.getLogger(ILTServerIT.class);
 
 	@Autowired
 	private InvestmentOrderDAO investmentOrderDAO;

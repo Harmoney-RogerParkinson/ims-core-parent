@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
@@ -53,9 +54,9 @@ import com.sforce.ws.ConnectionException;
 @TestPropertySource("/test2.properties")
 @ContextConfiguration(classes={MessageProcessorSpringConfig.class,PartnerConnectionSpringConfig.class,QueueHandlerSpringConfig.class,DatabaseSpringConfig.class})
 @ActiveProfiles({"message-processor-prod","server-dev"})
-public class ServerIT {
+public class ILTServerIT {
 	
-    private static final Logger log = LoggerFactory.getLogger(ServerIT.class);
+    private static final Logger log = LoggerFactory.getLogger(ILTServerIT.class);
 	@Autowired private EmpConnector empConnector;
     @Autowired ReceiverMock receiver;
     @Autowired ConfigurableApplicationContext context;

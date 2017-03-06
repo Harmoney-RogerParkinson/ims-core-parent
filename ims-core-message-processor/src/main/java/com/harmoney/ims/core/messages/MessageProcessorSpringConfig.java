@@ -45,8 +45,6 @@ public class MessageProcessorSpringConfig {
 	public long timeout;
 	
     private static final Logger log = LoggerFactory.getLogger(MessageProcessorSpringConfig.class);
-//	@Autowired private MessageHandler messageHandler;
-//	@Autowired private FieldResolverFactory fieldResolverFactory;
 
 	// needed for @PropertySource
 	@Bean

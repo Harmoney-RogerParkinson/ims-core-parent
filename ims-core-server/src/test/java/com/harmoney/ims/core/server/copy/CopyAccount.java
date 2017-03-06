@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.harmoney.ims.core.database.AccountDAO;
 import com.harmoney.ims.core.database.DatabaseSpringConfig;
 import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
-import com.harmoney.ims.core.server.test.ServerIT;
+import com.harmoney.ims.core.server.test.ILTServerIT;
 import com.sforce.ws.ConnectionException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -25,7 +25,7 @@ import com.sforce.ws.ConnectionException;
 @Transactional
 public class CopyAccount {
 
-	private static final Logger log = LoggerFactory.getLogger(ServerIT.class);
+	private static final Logger log = LoggerFactory.getLogger(ILTServerIT.class);
 
 	@Autowired
 	private AccountDAO accountDAO;

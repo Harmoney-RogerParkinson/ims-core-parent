@@ -107,12 +107,12 @@ loan__Loan_Payment_Transaction__r.Reverse_Rejected_Date__c Reverse_Rejected_Date
 PushTopic for the InvestorFundTransaction
 
 ```
-List<PushTopic> pts = [SELECT Id FROM PushTopic WHERE Name = 'IFT'];
+List<PushTopic> pts = [SELECT Id FROM PushTopic WHERE Name = 'IFTIMS'];
 Database.delete(pts);
 
 PushTopic pushTopic = new PushTopic();
-pushTopic.Name = 'IFT';
-pushTopic.Query = 'SELECT Id,Name,CreatedDate, loan_account_c, loan__Transaction_Date__c, loan__Transaction_Type__c, loan__transaction_amount__c, loan__Cleared__c,loan__Rejected__c, loan__Reversed__c,Reverse_Rejected_Date__c FROM loan__Investor_Fund_Transaction__c where LastModifiedDate > 1990-10-08T01:02:03Z';
+pushTopic.Name = 'IFTIMS';
+pushTopic.Query = 'SELECT Id,Name,CreatedDate, loan__Account__c, loan__Transaction_Date__c, loan__Transaction_Type__c, loan__transaction_amount__c, loan__Cleared__c,loan__Rejected__c, loan__Reversed__c,Reverse_Rejected_Date__c FROM loan__Investor_Fund_Transaction__c where LastModifiedDate > 1990-10-08T01:02:03Z';
 pushTopic.ApiVersion = 38.0;
 pushTopic.NotifyForOperationCreate = true;
 pushTopic.NotifyForOperationUpdate = true;
@@ -121,5 +121,6 @@ pushTopic.NotifyForOperationDelete = true;
 pushTopic.NotifyForFields = 'All';
 insert pushTopic;
 ```
+*The Salesforce Apex window where you enter this code only accepts one topic at a time. It looks like 'execute highlight' will work but it doesn't*
 
 

@@ -21,16 +21,22 @@ import com.harmoney.ims.core.queueprocessor.InvestorLoanTransactionProcessor;
  */
 @Component
 @Profile("queue-handler-prod")
-public class InvestorLoanTransactionReceiver {
+public class RabbitReceiver {
 
-    private static final Logger log = LoggerFactory.getLogger(InvestorLoanTransactionReceiver.class);
+    private static final Logger log = LoggerFactory.getLogger(RabbitReceiver.class);
     
     @Autowired private InvestorLoanTransactionProcessor investorLoanTransactionProcessor;
 
-    @AMPQReceiver(queueName="${rabbitmq.queue:transaction-queue}")
-    public void receiveMessage(Map<String, Map<String, Object>> message) {
+    @AMPQReceiver(queueName="ilt-queue")
+    public void receiveILTMessage(Map<String, Map<String, Object>> message) {
         log.debug("Received <{}>", message);
         investorLoanTransactionProcessor.receiveMessage(message);
+    }
+
+    @AMPQReceiver(queueName="ift-queue")
+    public void receiveIFTMessage(Map<String, Map<String, Object>> message) {
+        log.debug("Received <{}>", message);
+        //investorLoanTransactionProcessor.receiveMessage(message);
     }
 
 }

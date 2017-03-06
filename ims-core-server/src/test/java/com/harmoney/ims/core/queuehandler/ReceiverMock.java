@@ -30,10 +30,16 @@ public class ReceiverMock {
     
     @Autowired private InvestorLoanTransactionProcessor investorLoanTransactionProcessor;
     
-    @AMPQReceiver(queueName="${rabbitmq.queue}")
-    public void receiveMessage(Map<String, Map<String, Object>> message) {
+    @AMPQReceiver(queueName="ilt-queue")
+    public void receiveILTMessage(Map<String, Map<String, Object>> message) {
         log.debug("Received <{}>", message);
         investorLoanTransactionProcessor.receiveMessage(message);
+        latch.countDown();
+    }
+    @AMPQReceiver(queueName="ift-queue")
+    public void receiveIFTMessage(Map<String, Map<String, Object>> message) {
+        log.debug("Received <{}>", message);
+//        investorLoanTransactionProcessor.receiveMessage(message);
         latch.countDown();
     }
     public CountDownLatch getLatch() {
