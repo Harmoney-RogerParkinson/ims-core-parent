@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +21,6 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 import com.salesforce.emp.connector.BayeuxParameters;
 import com.salesforce.emp.connector.EmpConnector;
-import com.salesforce.emp.connector.TopicSubscription;
 
 /**
  * This is a Spring Configuration class that defines the beans needed for the
@@ -41,16 +41,12 @@ public class MessageProcessorSpringConfig {
 	public String password;
 	@Value("${salesforce.security.token}")
 	public String securityToken;
-	@Value("${salesforce.topic}")
-	public String topic;
-	@Value("${salesforce.replayFrom:-1}")
-	public long replayFrom;
 	@Value("${salesforce.timeout:5}")
 	public long timeout;
 	
     private static final Logger log = LoggerFactory.getLogger(MessageProcessorSpringConfig.class);
-	@Autowired private MessageHandler messageHandler;
-	@Autowired private FieldResolverFactory fieldResolverFactory;
+//	@Autowired private MessageHandler messageHandler;
+//	@Autowired private FieldResolverFactory fieldResolverFactory;
 
 	// needed for @PropertySource
 	@Bean
@@ -78,25 +74,7 @@ public class MessageProcessorSpringConfig {
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			throw new MessageHandlerException("failed to start", e);
 		}
-		
-		subscribe(connector,topic,messageHandler);
-		// we can easily add more subscribers here
-
 		return connector;
-	}
-	private void subscribe(EmpConnector connector, String thisTopic, MessageHandler thisMessageHandler) {
-		try {
-			Consumer<Map<String, Object>> consumer = event -> {
-				thisMessageHandler.processMessage(event);
-				};
-			connector.subscribe(thisTopic, replayFrom,
-					consumer).get(5, TimeUnit.SECONDS);
-			thisMessageHandler.setTopicName(thisTopic);
-			log.debug("subscription created: {} replayFrom {}",thisTopic, replayFrom);
-		} catch (InterruptedException | ExecutionException | TimeoutException e) {
-			throw new MessageHandlerException("failed to subscribe",e);
-		}
-		
 	}
 
 }

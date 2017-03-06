@@ -6,12 +6,12 @@ import static org.junit.Assert.assertTrue;
 import java.util.GregorianCalendar;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -46,19 +46,20 @@ import com.sforce.ws.ConnectionException;
 @TestPropertySource("/test.properties")
 @ContextConfiguration(classes={MessageProcessorSpringConfig.class,PartnerConnectionSpringConfig.class})
 @ActiveProfiles("message-processor-dev")
-public class SubscriptionIT {
+public class InvoiceStatementIT {
 	
-    private static final Logger log = LoggerFactory.getLogger(SubscriptionIT.class);
+    private static final Logger log = LoggerFactory.getLogger(InvoiceStatementIT.class);
 	@Autowired private EmpConnector empConnector;
-	@Autowired private MessageHandlerMock messageHandler;
+	@Autowired private MessageHandler messageHandler;
 	
 	@Autowired private PartnerConnection partnerConnection;
 
 	@Test
+	@Ignore // Superseded by InvestorLoanTransactionIT
 	public void testSubscription() throws ConnectionException, InterruptedException {
 		assertNotNull(empConnector);
 		createInvoiceStatement();
-		assertTrue("Did not reach expected count",messageHandler.getLatch().await(10000, TimeUnit.MILLISECONDS));
+		assertTrue("Did not reach expected count",((MessageHandlerMock)messageHandler).getLatch().await(10000, TimeUnit.MILLISECONDS));
 	}
 
 	private void createInvoiceStatement() throws ConnectionException {

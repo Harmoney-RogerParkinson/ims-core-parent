@@ -9,6 +9,7 @@ import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -35,6 +36,13 @@ public class QueueHandlerSpringConfig {
 	 public String exchangeName;
 	 @Value("${rabbitmq.queue:transaction-queue}")
 	 public String queueName;
+	 
+	 /**
+	 * Although this is not used here the only other place the
+	 * template is injected is a required=false (where false is okay for testing)
+	 * We seem to need to have a required=true here to force it to inject there.
+	 */
+	private @Autowired RabbitTemplate rabbitTemplate;
 
 	/**
 	 * Bean is our direct connection to RabbitMQ

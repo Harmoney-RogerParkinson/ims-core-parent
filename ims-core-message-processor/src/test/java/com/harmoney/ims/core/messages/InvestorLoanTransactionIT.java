@@ -1,6 +1,7 @@
 package com.harmoney.ims.core.messages;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -47,11 +48,11 @@ import com.sforce.ws.ConnectionException;
 @TestPropertySource("/test2.properties")
 @ContextConfiguration(classes={MessageProcessorSpringConfig.class,PartnerConnectionSpringConfig.class})
 @ActiveProfiles("message-processor-dev")
-public class Subscription2IT {
+public class InvestorLoanTransactionIT {
 	
-    private static final Logger log = LoggerFactory.getLogger(Subscription2IT.class);
+    private static final Logger log = LoggerFactory.getLogger(InvestorLoanTransactionIT.class);
 	@Autowired private EmpConnector empConnector;
-	@Autowired private MessageHandlerMock messageHandler;
+	@Autowired private MessageHandlerMap messageHandlerMap;
 	
 	@Autowired private PartnerConnection partnerConnection;
 
@@ -59,6 +60,7 @@ public class Subscription2IT {
 	public void testSubscription() throws ConnectionException, InterruptedException {
 		assertNotNull(empConnector);
 		updateInvestorLoanTransaction();
+		MessageHandlerMock messageHandler = (MessageHandlerMock) messageHandlerMap.getMessageHandler(MessageHandlerMap.ILTIMS);
 		assertTrue("Did not reach expected count",messageHandler.getLatch().await(100000, TimeUnit.MILLISECONDS));
 	}
 
