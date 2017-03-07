@@ -62,7 +62,7 @@
 					</xsd:appinfo>
 				</xsd:annotation>
 			</element>
-			<element name="id" type="string" nillable="false">
+			<element name="id" type="string">
 				<annotation>
 					<appinfo>
 						<annox:annotate>
@@ -71,12 +71,9 @@
 					</appinfo>
 				</annotation>
 			</element>
-			<element name="name" type="string" nillable="false">
+			<element name="name" type="string">
 				<annotation>
 					<appinfo>
-						<hj:basic>
-							<orm:column nullable="false" />
-						</hj:basic>
 						<annox:annotate>
 							<ims:SalesforceName fieldName="Name" />
 						</annox:annotate>
@@ -97,6 +94,21 @@
 					<appinfo>
 						<annox:annotate>
 							<ims:SalesforceName fieldName="CreatedDate" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="reversedId" type="long">
+				<annotation>
+					<documentation>If the transaction was reversed then this points to the reversal transaction.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="reversedOrRejectedDate" type="date">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Reverse_Rejected_Date__c" />
 						</annox:annotate>
 					</appinfo>
 				</annotation>
@@ -406,21 +418,6 @@
 					</appinfo>
 				</annotation>
 			</element>
-			<element name="reversedOrRejectedDate" type="date">
-				<annotation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="Reverse_Rejected_Date__c" />
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="reversedId" type="long">
-				<annotation>
-					<documentation>If the transaction was reversed then this points to the reversal transaction.
-					</documentation>
-				</annotation>
-			</element>
             </xsd:sequence>
          </xsd:extension>
     </xsd:complexContent>
@@ -520,22 +517,6 @@
 							</appinfo>
 						</annotation>
 					</element>
-					<element name="reversedOrRejectedDate" type="date">
-						<annotation>
-							<appinfo>
-								<annox:annotate>
-									<ims:SalesforceName fieldName="Reverse_Rejected_Date__c" />
-								</annox:annotate>
-							</appinfo>
-						</annotation>
-					</element>
-				<element name="reversedId" type="long">
-					<annotation>
-						<documentation>If the transaction was reversed then this points to the reversal transaction.
-						</documentation>
-					</annotation>
-				</element>
-
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>

@@ -3,6 +3,7 @@
  */
 package com.harmoney.ims.core.queueprocessor;
 
+import java.util.Date;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -23,35 +24,55 @@ import com.harmoney.ims.core.instances.InvestorLoanTransaction;
  *
  */
 @Component
-public class InvestorLoanTransactionProcessor {
+public class InvestorFundTransactionProcessor {
 
-    private static final Logger log = LoggerFactory.getLogger(InvestorLoanTransactionProcessor.class);
+    private static final Logger log = LoggerFactory.getLogger(InvestorFundTransactionProcessor.class);
     @Autowired private InvestorLoanTransactionDAO investorLoanTransactionDAO;
 
     public void receiveMessage(Map<String, Map<String, Object>> message) {
         log.debug("Received <{}>", message);
         String id = (String)message.get("sobject").get("Id");
         String eventType = (String)message.get("event").get("type");
-        InvestorLoanTransaction target = new InvestorLoanTransaction();
-        Result result = investorLoanTransactionDAO.unpackMessage(message, target);
-        log.debug("{}",result);
+        InvestorLoanTransaction target;
+        Result result;
         // Documentation is inconsistent on pushTopics
         // We may never see the deleted and undeleted types
         switch (eventType) {
         case "created":
+        	// Unpack the result into a new object and persist it
+            target = new InvestorLoanTransaction();
+            result = investorLoanTransactionDAO.unpackMessage(message, target);
+            log.debug("{}",result);
             investorLoanTransactionDAO.create(target);
         	break;
         case "updated":
         	// locate the existing object and unpack the result into that.
         	// TODO: this might be an update to change it to a reversal. Need to check the existing record.
+        	target = investorLoanTransactionDAO.getById(id);
+        	if (target == null) {
+                target = new InvestorLoanTransaction();
+                result = investorLoanTransactionDAO.unpackMessage(message, target);
+                log.debug("{}",result);
+                investorLoanTransactionDAO.create(target);
+                break;
+        	}
+        	result = investorLoanTransactionDAO.unpackMessage(message, target);
+            log.debug("{}",result);
         	investorLoanTransactionDAO.upate(target);
         	break;
         case "deleted":
         	// generate a reversal object and persist it
-            investorLoanTransactionDAO.delete(target);
+            target = new InvestorLoanTransaction();
+            result = investorLoanTransactionDAO.unpackMessage(message, target);
+            log.debug("{}",result);
+            investorLoanTransactionDAO.createReversal(target);
         	break;
         case "undeleted":
         	// generate a new object and persist it
+            target = new InvestorLoanTransaction();
+            result = investorLoanTransactionDAO.unpackMessage(message, target);
+            log.debug("{}",result);
+            // TODO: need to check dates?
             investorLoanTransactionDAO.create(target);
         	break;
         }

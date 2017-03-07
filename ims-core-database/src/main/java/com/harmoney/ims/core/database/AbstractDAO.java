@@ -4,6 +4,7 @@
 package com.harmoney.ims.core.database;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -22,12 +23,13 @@ import org.springframework.util.Assert;
 import com.harmoney.ims.core.database.descriptors.ObjectDescriptor;
 import com.harmoney.ims.core.database.descriptors.ObjectDescriptorGenerator;
 import com.harmoney.ims.core.database.descriptors.Result;
+import com.harmoney.ims.core.instances.Transaction;
 
 /**
  * @author Roger Parkinson
  *
  */
-public abstract class AbstractDAO<T> {
+public abstract class AbstractDAO<T extends Transaction> {
 	
 	private static final Logger log = LoggerFactory.getLogger(AbstractDAO.class);
 	
@@ -42,14 +44,22 @@ public abstract class AbstractDAO<T> {
 	private String byAll;
 	
 	@Transactional
-	public void create(T target) {
+	public boolean create(T target) {
 		entityManager.persist(target);
 		entityManager.flush();
+		return true;
 	}
 	@Transactional
-	public void createReversal(T target) {
+	public boolean createReversal(T target, T oldRecord) {
 		objectDescriptor.negate(target);
-		create(target);
+		target.setId(null);
+        target.setCreatedDate(new Date());
+        target.setReversedId(oldRecord.getImsid());
+        entityManager.persist(target);
+        oldRecord.setReversedId(target.getImsid());
+        oldRecord.setReversedOrRejectedDate(target.getReversedOrRejectedDate());
+        entityManager.flush();
+        return true;
 	}
 	@Transactional(readOnly=true)
 	public List<T> getAll()
@@ -60,10 +70,11 @@ public abstract class AbstractDAO<T> {
 	}
 
 	@Transactional
-	public void delete(T target)
+	public boolean delete(T target)
 	{
 		entityManager.remove(target);
 		entityManager.flush();
+		return true;
 	}
 	/**
 	 * Get the id value for this object. Assumes there is a single Id field, not a composite.
@@ -75,9 +86,10 @@ public abstract class AbstractDAO<T> {
 		return objectDescriptor.getId(object);
 	}
 	@Transactional
-	public void upate(T target) {
+	public boolean update(T target) {
 		entityManager.merge(target);
 		entityManager.flush();
+		return true;
 	}
 	@Transactional
 	public T getByIMSId(Long imsid) {
@@ -149,6 +161,12 @@ public abstract class AbstractDAO<T> {
 		Result ret = objectDescriptor.unpack(sobject, target);
 		create(target);
 		return ret;
+	}
+	protected ObjectDescriptor getObjectDescriptor() {
+		return objectDescriptor;
+	}
+	protected EntityManager getEntityManager() {
+		return entityManager;
 	}
 
 }

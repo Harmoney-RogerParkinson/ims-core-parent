@@ -7,9 +7,6 @@
         <dependent-module archiveName="ims-core-message-processor-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ims-core-message-processor/ims-core-message-processor">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="emp-connector-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/emp-connector/emp-connector">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
         <dependent-module archiveName="ims-core-partner-0.0.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ims-core-partner/ims-core-partner">
             <dependency-type>uses</dependency-type>
         </dependent-module>
