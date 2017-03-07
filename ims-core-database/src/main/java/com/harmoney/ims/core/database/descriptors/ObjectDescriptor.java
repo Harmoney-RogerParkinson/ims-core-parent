@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import javax.persistence.Column;
 
@@ -61,65 +62,74 @@ public class ObjectDescriptor {
 				continue;
 			}
 			String salesforceName = propertyHolder.getSalesforceName();
-			if (!sobject.containsKey(salesforceName)) {
-				log.error(ret.error("property not found in sobject: {}",salesforceName));
-				continue;
+			int found = 0;
+			for (String name: StringUtils.delimitedListToStringArray(salesforceName, ",")) {
+				if (sobject.containsKey(name)) {
+					found++;
+					unpackName(name,sobject,o,ret,propertyHolder);
+				}
 			}
-			try {
-				Object value = sobject.get(salesforceName);
-				if (value == null) {
-					log.warn(ret.warn("property {} was null",salesforceName));
-					continue;
-				}
-				if (salesforceName.equals("Id")) {
-					log.debug("SF Record id={}",value);
-				}
-				if (salesforceName.equals("Protect_Realised__c")) {
-					log.debug("Protect_Realised__c={}",value);
-				}
-				if (salesforceName.equals("Management_Fee_Realised__c")) {
-					log.debug("Management_Fee_Realised__c={}",value);
-				}
-				if (salesforceName.equals("Sales_Commission_Fee_Realised__c")) {
-					log.debug("Sales_Commission_Fee_Realised__c={}",value);
-				}
-				Class<?> columnType = propertyHolder.getColumnType();
-				if (value instanceof Double) {
-					//convert double to bigdecimal
-					value = new BigDecimal((Double)value);
-					int scale = propertyHolder.getColumn().scale();
-					value = ((BigDecimal)value).setScale(scale,BigDecimal.ROUND_HALF_DOWN);
-				} else if (columnType.equals(BigDecimal.class)) {
-					// We want a BigDecimal output but input was clearly not a Double
-					// Assume it is a string.
-					int scale = propertyHolder.getColumn().scale();
-					value = new BigDecimal((String)value).setScale(scale,BigDecimal.ROUND_HALF_DOWN);
-				} else if (columnType.equals(Date.class)) {
-					// Dates arrive as strings which we convert to java.sql.Date
-					// but first remove the time component
-					String d = ((String)value).substring(0, 10);
-					value = java.sql.Date.valueOf(d);
-				} else if (columnType.equals(LocalDate.class)) {
-					// Dates arrive as strings which we convert to java.sql.Date
-					// but first remove the time component
-					String d = ((String)value).substring(0, 10);
-					value = LocalDate.parse(d);
-				} else if (columnType.isEnum()) {
-					value = propertyHolder.valueOf((String) value);
-				}
-				Method writeMethod = propertyHolder.getWriteMethod();
-				try {
-					writeMethod.invoke(o, new Object[] { value });
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			} catch (Exception e) {
-				log.error(ret.error("Failed to unpack to field: {}.{} {}", clazz,propertyHolder.getName(),e.getMessage()));
-				continue;
+			if (found == 0) {
+				log.error(ret.error("property not found in sobject: {}",salesforceName));
 			}
 		}
 		return ret;
+	}
+	private boolean unpackName(String salesforceName,Map<String, Object> sobject, Object o,Result ret,PropertyHolder propertyHolder) {
+		try {
+			Object value = sobject.get(salesforceName);
+			if (value == null) {
+				log.warn(ret.warn("property {} was null",salesforceName));
+				return false;
+			}
+			if (salesforceName.equals("Id")) {
+				log.debug("SF Record id={}",value);
+			}
+			if (salesforceName.equals("Protect_Realised__c")) {
+				log.debug("Protect_Realised__c={}",value);
+			}
+			if (salesforceName.equals("Management_Fee_Realised__c")) {
+				log.debug("Management_Fee_Realised__c={}",value);
+			}
+			if (salesforceName.equals("Sales_Commission_Fee_Realised__c")) {
+				log.debug("Sales_Commission_Fee_Realised__c={}",value);
+			}
+			Class<?> columnType = propertyHolder.getColumnType();
+			if (value instanceof Double) {
+				//convert double to bigdecimal
+				value = new BigDecimal((Double)value);
+				int scale = propertyHolder.getColumn().scale();
+				value = ((BigDecimal)value).setScale(scale,BigDecimal.ROUND_HALF_DOWN);
+			} else if (columnType.equals(BigDecimal.class)) {
+				// We want a BigDecimal output but input was clearly not a Double
+				// Assume it is a string.
+				int scale = propertyHolder.getColumn().scale();
+				value = new BigDecimal((String)value).setScale(scale,BigDecimal.ROUND_HALF_DOWN);
+			} else if (columnType.equals(Date.class)) {
+				// Dates arrive as strings which we convert to java.sql.Date
+				// but first remove the time component
+				String d = ((String)value).substring(0, 10);
+				value = java.sql.Date.valueOf(d);
+			} else if (columnType.equals(LocalDate.class)) {
+				// Dates arrive as strings which we convert to java.sql.Date
+				// but first remove the time component
+				String d = ((String)value).substring(0, 10);
+				value = LocalDate.parse(d);
+			} else if (columnType.isEnum()) {
+				value = propertyHolder.valueOf((String) value);
+			}
+			Method writeMethod = propertyHolder.getWriteMethod();
+			try {
+				writeMethod.invoke(o, new Object[] { value });
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			log.error(ret.error("Failed to unpack to field: {}.{} {}", clazz,propertyHolder.getName(),e.getMessage()));
+			return false;
+		}
+		return true;
 	}
 	public void negate(Object target) {
 		for (PropertyHolder propertyHolder: map.values()) {

@@ -88,6 +88,13 @@
 				</annotation>
 			</element>
 			<element name="customerId" type="string" nillable="false">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="loan__Account__c,Account_ID__c" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
 			</element>
 			<element name="createdDate" type="date" nillable="false">
 				<annotation>

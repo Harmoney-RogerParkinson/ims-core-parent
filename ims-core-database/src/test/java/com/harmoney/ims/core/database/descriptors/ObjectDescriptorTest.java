@@ -73,6 +73,7 @@ loan__Txn_Code__c=CHARGE OFF}
 		sobject.put("loan__Charged_Off_Principal__c", new Double(311.56));
 		sobject.put("IsDeleted", new Boolean(false));
 		sobject.put("loan__Interest_Paid__c", new Double(0));
+		sobject.put("loan__Account__c", "whatever");
 		sobject.put("test__c", "RJP13:18:26.807");
 		sobject.put("loan__Investor_Loan__c", "a4Jp00000009JRdEAM");
 		sobject.put("Investment_Order_Status__c", "Investment_Order_Status__c");
