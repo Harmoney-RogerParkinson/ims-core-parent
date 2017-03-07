@@ -23,6 +23,7 @@ import org.springframework.util.Assert;
 import com.harmoney.ims.core.database.descriptors.ObjectDescriptor;
 import com.harmoney.ims.core.database.descriptors.ObjectDescriptorGenerator;
 import com.harmoney.ims.core.database.descriptors.Result;
+import com.harmoney.ims.core.instances.InvestorLoanTransaction;
 import com.harmoney.ims.core.instances.Transaction;
 
 /**
@@ -72,9 +73,28 @@ public abstract class AbstractDAO<T extends Transaction> {
 	@Transactional
 	public boolean delete(T target)
 	{
-		entityManager.remove(target);
-		entityManager.flush();
-		return true;
+		getObjectDescriptor().negate(target);
+        target.setCreatedDate(new Date());
+        T oldRecord = getById(target.getId());
+        if (oldRecord == null) {
+        	// we don't know about this record. Can't delete it
+        	log.error("Can't delete unknown record. Id={}",target.getId());
+        	return false;
+        }
+        if (oldRecord.getReversedId() != 0) {
+        	// Trying to delete a reversed transaction
+        	log.error("Can't delete reversed record. Id={}",target.getId());
+        	return false;
+        }
+        // Generate a reversal transaction and link the two together
+        target.setReversedId(oldRecord.getImsid());
+        target.setReversedOrRejectedDate(new Date());
+        target.setId(null);
+        getEntityManager().persist(target);
+        oldRecord.setReversedId(target.getImsid());
+        oldRecord.setReversedOrRejectedDate(target.getReversedOrRejectedDate());
+        getEntityManager().flush();
+        return true;
 	}
 	/**
 	 * Get the id value for this object. Assumes there is a single Id field, not a composite.
@@ -87,9 +107,23 @@ public abstract class AbstractDAO<T extends Transaction> {
 	}
 	@Transactional
 	public boolean update(T target) {
-		entityManager.merge(target);
-		entityManager.flush();
-		return true;
+		T oldRecord = getById(target.getId());
+		if (oldRecord == null) {
+			// updating a record we don't know about
+			return create(target);
+		}
+		if (oldRecord.getReversedId() != 0) {
+			// trying up update a reversed record
+			log.error("Can't update a reversed record. Id={}",target.getId());
+			return false;
+		}
+		if (target.getReversedOrRejectedDate() != null) {
+			// reversing an existing unreversed record
+			return createReversal(target, oldRecord);
+		}
+		getEntityManager().merge(target);
+		getEntityManager().flush();
+        return true;
 	}
 	@Transactional
 	public T getByIMSId(Long imsid) {
