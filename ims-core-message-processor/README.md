@@ -75,7 +75,7 @@ Database.delete(pts);
 
 PushTopic pushTopic = new PushTopic();
 pushTopic.Name = 'ILTIMS';
-pushTopic.Query = 'SELECT Id,Name,CreatedDate, Account_ID__c, Loan_Payment_Transaction_Remark__c, Original_Protect_Realised__c, Loan_Payment_Transaction_Protect_Realise__c, Share_Rounded__c, LastModifiedDate, isDeleted, loan__Investor_Loan__c, loan__Principal_Paid__c,loan__Interest_Paid__c, loan__Late_Fees_Paid__c,loan__Tax__c, loan__Total_Service_Charge__c,loan__Charged_Off_Date__c,Extra_Protect_Realised__c,HP_Management_Fee__c, Protect_Fee_Amount__c,Protect_Realised_Active__c,Protect_Charge_Off__c,HP_Sale_Commission_Fee__c,Protect_Enabled__c,loan__Charged_Off_Fees__c,loan__Charged_Off_Interest__c, loan__Charged_Off_Principal__c,Investor_Txn_Fee__c, loan__Txn_Code__c,loan__Waived__c, loan__Protect_Principal__c, loan__Txn_Type__c, loan__Rebate_Amount_On_Payoff__c,Net_Amount__c,Rejected__c,Reversed__c,Reverse_Rejected_Date__c  FROM loan__Investor_Loan_Account_Txns__c where LastModifiedDate > 1990-10-08T01:02:03Z';
+pushTopic.Query = 'SELECT Id,Name,CreatedDate, Account_ID__c, Investment_Order_Status__c, Loan_Payment_Transaction_Remark__c, Original_Protect_Realised__c, Loan_Payment_Transaction_Protect_Realise__c, Share_Rounded__c, LastModifiedDate, isDeleted, loan__Investor_Loan__c, loan__Principal_Paid__c,loan__Interest_Paid__c, loan__Late_Fees_Paid__c,loan__Tax__c, loan__Total_Service_Charge__c,loan__Charged_Off_Date__c,Extra_Protect_Realised__c,HP_Management_Fee__c, Protect_Fee_Amount__c,Protect_Realised_Active__c,Protect_Charge_Off__c,HP_Sale_Commission_Fee__c,Protect_Enabled__c,loan__Charged_Off_Fees__c,loan__Charged_Off_Interest__c, loan__Charged_Off_Principal__c,Investor_Txn_Fee__c, loan__Txn_Code__c,loan__Waived__c, loan__Protect_Principal__c, loan__Txn_Type__c, loan__Rebate_Amount_On_Payoff__c,Net_Amount__c,Rejected__c,Reversed__c,Reverse_Rejected_Date__c  FROM loan__Investor_Loan_Account_Txns__c where LastModifiedDate > 1990-10-08T01:02:03Z';
 pushTopic.ApiVersion = 38.0;
 pushTopic.NotifyForOperationCreate = true;
 pushTopic.NotifyForOperationUpdate = true;
@@ -101,6 +101,7 @@ loan__Investor_Loan__r.loan__Loan__r.loan__Protect_Enabled__c Protect_Enabled__c
 loan__Loan_Payment_Transaction__r.loan__Rejected__c Rejected__c
 loan__Loan_Payment_Transaction__r.loan__Reversed__c Reversed__c
 loan__Loan_Payment_Transaction__r.Reverse_Rejected_Date__c Reverse_Rejected_Date__c
+loan__Investor_Loan__r.loan__Loan_Status__c Investment_Order_Status__c
 
 ```
 

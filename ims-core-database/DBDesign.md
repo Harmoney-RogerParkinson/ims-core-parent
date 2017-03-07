@@ -121,9 +121,9 @@ Resulting table:
 ```
 Id
 type
-InvestmentOrderId
-loan__Investor_Loan__r.Name
-InvestmentOrderStatus__c
+Account_ID__c (investment order id)
+loan__Investor_Loan__r.Name (InvestmentOrder.Name) don't need it?
+Investment_Order_Status__c
 CreatedDate              
 loan__Principal_Paid__c  
 loan__Interest_Paid__c   
