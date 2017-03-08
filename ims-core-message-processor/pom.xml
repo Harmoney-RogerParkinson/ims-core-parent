@@ -62,7 +62,7 @@
 		<dependency>
 			<groupId>com.harmoney</groupId>
 			<artifactId>ims-core-partner</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 </project>

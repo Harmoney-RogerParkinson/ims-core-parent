@@ -24,7 +24,7 @@ public class Result {
 
 	public String error(String messagePattern, Object arg1, Object arg2, Object arg3) {
 		// TODO: this doesn't give the right string yet
-		String ret = MessageFormatter.format(messagePattern, new Object[]{arg1, arg2, arg3}).getMessage();
+		String ret = MessageFormatter.arrayFormat(messagePattern, new Object[]{arg1, arg2, arg3}).getMessage();
 		errors.add(ret);
 		return ret;
 	}
@@ -38,6 +38,12 @@ public class Result {
 	}
 	public String toString() {
 		return MessageFormatter.format("Unpacker errors: {} warnings: {}",errors.size(),warnings.size()).getMessage();
+	}
+
+	public String error(String messagePattern, String arg, String arg2) {
+		String ret = MessageFormatter.format(messagePattern, arg, arg2).getMessage();
+		errors.add(ret);
+		return ret;
 	}
 
 }

@@ -19,7 +19,7 @@ import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 @EnableAMPQ
-@ComponentScan(value={"com.harmoney.ims.core.queuehandler","com.harmoney.ims.core.queueprocessor"})
+@ComponentScan(value={"com.harmoney.ims.core.queuehandler","com.harmoney.ims.core.queueprocessor","com.harmoney.ims.core.queries"})
 @PropertySource(value = { "classpath:test.properties" }, ignoreResourceNotFound = true)
 public class QueueHandlerSpringConfig {
 
@@ -35,13 +35,11 @@ public class QueueHandlerSpringConfig {
 	 public String rabbitmqPassword;
 	 @Value("${rabbitmq.exchange:transaction-exchange}")
 	 public String exchangeName;
-//	 @Value("${rabbitmq.queue:transaction-queue}")
-//	 public String queueName;
 	 public static String ILTQUEUE = "ilt-queue"; 
 	 public static String IFTQUEUE = "ift-queue"; 
 	 
 	 /**
-	 * Although this is not used here the only other place the
+	 * Although the rabbitTemplate is not used here the only other place the
 	 * template is injected is a required=false (where false is okay for testing)
 	 * We seem to need to have a required=true here to force it to inject there.
 	 */

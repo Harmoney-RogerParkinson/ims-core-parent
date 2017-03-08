@@ -5,6 +5,7 @@ package com.harmoney.ims.core.database;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,12 +20,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import com.harmoney.ims.core.database.descriptors.ObjectDescriptor;
 import com.harmoney.ims.core.database.descriptors.ObjectDescriptorGenerator;
 import com.harmoney.ims.core.database.descriptors.Result;
-import com.harmoney.ims.core.instances.InvestorLoanTransaction;
 import com.harmoney.ims.core.instances.Transaction;
+import com.sforce.soap.partner.sobject.SObject;
+import com.sforce.ws.bind.XmlObject;
 
 /**
  * @author Roger Parkinson
@@ -164,6 +167,59 @@ public abstract class AbstractDAO<T extends Transaction> {
 	}
 	public List<String> getSalesforceFields() {
 		return objectDescriptor.getSalesForceFields();
+	}
+	public Result unpack(SObject sobject, T target) {
+		Map<String, Object> fieldMap = new HashMap<>();
+		for (String fieldName : getSalesforceFields()) {
+			String[] fieldNames = StringUtils.delimitedListToStringArray(fieldName, ",");
+			if (fieldNames.length > 1) {
+				fieldNames[0].toString();
+			}
+			for (String name: fieldNames) {
+				String fieldValue;
+				try {
+					fieldValue = extractValueFromSObject(sobject,name);
+				} catch (Exception e) {
+//					log.error(e.getMessage());
+					continue;
+				}
+				fieldMap.put(name, fieldValue);
+//				if (sobject.getChild(name) != null) {
+//					Object fieldValue = sobject.getField(name);
+//					if (fieldValue != null && fieldValue instanceof SObject) {
+//						String v = (String)((SObject)fieldValue).getChild("loan__Tax_Percentage__c").getValue();
+//						fieldMap.put(name, v);
+//					} else {
+//						fieldMap.put(name, sobject.getField(name));
+//					}
+//				}
+			}
+		}
+		if (!fieldMap.containsKey("Reverse_Rejected_Date__c")) {
+			fieldMap.put("Reverse_Rejected_Date__c", null);
+		}
+		if (!fieldMap.containsKey("CreatedDate")) {
+			fieldMap.put("CreatedDate", null);
+		}
+		return unpack(fieldMap,target);
+	}
+	private String extractValueFromSObject(SObject sobject, String name) {
+		if (name.indexOf('.') == -1) {
+			if (sobject.getChild(name) == null) {
+				throw new RuntimeException("No field ["+name+"] found in SObject");
+			}
+			return (String)sobject.getField(name);
+		}
+		String split[] = StringUtils.split(name, ".");
+		SObject f = (SObject)sobject.getField(split[0]);
+		if (f == null) {
+			return null;
+		}
+		XmlObject xmlObject = f.getChild(split[1]);
+		if (xmlObject == null) {
+			throw new RuntimeException("No field ["+split[1]+"] found in SObject");
+		}
+		return (String)xmlObject.getValue();
 	}
 	/**
 	 * Unpack the values in the map into the fields in the given message.

@@ -70,7 +70,7 @@ public class ObjectDescriptor {
 				}
 			}
 			if (found == 0) {
-				log.error(ret.error("property not found in sobject: {}",salesforceName));
+				log.error(ret.error("property not found in sobject: {} fields(s): {}",tableName,salesforceName));
 			}
 		}
 		return ret;
@@ -79,21 +79,21 @@ public class ObjectDescriptor {
 		try {
 			Object value = sobject.get(salesforceName);
 			if (value == null) {
-				log.warn(ret.warn("property {} was null",salesforceName));
+//				log.warn(ret.warn("property {} was null",salesforceName));
 				return false;
 			}
-			if (salesforceName.equals("Id")) {
-				log.debug("SF Record id={}",value);
-			}
-			if (salesforceName.equals("Protect_Realised__c")) {
-				log.debug("Protect_Realised__c={}",value);
-			}
-			if (salesforceName.equals("Management_Fee_Realised__c")) {
-				log.debug("Management_Fee_Realised__c={}",value);
-			}
-			if (salesforceName.equals("Sales_Commission_Fee_Realised__c")) {
-				log.debug("Sales_Commission_Fee_Realised__c={}",value);
-			}
+//			if (salesforceName.equals("Id")) {
+//				log.debug("SF Record id={}",value);
+//			}
+//			if (salesforceName.equals("Protect_Realised__c")) {
+//				log.debug("Protect_Realised__c={}",value);
+//			}
+//			if (salesforceName.equals("Management_Fee_Realised__c")) {
+//				log.debug("Management_Fee_Realised__c={}",value);
+//			}
+//			if (salesforceName.equals("Sales_Commission_Fee_Realised__c")) {
+//				log.debug("Sales_Commission_Fee_Realised__c={}",value);
+//			}
 			Class<?> columnType = propertyHolder.getColumnType();
 			if (value instanceof Double) {
 				//convert double to bigdecimal
@@ -127,6 +127,7 @@ public class ObjectDescriptor {
 			}
 		} catch (Exception e) {
 			log.error(ret.error("Failed to unpack to field: {}.{} {}", clazz,propertyHolder.getName(),e.getMessage()));
+			e.printStackTrace();
 			return false;
 		}
 		return true;

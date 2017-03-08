@@ -62,5 +62,10 @@
 		    <artifactId>madura-ampq</artifactId>
 		    <version>0.0.2</version>
 		</dependency>
+		<dependency>
+			<groupId>com.harmoney</groupId>
+			<artifactId>ims-core-partner</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>

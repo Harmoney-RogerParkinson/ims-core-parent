@@ -114,7 +114,7 @@ loan__Txn_Code__c=CHARGE OFF}
 		Result result = objectDescriptor.unpack(getMap().get("sobject"), target);
 		log.debug("{}",result);
 		Assert.assertEquals(0, result.getErrors().size());
-		Assert.assertEquals(3, result.getWarnings().size());
+		Assert.assertEquals(0, result.getWarnings().size());
 	}
 	
 	

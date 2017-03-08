@@ -30,7 +30,6 @@ public class InvestorLoanTransactionProcessor {
 
     public void receiveMessage(Map<String, Map<String, Object>> message) {
         log.debug("Received <{}>", message);
-        String id = (String)message.get("sobject").get("Id");
         String eventType = (String)message.get("event").get("type");
         InvestorLoanTransaction target = new InvestorLoanTransaction();
         Result result = investorLoanTransactionDAO.unpackMessage(message, target);
@@ -43,8 +42,7 @@ public class InvestorLoanTransactionProcessor {
         	break;
         case "updated":
         	// locate the existing object and unpack the result into that.
-        	// TODO: this might be an update to change it to a reversal. Need to check the existing record.
-        	investorLoanTransactionDAO.upate(target);
+        	investorLoanTransactionDAO.update(target);
         	break;
         case "deleted":
         	// generate a reversal object and persist it
