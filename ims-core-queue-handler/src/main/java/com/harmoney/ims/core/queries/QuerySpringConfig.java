@@ -8,7 +8,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
 @ComponentScan(value={"com.harmoney.ims.core.queueprocessor","com.harmoney.ims.core.queries"})
-@PropertySource(value = { "classpath:test2.properties" }, ignoreResourceNotFound = true)
+@PropertySource(value = { "classpath:test.properties" }, ignoreResourceNotFound = true)
 public class QuerySpringConfig {
 
 

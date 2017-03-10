@@ -16,10 +16,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
 @EnableAMPQ
-@ComponentScan(value={"com.harmoney.ims.core.queuehandler","com.harmoney.ims.core.queueprocessor","com.harmoney.ims.core.queries"})
+@ComponentScan(value={"com.harmoney.ims.core.queuehandler","com.harmoney.ims.core.queueprocessor"})
 @PropertySource(value = { "classpath:test.properties" }, ignoreResourceNotFound = true)
 public class QueueHandlerSpringConfig {
 
@@ -45,6 +46,12 @@ public class QueueHandlerSpringConfig {
 	 */
 	private @Autowired RabbitTemplate rabbitTemplate;
 
+	// needed for @PropertySource
+	@Bean
+	public static PropertySourcesPlaceholderConfigurer propertyConfigInProd() {
+		PropertySourcesPlaceholderConfigurer ret = new PropertySourcesPlaceholderConfigurer();
+		return ret;
+	}
 	/**
 	 * Bean is our direct connection to RabbitMQ
 	 * @return CachingConnectionFactory

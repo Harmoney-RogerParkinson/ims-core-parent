@@ -122,11 +122,11 @@ public class ObjectDescriptor {
 			try {
 				writeMethod.invoke(o, new Object[] { value });
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.error("name: {} value: {} {}",propertyHolder.getName(),value,e.getMessage());
+//				e.printStackTrace();
 			}
 		} catch (Exception e) {
-			log.error(ret.error("Failed to unpack to field: {}.{} {}", clazz,propertyHolder.getName(),e.getMessage()));
+			log.error(ret.error("Failed to unpack to field: {}.{} {}", clazz,salesforceName,e.getMessage()));
 			e.printStackTrace();
 			return false;
 		}

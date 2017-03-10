@@ -2,6 +2,7 @@ package com.harmoney.ims.core.queuehandler;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -57,10 +58,37 @@ public class MessageSenderIT {
 		map2.put("Name", "INV-0033");
 		map2.put("CreatedDate", "2017-02-23T00:00:00.000Z");
 		map2.put("loan__Principal_Paid__c", new Double(200D));
+		map2.put("loan__Late_Fees_Paid__c", new Double(200D));
+		map2.put("loan__Charged_Off_Interest__c", new Double(200D));
+		map2.put("Protect_Realised__c", new Double(200D));
+		map2.put("loan__Investor_Loan__c", "loan__Investor_Loan__c");
+		map2.put("loan__Protect_Principal__c", new Double(200D));
+		map2.put("loan__Charged_Off_Principal__c", new Double(200D));
+		map2.put("Investor_Txn_Fee__c", new Double(200D));
+		map2.put("loan__Interest_Paid__c", new Double(200D));
+		map2.put("loan__Rebate_Amount_On_Payoff__c", new Double(200D));
+		map2.put("Management_Fee_Realised__c", new Double(200D));
+		map2.put("Net_Amount__c", new Double(200D));
+		map2.put("loan__Tax__c", new Double(200D));
+		map2.put("loan__Total_Service_Charge__c", new Double(200D));
+		map2.put("loan__Charged_Off_Fees__c", new Double(200D));
+		map2.put("Sales_Commission_Fee_Realised__c", new Double(200D));
+		map2.put("loan__Txn_Code__c", new Double(200D));
+		
+		map2.put("loan__Txn_Type__c", null);
+		map2.put("loan__Waived__c", new Boolean(false));
+		map2.put("loan__Account__c", "loan__Account__c");
+		map2.put("Investment_Order_Status__c", "Investment_Order_Status__c");
+		map2.put("loan__Charged_Off_Date__c", "2017-02-23T00:00:00.000Z");
+		map2.put("Reverse_Rejected_Date__c", null);
+		map2.put("Account_ID__c", "Account_ID__c");
+		map2.put("loan__Txn_Code__c", "ACTIVE");
+		map2.put("Reversed__c", new Boolean(false));
+		map2.put("Rejected__c", new Boolean(false));
 		map2.put("transactionType", "ACTIVE");
 		rabbitTemplate.convertAndSend(QueueHandlerSpringConfig.ILTQUEUE, map);
 		assertTrue("Did not reach expected count",
-				receiver.getLatch().await(10000, TimeUnit.MILLISECONDS));
+				receiver.getLatch().await(100000, TimeUnit.MILLISECONDS));
 		context.close();
 	}
 

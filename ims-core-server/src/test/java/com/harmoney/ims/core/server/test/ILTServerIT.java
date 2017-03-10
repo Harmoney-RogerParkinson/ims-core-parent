@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -68,7 +69,6 @@ public class ILTServerIT {
 		updateInvestorLoanTransaction();
 		"".toCharArray();
 		assertTrue("Did not reach expected count",receiver.getLatch().await(10000, TimeUnit.MILLISECONDS));
-        context.close();
 	}
 
 	private void updateInvestorLoanTransaction() throws ConnectionException {

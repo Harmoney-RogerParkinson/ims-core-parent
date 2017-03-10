@@ -1,6 +1,5 @@
 package com.harmoney.ims.core.queries;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -16,7 +15,6 @@ import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { QuerySpringConfig.class, PartnerConnectionSpringConfig.class,DatabaseSpringConfig.class})
-@ComponentScan(value={"com.harmoney.ims.core.queueprocessor","com.harmoney.ims.core.queries"})
 public class QueryIT {
 
 	private static final Logger log = LoggerFactory

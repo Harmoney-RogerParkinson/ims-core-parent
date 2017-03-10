@@ -216,6 +216,9 @@
 				  <artifactId>maven-failsafe-plugin</artifactId>
 				  <version>2.19.1</version>
 					<configuration>
+			              <systemPropertyVariables>
+			                <database.hbm2ddl.auto>create-drop</database.hbm2ddl.auto>
+			              </systemPropertyVariables>
 						<includes>
 							<include>**/*IT.java</include>
 						</includes>

@@ -60,7 +60,7 @@
 		<dependency>
 		    <groupId>nz.co.senanque</groupId>
 		    <artifactId>madura-ampq</artifactId>
-		    <version>0.0.2</version>
+		    <version>0.0.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.harmoney</groupId>
@@ -68,4 +68,12 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 </project>
