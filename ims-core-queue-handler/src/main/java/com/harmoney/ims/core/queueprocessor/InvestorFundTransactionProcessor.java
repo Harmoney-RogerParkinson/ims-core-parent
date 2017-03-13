@@ -15,7 +15,7 @@ import com.harmoney.ims.core.database.descriptors.Result;
 import com.harmoney.ims.core.instances.InvestorFundTransaction;
 
 /**
- * The incoming message for InvestorLoanTransactionProcessor arrives here.
+ * The incoming message for InvestorFundTransactionProcessor arrives here.
  * It is a separate class from the queue handler to make it easier to detach from the queue
  * during testing.
  *

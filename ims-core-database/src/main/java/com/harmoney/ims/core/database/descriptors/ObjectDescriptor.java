@@ -19,6 +19,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import com.harmoney.ims.core.annotations.SalesforceName;
+import com.harmoney.ims.core.instances.InvestorLoanTransaction;
 
 public class ObjectDescriptor {
 	
@@ -137,6 +138,17 @@ public class ObjectDescriptor {
 			propertyHolder.negate(target);
 		}
 	}
+	public void zero(Object target) {
+		for (PropertyHolder propertyHolder: map.values()) {
+			propertyHolder.zero(target);
+		}
+	}
+	public void accumulate(Object source, Object totals) {
+		Assert.isTrue(source.getClass().equals(totals.getClass()), "Accumulating objects must be the same class");
+		for (PropertyHolder propertyHolder: map.values()) {
+			propertyHolder.accumulate(source,totals);
+		}
+	}
 	public long getId(Object object) {
 		Assert.notNull(idMethod,"idMethod must not be null");
 		try {
@@ -189,4 +201,5 @@ public class ObjectDescriptor {
 		}
 		return r;
 	}
+
 }

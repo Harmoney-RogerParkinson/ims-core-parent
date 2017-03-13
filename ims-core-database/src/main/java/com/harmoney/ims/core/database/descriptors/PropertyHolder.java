@@ -104,5 +104,36 @@ public class PropertyHolder {
 			}
 		}
 	}
+	public void zero(Object target) {
+		if (negateable) {
+			try {
+				BigDecimal bigDecimal = new BigDecimal(0);
+				if (bigDecimal != null) {
+					writeMethod.invoke(target, bigDecimal.setScale(column.scale(),BigDecimal.ROUND_HALF_DOWN));
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+	protected void accumulate(Object source, Object totals) {
+		if (negateable) {
+			try {
+				BigDecimal bigDecimal = (BigDecimal)readMethod.invoke(source);
+				if (bigDecimal != null) {
+					BigDecimal bigDecimalTotal = (BigDecimal)readMethod.invoke(totals);
+					if (bigDecimalTotal == null) {
+						bigDecimalTotal = new BigDecimal(0).setScale(column.scale(),BigDecimal.ROUND_HALF_DOWN);
+					}
+					bigDecimalTotal.add(bigDecimal);
+					writeMethod.invoke(totals, bigDecimalTotal.setScale(column.scale(),BigDecimal.ROUND_HALF_DOWN));
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+		
+	}
 
 }

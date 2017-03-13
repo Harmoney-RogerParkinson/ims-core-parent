@@ -2,6 +2,7 @@ package com.harmoney.ims.core.database.descriptors;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -112,9 +113,12 @@ loan__Txn_Code__c=CHARGE OFF}
 		InvestorLoanTransaction target = new InvestorLoanTransaction();
 		ObjectDescriptor objectDescriptor = objectDescriptorGenerator.build(InvestorLoanTransaction.class);
 		Result result = objectDescriptor.unpack(getMap().get("sobject"), target);
-		log.debug("{}",result);
+		log.debug("{} [{}]",result,TimeZone.getDefault());
 		Assert.assertEquals(0, result.getErrors().size());
 		Assert.assertEquals(0, result.getWarnings().size());
+		TimeZone tz = TimeZone.getDefault();
+		tz.toString();
+		
 	}
 	
 	

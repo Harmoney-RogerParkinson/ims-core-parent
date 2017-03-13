@@ -124,6 +124,13 @@ public abstract class AbstractDAO<T extends Transaction> {
 			// reversing an existing unreversed record
 			return createReversal(target, oldRecord);
 		}
+		target.setImsid(oldRecord.getImsid());
+		getEntityManager().merge(target);
+		getEntityManager().flush();
+        return true;
+	}
+	@Transactional
+	public boolean merge(T target) {
 		getEntityManager().merge(target);
 		getEntityManager().flush();
         return true;
@@ -252,7 +259,7 @@ public abstract class AbstractDAO<T extends Transaction> {
 		create(target);
 		return ret;
 	}
-	protected ObjectDescriptor getObjectDescriptor() {
+	public ObjectDescriptor getObjectDescriptor() {
 		return objectDescriptor;
 	}
 	protected EntityManager getEntityManager() {

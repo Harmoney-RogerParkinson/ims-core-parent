@@ -5,6 +5,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 import org.junit.Test;
@@ -45,6 +49,7 @@ public class InvestorLoanTransactionIT {
 		ilt.setName("ILT_100");
 		ilt.setNetAmount(new BigDecimal(123.456));
 		ilt.setCreatedDate(java.sql.Date.valueOf("2017-02-23"));
+		ilt.setAccountId("XYZ");
 		assertTrue(investorLoanTransactionDAO.create(ilt));
 		List<InvestorLoanTransaction> transactions = investorLoanTransactionDAO.getAll();
 		assertEquals(1,transactions.size());
@@ -60,6 +65,11 @@ public class InvestorLoanTransactionIT {
 		assertTrue(investorLoanTransactionDAO.update(ilt2));
 		InvestorLoanTransaction ilt3 = investorLoanTransactionDAO.getById(id);
 		assertEquals("ILT_101",ilt3.getName());
+		LocalDate start = LocalDate.of(2017, 2, 1);
+		LocalDate end = start.with(TemporalAdjusters.lastDayOfMonth());
+		LocalTime t = LocalTime.now();
+		List<String> accountIds = investorLoanTransactionDAO.getAccountIds(LocalDateTime.of(start, t),LocalDateTime.of(end, t));
+		assertEquals(1,accountIds.size());
 	}
 	
 	@Test
