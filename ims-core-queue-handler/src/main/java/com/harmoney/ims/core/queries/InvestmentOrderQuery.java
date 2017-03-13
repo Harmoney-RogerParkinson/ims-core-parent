@@ -3,13 +3,9 @@
  */
 package com.harmoney.ims.core.queries;
 
-import java.util.Date;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.harmoney.ims.core.database.InvestmentOrderDAO;
-import com.harmoney.ims.core.instances.InvestmentOrder;
 import com.harmoney.ims.core.queueprocessor.InvestmentOrderProcessor;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.QueryResult;
@@ -26,7 +22,7 @@ public class InvestmentOrderQuery {
 	@Autowired private PartnerConnection partnerConnection;
 	@Autowired private InvestmentOrderProcessor investmentOrderProcessor;
 	
-	public void doQuery() throws ConnectionException {
+	public int doQuery() throws ConnectionException {
 		String queryString = "Select Id                                       " +
                 "      ,Name                                     " +
                 "      ,CreatedDate                              " +
@@ -47,6 +43,7 @@ public class InvestmentOrderQuery {
 		QueryResult qr = partnerConnection.query(queryString);
 		SObject[] records = qr.getRecords();
 		investmentOrderProcessor.processQuery(records);
+		return records.length;
 	}
 
 }

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
@@ -61,18 +62,22 @@ public class IFTMessagingIT {
 	@Test
 	public void testSubscription() throws ConnectionException, InterruptedException {
 		assertNotNull(empConnector);
-		updateInvestorLoanTransaction();
-		MessageHandlerMock messageHandler = (MessageHandlerMock) messageHandlerMap.getMessageHandler(MessageHandlerMap.IFTIMS);
-		assertTrue("Did not reach expected count",messageHandler.getLatch().await(100000, TimeUnit.MILLISECONDS));
+		MessageHandler messageHandler = messageHandlerMap.getMessageHandler(MessageHandlerMap.IFTIMS);
+		int saved = updateInvestorLoanTransaction();
+		CountDownLatch latch = new CountDownLatch(saved);
+		messageHandler.setLatch(latch);
+		assertTrue("Did not reach expected count",latch.await(100000, TimeUnit.MILLISECONDS));
+		log.info("Processed {} records",saved);
 	}
 
-	private void updateInvestorLoanTransaction() throws ConnectionException {
+	private int updateInvestorLoanTransaction() throws ConnectionException {
 		
 		String testValue = "RJP"+LocalDateTime.now().toLocalTime().toString();
 		QueryResult qr = partnerConnection.query("SELECT Id,LastModifiedDate FROM loan__Investor_Fund_Transaction__c");
 		qr.getSize();
 		List<SObject> updates = new ArrayList<>();
 		int count = 0;
+		int saved = 0;
 		Calendar now = new GregorianCalendar();
 		SObject[] records = qr.getRecords();
 		for (SObject r: records) {
@@ -83,24 +88,26 @@ public class IFTMessagingIT {
 			r1.setField("Id", id);
 			updates.add(r1);
 			if (count++ > 0) {
-				saveResults(updates);
+				saved += saveResults(updates);
 				count = 0;
 				updates.clear();
 				break;
 			}
 		}
 		if (count > 0) {
-			saveResults(updates);
+			saved += saveResults(updates);
 		}
-		
+		return saved;
 	}
 	
-	private void saveResults(List<SObject> records) throws ConnectionException {
+	private int saveResults(List<SObject> records) throws ConnectionException {
 		SObject[] sobjects = records.toArray(new SObject[records.size()]);
 		SaveResult[] saveResults = partnerConnection.update(sobjects);
+		int ret=0;
 		// check the returned results for any errors
 		for (int i = 0; i < saveResults.length; i++) {
 			if (saveResults[i].isSuccess()) {
+				ret++;
 				log.debug(i
 						+ ". Successfully updated record - Id: "
 						+ saveResults[i].getId());
@@ -112,6 +119,6 @@ public class IFTMessagingIT {
 				}
 			}
 		}
-		
+		return ret;
 	}
 }

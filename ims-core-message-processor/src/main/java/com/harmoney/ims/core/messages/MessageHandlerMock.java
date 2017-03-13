@@ -49,5 +49,10 @@ public class MessageHandlerMock implements com.harmoney.ims.core.messages.Messag
 		}
 		return ret.toString();
     }
+	@Override
+	public void setLatch(CountDownLatch latch) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

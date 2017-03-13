@@ -4,6 +4,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.GregorianCalendar;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Ignore;
@@ -55,11 +56,13 @@ public class InvoiceStatementIT {
 	@Autowired private PartnerConnection partnerConnection;
 
 	@Test
-	@Ignore // Superseded by InvestorLoanTransactionIT
+	@Ignore // Superseded by ILTMessagingIT
 	public void testSubscription() throws ConnectionException, InterruptedException {
 		assertNotNull(empConnector);
+		CountDownLatch latch = new CountDownLatch(1);
+		messageHandler.setLatch(latch);
 		createInvoiceStatement();
-		assertTrue("Did not reach expected count",((MessageHandlerMock)messageHandler).getLatch().await(10000, TimeUnit.MILLISECONDS));
+		assertTrue("Did not reach expected count",latch.await(10000, TimeUnit.MILLISECONDS));
 	}
 
 	private void createInvoiceStatement() throws ConnectionException {

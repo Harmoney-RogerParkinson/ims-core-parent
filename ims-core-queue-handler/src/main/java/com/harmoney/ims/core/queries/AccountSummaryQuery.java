@@ -22,7 +22,7 @@ public class AccountSummaryQuery {
 	@Autowired private PartnerConnection partnerConnection;
 	@Autowired private AccountSummaryProcessor accountSummaryProcessor;
 	
-	public void doQuery() throws ConnectionException {
+	public int doQuery() throws ConnectionException {
 		String queryString = "Select Id                                 " +
                 "      ,harMoney_Account_Number__c         " +
                 "      ,Name                               " +
@@ -46,6 +46,7 @@ public class AccountSummaryQuery {
 		QueryResult qr = partnerConnection.query(queryString);
 		SObject[] records = qr.getRecords();
 		accountSummaryProcessor.processQuery(records);
+		return records.length;
 	}
 
 }

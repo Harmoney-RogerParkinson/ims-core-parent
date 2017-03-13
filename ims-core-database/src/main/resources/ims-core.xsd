@@ -521,7 +521,7 @@
 						<annotation>
 							<appinfo>
 								<annox:annotate>
-									<ims:SalesforceName fieldName="loan_account_c" />
+									<ims:SalesforceName fieldName="loan__Account__c" />
 								</annox:annotate>
 							</appinfo>
 						</annotation>

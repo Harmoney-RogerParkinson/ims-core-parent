@@ -1,24 +1,29 @@
 package com.harmoney.ims.core.server.test;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
+import org.dbunit.database.DatabaseConfig;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
-import org.junit.Ignore;
+import org.dbunit.ext.postgresql.PostgresqlDataTypeFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -28,12 +33,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.StringUtils;
 
 import com.harmoney.ims.core.database.DatabaseSpringConfig;
+import com.harmoney.ims.core.messages.MessageHandlerImpl;
+import com.harmoney.ims.core.messages.MessageHandlerMap;
 import com.harmoney.ims.core.messages.MessageProcessorSpringConfig;
 import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
 import com.harmoney.ims.core.queries.AccountSummaryQuery;
 import com.harmoney.ims.core.queries.InvestmentOrderQuery;
+import com.harmoney.ims.core.queries.QuerySpringConfig;
 import com.harmoney.ims.core.queuehandler.QueueHandlerSpringConfig;
-import com.harmoney.ims.core.queuehandler.ReceiverMock;
 import com.salesforce.emp.connector.EmpConnector;
 import com.sforce.soap.partner.Error;
 import com.sforce.soap.partner.PartnerConnection;
@@ -59,28 +66,48 @@ import com.sforce.ws.ConnectionException;
  * 
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@TestPropertySource("/test2.properties")
-@ContextConfiguration(classes={MessageProcessorSpringConfig.class,PartnerConnectionSpringConfig.class,QueueHandlerSpringConfig.class,DatabaseSpringConfig.class})
-@ActiveProfiles({"message-processor-prod","server-prod"})
+@TestPropertySource("/SuperServerIT.properties")
+@ContextConfiguration(classes={MessageProcessorSpringConfig.class,
+		PartnerConnectionSpringConfig.class,
+		QueueHandlerSpringConfig.class,
+		DatabaseSpringConfig.class,
+		QuerySpringConfig.class})
+@ActiveProfiles({"message-processor-prod","server-prod","queue-handler-prod"})
 public class SuperServerIT {
 	
     private static final Logger log = LoggerFactory.getLogger(SuperServerIT.class);
+    private static final int SAVE_BUFFER = 75;
 	@Autowired private EmpConnector empConnector;
-    @Autowired ReceiverMock receiver;
     @Autowired ConfigurableApplicationContext context;
 	@Autowired private PartnerConnection partnerConnection;
 	@Autowired AccountSummaryQuery accountSummaryquery;
 	@Autowired InvestmentOrderQuery investmentOrderquery;
 	@Autowired DataSource dataSource;
+	@Autowired MessageHandlerMap messageHandlerMap;
+	@Autowired RabbitAdmin rabbitAdmin;
 
-	@Test @Ignore
+	@Test
 	public void testEverythingFromSalesforce() throws Exception {
 		assertNotNull(empConnector);
-		updateInvestorLoanTransaction();
-		updateInvestorFundTransaction();
-		accountSummaryquery.doQuery();
-		investmentOrderquery.doQuery();
-		// hopefully all the db updates from the pushtopics have come through now
+		MessageHandlerImpl iltms = (MessageHandlerImpl)messageHandlerMap.getMessageHandler(MessageHandlerMap.ILTIMS);
+		MessageHandlerImpl iftms = (MessageHandlerImpl)messageHandlerMap.getMessageHandler(MessageHandlerMap.IFTIMS);
+		
+		log.info("Updating transactions...");
+		int iltCount = updateInvestorLoanTransaction(500);
+		int iftCount = updateInvestorFundTransaction(500);
+		CountDownLatch latch = new CountDownLatch(iltCount+iftCount);
+		iltms.setLatch(latch);
+		iftms.setLatch(latch);
+		log.info("Waiting for {} pushTopic records...",latch.getCount());
+		assertTrue("Did not reach expected count",latch.await(100000, TimeUnit.MILLISECONDS));
+		log.info("ILT processed: {} of {}",iltms.getCount(),iltCount);
+		log.info("IFT processed: {} of {}",iftms.getCount(),iftCount);
+		log.info("PushTopic updates complete");
+
+		int accountSummaryCount = accountSummaryquery.doQuery();
+		log.info("accountSummaryCount {}",accountSummaryCount);
+		int investmentOrderCount = investmentOrderquery.doQuery();
+		log.info("investmentOrderCount {}",investmentOrderCount);
 		saveDatabase("/tmp/ims.xml");
 		
 	}
@@ -88,11 +115,13 @@ public class SuperServerIT {
 	private void saveDatabase(String outputFile) throws Exception {
 		Connection jdbcCconnection = dataSource.getConnection();
 		IDatabaseConnection connection = new DatabaseConnection(jdbcCconnection);
+		DatabaseConfig dbConfig = connection.getConfig();
+		dbConfig.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new PostgresqlDataTypeFactory());
         IDataSet fullDataSet = connection.createDataSet();
         FlatXmlDataSet.write(fullDataSet, new FileOutputStream(outputFile));		
 	}
 
-	private void updateInvestorLoanTransaction() throws ConnectionException {
+	private int updateInvestorLoanTransaction(int max) throws ConnectionException {
 		int saved = 0;
 		String testValue = "RJP"+LocalDateTime.now().toLocalTime().toString();
 		QueryResult qr = partnerConnection.query("SELECT Id,test__c FROM loan__Investor_Loan_Account_Txns__c");
@@ -109,21 +138,25 @@ public class SuperServerIT {
 				r1.setField("test__c", testValue);
 				r1.setField("Id", id);
 				updates.add(r1);
-				if (count++ > 5) {
+				if (count++ > SAVE_BUFFER) {
 					saved = saved + saveResults(updates);
+					log.info("ILT... {}",saved);
 					count = 0;
 					updates.clear();
-					break;
+					if (saved >= max) {
+						break;
+					}
 				}
 			}
 		}
-		if (count > 0) {
+		if (count > 0 && !(saved >= max)) {
 			saved = saved + saveResults(updates);
 		}
-		log.debug("records updated: {}",saved);
+		log.info("ILT records updated: {}",saved);
+		return saved;
 	}
 	
-	private void updateInvestorFundTransaction() throws ConnectionException {
+	private int updateInvestorFundTransaction(int max) throws ConnectionException {
 		int saved = 0;
 		String testValue = "RJP"+LocalDateTime.now().toLocalTime().toString();
 		QueryResult qr = partnerConnection.query("SELECT Id,LastModifiedDate FROM loan__Investor_Fund_Transaction__c");
@@ -138,17 +171,24 @@ public class SuperServerIT {
 			r1.setField("loan__Reject_Reason__c", testValue);
 			r1.setField("Id", id);
 			updates.add(r1);
-			if (count++ > 5) {
+			if (count++ > SAVE_BUFFER) {
 				saved = saved + saveResults(updates);
+				log.info("IFT... {}",saved);
 				count = 0;
 				updates.clear();
+				if (saved >= max) {
+					break;
+				}
+			}
+			if (saved >= max) {
 				break;
 			}
 		}
-		if (count > 0) {
+		if (count > 0 && !(saved >= max)) {
 			saved = saved + saveResults(updates);
 		}
-		log.debug("records updated: {}",saved);
+		log.info("IFT records updated: {}",saved);
+		return saved;
 	}
 	private int saveResults(List<SObject> records) throws ConnectionException {
 		int saved = 0;

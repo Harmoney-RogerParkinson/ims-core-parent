@@ -81,7 +81,7 @@ public class PropertyHolder {
 
 	protected Object valueOf(String value) {
 		try {
-			return enumValueOf.invoke(null, value.replace(' ', '_'));
+			return enumValueOf.invoke(null, value.replace(' ', '_').replace('-', '_'));
 		} catch (IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException e) {
 			throw new RuntimeException(e);

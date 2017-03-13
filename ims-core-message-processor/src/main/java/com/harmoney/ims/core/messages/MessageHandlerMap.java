@@ -51,11 +51,11 @@ public class MessageHandlerMap {
 	}
 	private MessageHandler getMessageHandler(String rabbitQueue, FieldResolver fieldResolver) {
 		MessageHandler messageHandler = null;
-		if (rabbitTemplate != null) {
+//		if (rabbitTemplate != null) {
 			messageHandler = new MessageHandlerImpl(rabbitTemplate,rabbitQueue,fieldResolver);
-		} else {
-			messageHandler = new MessageHandlerMock(fieldResolver);
-		}
+//		} else {
+//			messageHandler = new MessageHandlerMock(fieldResolver);
+//		}
 		return messageHandler;
 	}
 	private void subscribe(EmpConnector connector, String thisTopic, MessageHandler thisMessageHandler) {

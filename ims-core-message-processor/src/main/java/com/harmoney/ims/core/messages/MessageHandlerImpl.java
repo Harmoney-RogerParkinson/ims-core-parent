@@ -4,6 +4,7 @@
 package com.harmoney.ims.core.messages;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.CountDownLatch;
 
 import org.slf4j.Logger;
@@ -24,6 +25,8 @@ public class MessageHandlerImpl implements MessageHandler {
 	public String rabbitQueue;
 	private final RabbitTemplate rabbitTemplate;
 	private final FieldResolver fieldResolver;
+	private CountDownLatch latch;
+	private long count = 0;
 	
 	public MessageHandlerImpl(RabbitTemplate rabbitTemplate, String rabbitQueue,
 			FieldResolver fieldResolver) {
@@ -37,9 +40,40 @@ public class MessageHandlerImpl implements MessageHandler {
 		log.debug("Received:\n{}", message);
 		Map<String,Object> sobject = (Map<String,Object>)message.get("sobject");
 		fieldResolver.resolve(sobject);
+		if (log.isDebugEnabled()) {
+			log.debug("sobject:\n {}",getSobject(sobject));
+		}
+
+		if (latch != null) {
+			latch.countDown();
+		}
 		if (rabbitTemplate != null) {
 			rabbitTemplate.convertAndSend(rabbitQueue, message);
 			log.debug("Sent to: {}", rabbitQueue);
 		}
+		count++;
 	}
+
+	public void setLatch(CountDownLatch latch) {
+		this.latch = latch;
+		for (int i = 0; i<count; i++) {
+			latch.countDown();
+		}
+	}
+	
+    private String getSobject(Map<String,Object> sobject) {
+    	StringBuilder ret = new StringBuilder();
+		for (Entry<String,Object> entry: sobject.entrySet()) {
+			ret.append(entry.getKey());
+			ret.append('=');
+			ret.append(entry.getValue());
+			ret.append('\n');
+		}
+		return ret.toString();
+    }
+
+	public long getCount() {
+		return count;
+	}
+
 }
