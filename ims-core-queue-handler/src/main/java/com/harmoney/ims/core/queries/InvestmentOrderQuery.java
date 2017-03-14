@@ -26,6 +26,7 @@ public class InvestmentOrderQuery {
 		String queryString = "Select Id                                       " +
                 "      ,Name                                     " +
                 "      ,CreatedDate                              " +
+                "      ,loan__Account__c                         " +
                 "      ,loan__Loan__c                            " +     //# Fkey to loan__Loan_Account__c (CL Contract)
                 "      ,loan__Investment_Amount__c               " +
                 "      ,HM_Investment_Amount__c                  " +

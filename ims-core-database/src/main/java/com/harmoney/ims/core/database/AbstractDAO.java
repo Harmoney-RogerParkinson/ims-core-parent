@@ -187,19 +187,10 @@ public abstract class AbstractDAO<T extends Transaction> {
 				try {
 					fieldValue = extractValueFromSObject(sobject,name);
 				} catch (Exception e) {
-//					log.error(e.getMessage());
+					log.error(e.getMessage());
 					continue;
 				}
 				fieldMap.put(name, fieldValue);
-//				if (sobject.getChild(name) != null) {
-//					Object fieldValue = sobject.getField(name);
-//					if (fieldValue != null && fieldValue instanceof SObject) {
-//						String v = (String)((SObject)fieldValue).getChild("loan__Tax_Percentage__c").getValue();
-//						fieldMap.put(name, v);
-//					} else {
-//						fieldMap.put(name, sobject.getField(name));
-//					}
-//				}
 			}
 		}
 		if (!fieldMap.containsKey("Reverse_Rejected_Date__c")) {

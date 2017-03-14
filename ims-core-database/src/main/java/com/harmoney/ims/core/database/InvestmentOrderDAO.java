@@ -20,11 +20,6 @@ public class InvestmentOrderDAO  extends AbstractDAO<InvestmentOrder>{
 	
 	private static final Logger log = LoggerFactory.getLogger(InvestmentOrderDAO.class);
 
-	public Result unpack(SObject sobject, InvestmentOrder investmentOrder) {
-		// TODO Auto-generated method stub
-		return null;
-		
-	}
-	
+
 
 }

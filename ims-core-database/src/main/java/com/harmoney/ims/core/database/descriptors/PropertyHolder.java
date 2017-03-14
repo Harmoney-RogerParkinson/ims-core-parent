@@ -126,7 +126,7 @@ public class PropertyHolder {
 					if (bigDecimalTotal == null) {
 						bigDecimalTotal = new BigDecimal(0).setScale(column.scale(),BigDecimal.ROUND_HALF_DOWN);
 					}
-					bigDecimalTotal.add(bigDecimal);
+					bigDecimalTotal = bigDecimalTotal.add(bigDecimal);
 					writeMethod.invoke(totals, bigDecimalTotal.setScale(column.scale(),BigDecimal.ROUND_HALF_DOWN));
 				}
 			} catch (Exception e) {
@@ -134,6 +134,20 @@ public class PropertyHolder {
 			}
 		}
 		
+	}
+
+	public void copy(Object source, Object target) {
+		if (negateable) {
+			try {
+				BigDecimal bigDecimal = (BigDecimal)readMethod.invoke(source);
+				if (bigDecimal == null) {
+					bigDecimal = new BigDecimal(0).setScale(column.scale(),BigDecimal.ROUND_HALF_DOWN);
+				}
+				writeMethod.invoke(target, bigDecimal.setScale(column.scale(),BigDecimal.ROUND_HALF_DOWN));
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 
 }

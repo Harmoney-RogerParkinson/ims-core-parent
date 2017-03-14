@@ -194,7 +194,7 @@
 							name="InvestorLoanTransaction.accountdate" query="select i from InvestorLoanTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end and i.accountId=:accountId order by accountId,createdDate">
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
-							name="InvestorLoanTransaction.accountdatebalancefwd" query="select i from InvestorLoanTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end and i.accountId=:accountId and i.iltType = 'BalanceForward' order by accountId,createdDate">
+							name="InvestorLoanTransaction.accountdatebalancefwd" query="select i from InvestorLoanTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end and i.accountId=:accountId and i.iltType = 'BALANCE_FORWARD' order by accountId,createdDate">
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
 							name="InvestorLoanTransaction.accountIds" query="select i.accountId from InvestorLoanTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end group by accountId">
@@ -530,7 +530,7 @@
 						<annotation>
 							<appinfo>
 								<annox:annotate>
-									<ims:SalesforceName fieldName="loan__transaction_amount__c" />
+									<ims:SalesforceName fieldName="loan__Transaction_Amount__c" />
 									<ims:Negateable />
 								</annox:annotate>
 							</appinfo>

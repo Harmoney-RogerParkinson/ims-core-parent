@@ -71,7 +71,7 @@ public class InvestorLoanTransactionDAO  extends AbstractDAO<InvestorLoanTransac
     	if (balFwdCount == 0) {
     		// If there were no balance forward records we have to go back to the beginning of time
     		// and sum all the transactions.
-    		startDate = Date.from(LocalDateTime.MIN.atZone(ZoneId.systemDefault()).toInstant());
+    		startDate = new Date(0L);
     	}
     	if (balFwdCount == 1) {
     		// We found one balance forward record.
@@ -137,14 +137,18 @@ public class InvestorLoanTransactionDAO  extends AbstractDAO<InvestorLoanTransac
     			break;
     		}
     	}
-    	iltTotals.setAccountId(accountId);
-    	iltTotals.setCreatedDate(endDate);
-    	iltTotals.setIltType(ItemType.BALANCE_FORWARD);
     	if (secondBalfwd != null) {
     		// we have an end balance forward record so ensure it is updated
-    		iltTotals.setImsid(secondBalfwd.getImsid());
+    		objectDescriptor.copy(iltTotals,secondBalfwd);
+    		merge(secondBalfwd);
+    		log.debug("Updated existing balfwd");
+    	} else {
+        	iltTotals.setAccountId(accountId);
+        	iltTotals.setCreatedDate(endDate);
+        	iltTotals.setIltType(ItemType.BALANCE_FORWARD);
+    		create(iltTotals);
+    		log.debug("Created new balfwd");
     	}
-    	merge(iltTotals);
     }
 
 	public List<String> getAccountIds(LocalDateTime start,

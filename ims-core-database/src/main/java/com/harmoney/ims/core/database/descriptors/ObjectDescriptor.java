@@ -149,6 +149,12 @@ public class ObjectDescriptor {
 			propertyHolder.accumulate(source,totals);
 		}
 	}
+	public void copy(Object source, Object target) {
+		Assert.isTrue(source.getClass().equals(target.getClass()), "Accumulating objects must be the same class");
+		for (PropertyHolder propertyHolder: map.values()) {
+			propertyHolder.copy(source,target);
+		}
+	}
 	public long getId(Object object) {
 		Assert.notNull(idMethod,"idMethod must not be null");
 		try {
@@ -201,5 +207,6 @@ public class ObjectDescriptor {
 		}
 		return r;
 	}
+
 
 }

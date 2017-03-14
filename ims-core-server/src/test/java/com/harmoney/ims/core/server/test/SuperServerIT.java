@@ -1,5 +1,6 @@
 package com.harmoney.ims.core.server.test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -77,6 +78,8 @@ public class SuperServerIT {
 	
     private static final Logger log = LoggerFactory.getLogger(SuperServerIT.class);
     private static final int SAVE_BUFFER = 75;
+    private static final int MAX_TRANSACTIONS = 500;
+    private static final String dbLocation = "/tmp/ims.xml";
 	@Autowired private EmpConnector empConnector;
     @Autowired ConfigurableApplicationContext context;
 	@Autowired private PartnerConnection partnerConnection;
@@ -93,8 +96,8 @@ public class SuperServerIT {
 		MessageHandlerImpl iftms = (MessageHandlerImpl)messageHandlerMap.getMessageHandler(MessageHandlerMap.IFTIMS);
 		
 		log.info("Updating transactions...");
-		int iltCount = updateInvestorLoanTransaction(500);
-		int iftCount = updateInvestorFundTransaction(500);
+		int iltCount = updateInvestorLoanTransaction(MAX_TRANSACTIONS);
+		int iftCount = updateInvestorFundTransaction(MAX_TRANSACTIONS);
 		CountDownLatch latch = new CountDownLatch(iltCount+iftCount);
 		iltms.setLatch(latch);
 		iftms.setLatch(latch);
@@ -103,12 +106,15 @@ public class SuperServerIT {
 		log.info("ILT processed: {} of {}",iltms.getCount(),iltCount);
 		log.info("IFT processed: {} of {}",iftms.getCount(),iftCount);
 		log.info("PushTopic updates complete");
+		assertEquals(iltms.getCount(),iltCount);
+		assertEquals(iftms.getCount(),iftCount);
 
 		int accountSummaryCount = accountSummaryquery.doQuery();
 		log.info("accountSummaryCount {}",accountSummaryCount);
 		int investmentOrderCount = investmentOrderquery.doQuery();
 		log.info("investmentOrderCount {}",investmentOrderCount);
-		saveDatabase("/tmp/ims.xml");
+		saveDatabase(dbLocation);
+		log.info("Database image saved to {}",dbLocation);
 		
 	}
 	
