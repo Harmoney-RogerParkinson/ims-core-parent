@@ -5,6 +5,7 @@ package com.harmoney.ims.core.queuehandler;
 
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 
 import nz.co.senanque.madura.ampq.AMPQReceiver;
 
@@ -55,12 +56,15 @@ public class RabbitReceiver {
 	}
 	private void count() {
 		if (latch != null) {
-			latch.countDown();
+			synchronized(this) {
+				latch.countDown();
+				count++;
+			}
 		}
-		count++;
 	}
 
 	public long getCount() {
 		return count;
 	}
+
 }

@@ -96,6 +96,11 @@
 		    <artifactId>shedlock-provider-jdbc</artifactId>
 		    <version>0.6.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	
 </project>

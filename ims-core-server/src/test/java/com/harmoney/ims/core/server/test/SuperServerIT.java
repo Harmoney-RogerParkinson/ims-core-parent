@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.FileOutputStream;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.dbunit.ext.h2.H2DataTypeFactory;
 import org.dbunit.ext.postgresql.PostgresqlDataTypeFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -42,6 +45,7 @@ import com.harmoney.ims.core.queries.AccountSummaryQuery;
 import com.harmoney.ims.core.queries.InvestmentOrderQuery;
 import com.harmoney.ims.core.queries.QuerySpringConfig;
 import com.harmoney.ims.core.queuehandler.QueueHandlerSpringConfig;
+import com.harmoney.ims.core.queuehandler.RabbitReceiver;
 import com.salesforce.emp.connector.EmpConnector;
 import com.sforce.soap.partner.Error;
 import com.sforce.soap.partner.PartnerConnection;
@@ -79,50 +83,79 @@ public class SuperServerIT {
     private static final Logger log = LoggerFactory.getLogger(SuperServerIT.class);
     private static final int SAVE_BUFFER = 75;
     private static final int MAX_TRANSACTIONS = 500;
-    private static final String dbLocation = "/tmp/ims.xml";
-	@Autowired private EmpConnector empConnector;
+	@Autowired EmpConnector empConnector;
     @Autowired ConfigurableApplicationContext context;
-	@Autowired private PartnerConnection partnerConnection;
+	@Autowired PartnerConnection partnerConnection;
 	@Autowired AccountSummaryQuery accountSummaryquery;
 	@Autowired InvestmentOrderQuery investmentOrderquery;
 	@Autowired DataSource dataSource;
-	@Autowired MessageHandlerMap messageHandlerMap;
-	@Autowired RabbitAdmin rabbitAdmin;
+	@Autowired RabbitReceiver rabbitReceiver;
+	@Value("${com.harmoney.ims.core.server.test.SuperServerIT.transactionsOnly:false}")
+	private boolean transactionsOnly;
+	@Value("${com.harmoney.ims.core.server.test.SuperServerIT.saveData:/tmp/ims.xml}")
+	private String dbLocation;
+	@Value("${database.dialect}")
+	private String databaseDialect;
 
 	@Test
 	public void testEverythingFromSalesforce() throws Exception {
 		assertNotNull(empConnector);
-		MessageHandlerImpl iltms = (MessageHandlerImpl)messageHandlerMap.getMessageHandler(MessageHandlerMap.ILTIMS);
-		MessageHandlerImpl iftms = (MessageHandlerImpl)messageHandlerMap.getMessageHandler(MessageHandlerMap.IFTIMS);
 		
-		log.info("Updating transactions...");
-		int iltCount = updateInvestorLoanTransaction(MAX_TRANSACTIONS);
-		int iftCount = updateInvestorFundTransaction(MAX_TRANSACTIONS);
-		CountDownLatch latch = new CountDownLatch(iltCount+iftCount);
-		iltms.setLatch(latch);
-		iftms.setLatch(latch);
+		log.info("Transactions only: {}",transactionsOnly);
+		log.info("Database: {}",databaseDialect);
+		CountDownLatch latch = null;
+		int iltCount = 0;
+		int iftCount = 0;
+		// There's a little sync dance going on here. The Rabbit receiver doesn't do any syncing
+		// in production but here we want to prevent it from running ahead of us and then
+		// getting behind us later. It only syncs when there is a latch set and we don't know how
+		// big a latch to set until we've run the updates (by which time the pushtopics have started
+		// arriving before we can count them). So we set a dummy latch at first and do the updates
+		// while the rabbitReceiver is locked, making it wait to process any incoming records.
+		// Once the updates are done we put in the real latch (with the correct count)
+		// and then we can release the lock and wait for the count.
+		rabbitReceiver.setLatch(new CountDownLatch(iltCount+iftCount));
+		synchronized(rabbitReceiver) {
+			log.info("Updating transactions...");
+			iltCount = updateInvestorLoanTransaction(MAX_TRANSACTIONS);
+			iftCount = updateInvestorFundTransaction(MAX_TRANSACTIONS);
+			latch = new CountDownLatch(iltCount+iftCount);
+			rabbitReceiver.setLatch(latch);
+		}
 		log.info("Waiting for {} pushTopic records...",latch.getCount());
 		assertTrue("Did not reach expected count",latch.await(100000, TimeUnit.MILLISECONDS));
-		log.info("ILT processed: {} of {}",iltms.getCount(),iltCount);
-		log.info("IFT processed: {} of {}",iftms.getCount(),iftCount);
+		log.info("rabbitReceiver processed: {} of {}",rabbitReceiver.getCount(),iltCount+iftCount);
 		log.info("PushTopic updates complete");
-		assertEquals(iltms.getCount(),iltCount);
-		assertEquals(iftms.getCount(),iftCount);
-
-		int accountSummaryCount = accountSummaryquery.doQuery();
-		log.info("accountSummaryCount {}",accountSummaryCount);
-		int investmentOrderCount = investmentOrderquery.doQuery();
-		log.info("investmentOrderCount {}",investmentOrderCount);
-		saveDatabase(dbLocation);
-		log.info("Database image saved to {}",dbLocation);
-		
+		assertEquals(rabbitReceiver.getCount(),iltCount+iftCount);
+		if (!transactionsOnly) {
+			int accountSummaryCount = accountSummaryquery.doQuery();
+			log.info("accountSummaryCount {}",accountSummaryCount);
+			int investmentOrderCount = investmentOrderquery.doQuery();
+			log.info("investmentOrderCount {}",investmentOrderCount);
+		}
+		if (StringUtils.hasText(dbLocation)) {
+			saveDatabase(dbLocation);
+			log.info("Database image saved to {}",dbLocation);
+		} else {
+			log.info("Database image save disabled");
+		}
+		shutownDatabase();
+	}
+	
+	private void shutownDatabase() throws SQLException{
+        if (databaseDialect.equals("org.hibernate.dialect.H2Dialect")) {
+        	dataSource.getConnection().createStatement().execute("SHUTDOWN");
+        }
 	}
 	
 	private void saveDatabase(String outputFile) throws Exception {
 		Connection jdbcCconnection = dataSource.getConnection();
 		IDatabaseConnection connection = new DatabaseConnection(jdbcCconnection);
 		DatabaseConfig dbConfig = connection.getConfig();
-		dbConfig.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new PostgresqlDataTypeFactory());
+		dbConfig.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new H2DataTypeFactory());
+        if (databaseDialect.equals("org.hibernate.dialect.PostgreSQLDialect")) {
+    		dbConfig.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new PostgresqlDataTypeFactory());
+        }
         IDataSet fullDataSet = connection.createDataSet();
         FlatXmlDataSet.write(fullDataSet, new FileOutputStream(outputFile));		
 	}
@@ -130,7 +163,11 @@ public class SuperServerIT {
 	private int updateInvestorLoanTransaction(int max) throws ConnectionException {
 		int saved = 0;
 		String testValue = "RJP"+LocalDateTime.now().toLocalTime().toString();
-		QueryResult qr = partnerConnection.query("SELECT Id,test__c FROM loan__Investor_Loan_Account_Txns__c");
+		String queryString = "SELECT Id,test__c FROM loan__Investor_Loan_Account_Txns__c";
+		if (!transactionsOnly) {
+			queryString = "SELECT Id,test__c FROM loan__Investor_Loan_Account_Txns__c where CreatedDate <= 2016-12-31T00:00:00Z order by CreatedDate desc";
+		}
+		QueryResult qr = partnerConnection.query(queryString);
 		qr.getSize();
 		List<SObject> updates = new ArrayList<>();
 		int count = 0;
