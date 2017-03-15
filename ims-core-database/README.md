@@ -28,6 +28,9 @@ The database.hbm2ddl.auto is for auto creation. Default does nothing but change 
 
 Note that the generated DDL script can be used to create the db, but it probably needs optimisation for production.
 
+TODO: 
+depends on a custom HyperJAXB3 plugin. This needs some tidying up ie releasing properly. Build won't run anywhere else until I do this.
+
 ----
 keep this for now...
 
