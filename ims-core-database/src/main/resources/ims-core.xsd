@@ -14,9 +14,9 @@
 				<jaxb:javaType name="java.math.BigDecimal" xmlType="tns:currency"
 					parseMethod="com.harmoney.ims.core.database.ConvertUtils.parseCurrency"
 					printMethod="com.harmoney.ims.core.database.ConvertUtils.printCurrency" />
-				<jaxb:javaType name="java.util.Date" xmlType="xsd:dateTime" 
-					parseMethod="com.harmoney.ims.core.database.ConvertUtils.parseDate" 
-					printMethod="com.harmoney.ims.core.database.ConvertUtils.printDate" 
+				<jaxb:javaType name="java.sql.Timestamp" xmlType="xsd:dateTime" 
+					parseMethod="com.harmoney.ims.core.database.ConvertUtils.parseTimestamp" 
+					printMethod="com.harmoney.ims.core.database.ConvertUtils.printTimestamp" 
 					/>
 				<jaxb:javaType name="java.util.Date" xmlType="xsd:date"
 					parseMethod="com.harmoney.ims.core.database.ConvertUtils.parseDate"
@@ -96,7 +96,7 @@
 					</appinfo>
 				</annotation>
 			</element>
-			<element name="createdDate" type="date" nillable="false">
+			<element name="createdDate" type="dateTime" nillable="false">
 				<annotation>
 					<appinfo>
 						<annox:annotate>
@@ -195,7 +195,7 @@
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
 							name="InvestorLoanTransaction.accountdatebalancefwd" query="select i from InvestorLoanTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end and i.accountId=:accountId and i.iltType = 'BALANCE_FORWARD' order by accountId,createdDate">
-						</annox:annotate>
+						</annox:annotate> -->
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
 							name="InvestorLoanTransaction.accountIds" query="select i.accountId from InvestorLoanTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end group by accountId">
 						</annox:annotate>

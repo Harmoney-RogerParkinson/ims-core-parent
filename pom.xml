@@ -29,7 +29,7 @@
 		<jaxb2_commons.version>0.6.2</jaxb2_commons.version>
 		<slf4j.version>1.7.12</slf4j.version>
 		<logback.version>1.1.3</logback.version>
-		<hyperjaxb3-ejb-runtime.version>0.6.1</hyperjaxb3-ejb-runtime.version>
+		<hyperjaxb3.version>0.6.2-SNAPSHOT</hyperjaxb3.version>
    		<timestamp>${maven.build.timestamp}</timestamp>
    		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
 		<skipITs>true</skipITs>
@@ -218,6 +218,11 @@
 	    <pluginManagement>
 	    	<plugins>
 				<plugin>
+					<groupId>org.jvnet.hyperjaxb3</groupId>
+					<artifactId>maven-hyperjaxb3-plugin</artifactId>
+					<version>${hyperjaxb3.version}</version>
+				</plugin>
+				<plugin>
 				  <groupId>org.apache.maven.plugins</groupId>
 				  <artifactId>maven-failsafe-plugin</artifactId>
 				  <version>2.19.1</version>
@@ -252,12 +257,12 @@
 						<dependency>
 							<groupId>org.jvnet.hyperjaxb3</groupId>
 							<artifactId>hyperjaxb3-ejb-runtime</artifactId>
-							<version>${hyperjaxb3-ejb-runtime.version}</version>
+							<version>${hyperjaxb3.version}</version>
 						</dependency>
 						<dependency>
 							<groupId>org.jvnet.hyperjaxb3</groupId>
 							<artifactId>hyperjaxb3-ejb-plugin</artifactId>
-							<version>${hyperjaxb3-ejb-runtime.version}</version>
+							<version>${hyperjaxb3.version}</version>
 						</dependency>
 						<dependency>
 							<groupId>org.slf4j</groupId>

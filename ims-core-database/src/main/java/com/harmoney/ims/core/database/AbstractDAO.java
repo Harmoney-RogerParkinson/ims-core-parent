@@ -4,6 +4,8 @@
 package com.harmoney.ims.core.database;
 
 import java.lang.reflect.ParameterizedType;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +39,12 @@ public abstract class AbstractDAO<T extends Transaction> {
 	
 	private static final Logger log = LoggerFactory.getLogger(AbstractDAO.class);
 	
+	/**
+	 * These fields are in the Transaction object but they are not always supplied by Account and Investment Order
+	 * So we use this to suppress unnecessary error messages. 
+	 */
+	private static final String IGNORE_NAMES = "Reverse_Rejected_Date__c,Account_ID__c,harMoney_Account_Number__c,loan__Account__c,CreatedDate";
+	
 	@Autowired ObjectDescriptorGenerator objectDescriptorGenerator;
 	private ObjectDescriptor objectDescriptor;
 	private Class<T> clazz;
@@ -57,7 +65,7 @@ public abstract class AbstractDAO<T extends Transaction> {
 	public boolean createReversal(T target, T oldRecord) {
 		objectDescriptor.negate(target);
 		target.setId(null);
-        target.setCreatedDate(new Date());
+        target.setCreatedDate(new Timestamp(System.currentTimeMillis()));
         target.setReversedId(oldRecord.getImsid());
         entityManager.persist(target);
         oldRecord.setReversedId(target.getImsid());
@@ -77,7 +85,7 @@ public abstract class AbstractDAO<T extends Transaction> {
 	public boolean delete(T target)
 	{
 		getObjectDescriptor().negate(target);
-        target.setCreatedDate(new Date());
+        target.setCreatedDate(new Timestamp(System.currentTimeMillis()));
         T oldRecord = getById(target.getId());
         if (oldRecord == null) {
         	// we don't know about this record. Can't delete it
@@ -187,7 +195,9 @@ public abstract class AbstractDAO<T extends Transaction> {
 				try {
 					fieldValue = extractValueFromSObject(sobject,name);
 				} catch (Exception e) {
-					log.error(e.getMessage());
+					if (!IGNORE_NAMES.contains(name)) {
+						log.warn(e.getMessage());
+					}
 					continue;
 				}
 				fieldMap.put(name, fieldValue);

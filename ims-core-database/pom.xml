@@ -97,7 +97,6 @@
 		<plugin>
 			<groupId>org.jvnet.hyperjaxb3</groupId>
 			<artifactId>maven-hyperjaxb3-plugin</artifactId>
-			<version>0.6.1</version>
 		    <dependencies>
 				<dependency>
 					<groupId>com.harmoney</groupId>

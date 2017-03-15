@@ -3,6 +3,7 @@
  */
 package com.harmoney.ims.core.database;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -29,21 +30,21 @@ public class InvestorLoanTransactionDAO  extends AbstractDAO<InvestorLoanTransac
 	
 	private static final Logger log = LoggerFactory.getLogger(InvestorLoanTransactionDAO.class);
 
-	public List<InvestorLoanTransaction> getByAccountDate(Date start, Date end, String accountId) {
+	public List<InvestorLoanTransaction> getByAccountDate(LocalDateTime start, LocalDateTime end, String accountId) {
 		TypedQuery<InvestorLoanTransaction> query =
 				  getEntityManager().createNamedQuery("InvestorLoanTransaction.accountdate", InvestorLoanTransaction.class);
 		query.setParameter("accountId", accountId);
-		query.setParameter("start", start);
-		query.setParameter("end", end);
+		query.setParameter("start", Timestamp.valueOf(start));
+		query.setParameter("end", Timestamp.valueOf(end));
 		return query.getResultList();
 	}
 
-	public List<InvestorLoanTransaction> getByAccountDateBalFwd(Date start,	Date end, String accountId) {
+	public List<InvestorLoanTransaction> getByAccountDateBalFwd(LocalDateTime start, LocalDateTime end, String accountId) {
 		TypedQuery<InvestorLoanTransaction> query =
 				  getEntityManager().createNamedQuery("InvestorLoanTransaction.accountdatebalancefwd", InvestorLoanTransaction.class);
 		query.setParameter("accountId", accountId);
-		query.setParameter("start", start);
-		query.setParameter("end", end);
+		query.setParameter("start", Timestamp.valueOf(start));
+		query.setParameter("end", Timestamp.valueOf(end));
 		return query.getResultList();
 	}
     /**
@@ -62,77 +63,69 @@ public class InvestorLoanTransactionDAO  extends AbstractDAO<InvestorLoanTransac
     	// The db calls still need to use the old Dates
     	Date startDate = Date.from(start.atZone(ZoneId.systemDefault()).toInstant());
     	Date endDate = Date.from(end.atZone(ZoneId.systemDefault()).toInstant());
+    	Timestamp endTimestamp = Timestamp.valueOf(end);
     	
     	// the balfwdlist has the balance forward records already created for this
     	// period. We expect 0, 1 or 2, depending on if this process had been run before for the period
-    	List<InvestorLoanTransaction> balfwdlist = getByAccountDateBalFwd(startDate,endDate,accountId);
+    	List<InvestorLoanTransaction> balfwdlist = getByAccountDateBalFwd(start,end,accountId);
     	int balFwdCount = balfwdlist.size();
-    	boolean foundFirstBalfwd = false;
+    	boolean accumulating = false;
+    	InvestorLoanTransaction iltTotals = new InvestorLoanTransaction();
+    	ObjectDescriptor objectDescriptor = getObjectDescriptor();
+    	log.debug("Account {} balFwdCount found {}",accountId,balFwdCount);
     	if (balFwdCount == 0) {
     		// If there were no balance forward records we have to go back to the beginning of time
     		// and sum all the transactions.
     		startDate = new Date(0L);
+    		accumulating = true;
     	}
     	if (balFwdCount == 1) {
     		// We found one balance forward record.
+    		InvestorLoanTransaction balfwd1 = balfwdlist.get(0);
     		// Here we figure out if it is the first one or the last one
-    		LocalDateTime createdDate = LocalDateTime.ofInstant(balfwdlist.get(0).getCreatedDate().toInstant(), ZoneId.systemDefault());
+    		LocalDateTime createdDate = balfwd1.getCreatedDate().toLocalDateTime();
     		if (createdDate.equals(start)) {
     			// it was the first one, we're fine
+    			// The flag will ensure we ignore up to that first balfwd
+    			accumulating = false;
     		} else if (createdDate.equals(end)) {
     			// it was the last one. Fake finding the first one
-    			// and make it look like we found 2
-    			foundFirstBalfwd = true;
-    			balFwdCount = 2;
+    			// and make it look like we found 2 and search from the beginning of time.
+    			accumulating = true;
+    			startDate = new Date(0L);
     		} else {
     			// we have a screw up
-    			// The best we can do is assume we have start and end
-    			balFwdCount = 2;
+    			// The best we can do is assume we have none
+    			accumulating = true;
+    			startDate = new Date(0L);
     		}
     	}
+    	log.debug("After adjustments: startDate {} balFwdCount {}",startDate,balFwdCount);
     	
-    	List<InvestorLoanTransaction> list = getByAccountDate(startDate,endDate,accountId);
-    	InvestorLoanTransaction iltTotals = new InvestorLoanTransaction();
+    	List<InvestorLoanTransaction> list = getByAccountDate(start,end,accountId);
     	InvestorLoanTransaction secondBalfwd = null;
     	// sum all the summable things into the totals object
-    	ObjectDescriptor objectDescriptor = getObjectDescriptor();
     	for (InvestorLoanTransaction ilt: list) {
-    		switch (balFwdCount) {
-    		case 0:
-    			// No balance forward records found. Just accumulate what we find.
-   				if (ilt.getIltType() == ItemType.BALANCE_FORWARD) {
-   					// ... but if we do find a balance forward then ignore it
-   				} else {
-   					objectDescriptor.accumulate(ilt,iltTotals);
-   				}
-    			break;
-    		case 1:
-    			// Found one, and we already established it is the first one
-    			if (!foundFirstBalfwd) {
-    				if (ilt.getIltType() == ItemType.BALANCE_FORWARD) {
-    					objectDescriptor.accumulate(ilt,iltTotals);
-    					foundFirstBalfwd = true;
-    				} else {
-    					objectDescriptor.accumulate(ilt,iltTotals);
-    				}
-    			}
-    			break;
-    		case 2:
-    			// Found both start and end. Ignore everything before the first one
-    			// and stop before totaling the last one.
-    			if (!foundFirstBalfwd) {
-    				if (ilt.getIltType() == ItemType.BALANCE_FORWARD) {
-    					objectDescriptor.accumulate(ilt,iltTotals);
-    					foundFirstBalfwd = true;
-    				}
-    			} else {
-    				if (ilt.getIltType() == ItemType.BALANCE_FORWARD) {
-    					secondBalfwd = ilt;
-    				} else {
-    					objectDescriptor.accumulate(ilt,iltTotals);
-    				}
-    			}
-    		}
+			if (!accumulating) {
+				if (ilt.getIltType() == ItemType.BALANCE_FORWARD) {
+					// If this is the first balfwd then accumulate and flag
+					if (ilt.getCreatedDate().toLocalDateTime().equals(start)) {
+						objectDescriptor.accumulate(ilt,iltTotals);
+						accumulating = true;
+					}
+				} else {
+					// do not accumulate
+				}
+			} else {
+				if (ilt.getIltType() == ItemType.BALANCE_FORWARD) {
+					// If this is the last balfwd then save it for update (which will exit the loop)
+					if (ilt.getCreatedDate().toLocalDateTime().equals(end)) {
+						secondBalfwd = ilt;
+					}
+				} else {
+					objectDescriptor.accumulate(ilt,iltTotals);
+				}
+			}
     		if (secondBalfwd != null) {
     			break;
     		}
@@ -144,7 +137,7 @@ public class InvestorLoanTransactionDAO  extends AbstractDAO<InvestorLoanTransac
     		log.debug("Updated existing balfwd");
     	} else {
         	iltTotals.setAccountId(accountId);
-        	iltTotals.setCreatedDate(endDate);
+        	iltTotals.setCreatedDate(endTimestamp);
         	iltTotals.setIltType(ItemType.BALANCE_FORWARD);
     		create(iltTotals);
     		log.debug("Created new balfwd");
@@ -155,12 +148,12 @@ public class InvestorLoanTransactionDAO  extends AbstractDAO<InvestorLoanTransac
 			LocalDateTime end) {
     	
     	// The db calls still need to use the old Dates
-    	Date startDate = Date.from(start.atZone(ZoneId.systemDefault()).toInstant());
-    	Date endDate = Date.from(end.atZone(ZoneId.systemDefault()).toInstant());
+		Timestamp startTimestamp = Timestamp.valueOf(start);
+		Timestamp endTimestamp = Timestamp.valueOf(end);
     	
 		Query query = getEntityManager().createNamedQuery("InvestorLoanTransaction.accountIds");
-		query.setParameter("start", startDate);
-		query.setParameter("end", endDate);
+		query.setParameter("start", startTimestamp);
+		query.setParameter("end", endTimestamp);
 		List ret = query.getResultList();
 		return ret;
 	}

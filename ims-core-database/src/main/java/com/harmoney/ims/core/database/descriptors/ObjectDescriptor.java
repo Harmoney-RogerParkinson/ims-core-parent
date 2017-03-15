@@ -2,14 +2,14 @@ package com.harmoney.ims.core.database.descriptors;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.persistence.Column;
 
@@ -19,7 +19,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import com.harmoney.ims.core.annotations.SalesforceName;
-import com.harmoney.ims.core.instances.InvestorLoanTransaction;
 
 public class ObjectDescriptor {
 	
@@ -111,11 +110,11 @@ public class ObjectDescriptor {
 				// but first remove the time component
 				String d = ((String)value).substring(0, 10);
 				value = java.sql.Date.valueOf(d);
-			} else if (columnType.equals(LocalDate.class)) {
+			} else if (columnType.equals(Timestamp.class)) {
 				// Dates arrive as strings which we convert to java.sql.Date
 				// but first remove the time component
-				String d = ((String)value).substring(0, 10);
-				value = LocalDate.parse(d);
+				String d = ((String)value).substring(0, 22);
+				value = Timestamp.valueOf(LocalDateTime.parse(d));
 			} else if (columnType.isEnum()) {
 				value = propertyHolder.valueOf((String) value);
 			}

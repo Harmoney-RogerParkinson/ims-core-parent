@@ -1,9 +1,15 @@
 package com.harmoney.ims.core.balanceforward;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.FileInputStream;
+import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -16,6 +22,8 @@ import org.dbunit.ext.postgresql.PostgresqlDataTypeFactory;
 import org.dbunit.operation.DatabaseOperation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
@@ -24,6 +32,8 @@ import org.springframework.util.StringUtils;
 import org.xml.sax.InputSource;
 
 import com.harmoney.ims.core.database.DatabaseSpringConfig;
+import com.harmoney.ims.core.database.InvestorLoanTransactionDAO;
+import com.harmoney.ims.core.instances.InvestorLoanTransaction;
 import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
 import com.harmoney.ims.core.queries.QuerySpringConfig;
 
@@ -31,11 +41,14 @@ import com.harmoney.ims.core.queries.QuerySpringConfig;
 @ContextConfiguration(classes = { QuerySpringConfig.class, PartnerConnectionSpringConfig.class,DatabaseSpringConfig.class})
 public class InvestorLoanTransactionBalanceForwardIT {
 
-	 @Value("${database.hbm2ddl.auto}")
-	 public String hbm2ddlauto;
+    private static final Logger log = LoggerFactory.getLogger(InvestorLoanTransactionBalanceForwardIT.class);
+
+	@Value("${database.hbm2ddl.auto}")
+	public String hbm2ddlauto;
 	@Autowired DataSource dataSource;
 	@Autowired InvestorLoanTransactionBalanceForward investorLoanTransactionBalanceForward;
-    private static final String dbLocation = "/tmp/ims.xml";
+	@Autowired InvestorLoanTransactionDAO investorLoanTransactionDAO;
+    private static final String dbLocation = "ims.xml";
 
 	@Test
 	public void processBalanceForward() throws Exception {
@@ -45,7 +58,32 @@ public class InvestorLoanTransactionBalanceForwardIT {
 			loadDatabase();
 		}
 		// period 2016-08 has two accounts to process
-		investorLoanTransactionBalanceForward.processBalanceForward(LocalDate.of(2016, 8, 15));
+		BalanceForwardDTO balanceForwardDTO = investorLoanTransactionBalanceForward.processBalanceForward(LocalDate.of(2016, 8, 15));
+
+		Map<String,BigDecimal> netAmountByAccountId = new HashMap<>(); 
+		// Query for the new balfwd records, very the number, save the amounts.
+		for (String accountId: balanceForwardDTO.getAccountIds()) {
+			List<InvestorLoanTransaction> balfwdlist = investorLoanTransactionDAO.getByAccountDateBalFwd(
+					balanceForwardDTO.getStart(),
+					balanceForwardDTO.getEnd(),
+					accountId
+					);
+			assertEquals(1,balfwdlist.size());
+			netAmountByAccountId.put(accountId, balfwdlist.get(0).getNetAmount());
+		}
+		// Rerun the same process for the same dates
+		// Should update the existing records with the same values (ie process is repeatable) 
+		balanceForwardDTO = investorLoanTransactionBalanceForward.processBalanceForward(LocalDate.of(2016, 8, 15));
+		// Query for the new balfwd records, verify the number and the amounts.
+		for (String accountId: balanceForwardDTO.getAccountIds()) {
+			List<InvestorLoanTransaction> balfwdlist = investorLoanTransactionDAO.getByAccountDateBalFwd(
+					balanceForwardDTO.getStart(),
+					balanceForwardDTO.getEnd(),
+					accountId
+					);
+			assertEquals(1,balfwdlist.size());
+			assertEquals(netAmountByAccountId.get(accountId),balfwdlist.get(0).getNetAmount());
+		}
 		
 		
 	}
@@ -56,6 +94,7 @@ public class InvestorLoanTransactionBalanceForwardIT {
 	 * @throws Exception
 	 */
 	private void loadDatabase() throws Exception {
+		log.debug("Loading database hbm2ddlauto={}",hbm2ddlauto);
 		Connection jdbcConnection = dataSource.getConnection();
 		IDatabaseConnection connection = new DatabaseConnection(jdbcConnection);
 		DatabaseConfig dbConfig = connection.getConfig();
@@ -67,6 +106,7 @@ public class InvestorLoanTransactionBalanceForwardIT {
         // Current file take it to just over 3000 so 4000 allows for some padding
         CallableStatement callable = jdbcConnection.prepareCall("ALTER SEQUENCE hibernate_sequence RESTART WITH 4000;");
         callable.execute();
+        log.debug("Database load complete",hbm2ddlauto);
         
 	}
 }

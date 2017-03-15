@@ -1,6 +1,8 @@
 package com.harmoney.ims.core.queuehandler;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
@@ -37,7 +39,7 @@ public class ReceiverMock {
         Result result = investorLoanTransactionDAO.unpackMessage(message, target);
         log.debug("{}",result);
         Assert.assertEquals("a6fN00000008giLIAQ",target.getId());
-        Assert.assertEquals(java.sql.Date.valueOf("2017-02-23"),target.getCreatedDate());
+        Assert.assertEquals(Timestamp.valueOf(LocalDateTime.parse("2017-02-23T00:00")),target.getCreatedDate());
         Assert.assertEquals(new BigDecimal(200D).longValue(),target.getPrincipalPaid().longValue());
         latch.countDown();
     }

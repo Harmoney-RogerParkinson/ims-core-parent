@@ -1,7 +1,8 @@
 package com.harmoney.ims.core.queueprocessor;
 
 
-import java.util.Date;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,12 +24,12 @@ public class InvestmentOrderProcessor {
 
 	@Transactional
 	public void processQuery(SObject[] records) {
-		Date createdDate = new Date();
+		LocalDateTime createdDate = LocalDateTime.now();
 		for (SObject sobject: records) {
 			InvestmentOrder investmentOrder = new InvestmentOrder();
 			Result result = investmentOrderDAO.unpack(sobject, investmentOrder);
 			log.debug("Result: {}",result);
-			investmentOrder.setCreatedDate(createdDate);
+			investmentOrder.setCreatedDate(Timestamp.valueOf(createdDate));
 			investmentOrderDAO.create(investmentOrder);
 		}
 	}

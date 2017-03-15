@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Date;
 
@@ -88,6 +89,14 @@ public class ConvertUtils
         }
         return LocalDate.parse(d);
     }
+    public static final LocalDateTime parseLocalDateTime(String d)
+    {
+        if (d == null)
+        {
+            return null;
+        }
+        return LocalDateTime.parse(d);
+    }
     public static final OffsetDateTime parseOffsetDateTime(String d)
     {
         if (d == null)
@@ -97,6 +106,14 @@ public class ConvertUtils
         return OffsetDateTime.parse(d);
      }
     public static final String printLocalDate(LocalDate c)
+    {
+        if (c == null)
+        {
+            return null;
+        }
+        return c.toString();
+    }
+    public static final String printLocalDateTime(LocalDateTime c)
     {
         if (c == null)
         {

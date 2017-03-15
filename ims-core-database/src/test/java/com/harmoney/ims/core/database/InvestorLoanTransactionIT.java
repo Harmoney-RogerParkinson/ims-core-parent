@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -41,6 +42,7 @@ public class InvestorLoanTransactionIT {
 			.getLogger(InvestorLoanTransactionIT.class);
 	
 	@Autowired private InvestorLoanTransactionDAO investorLoanTransactionDAO;
+	private Timestamp today = Timestamp.valueOf(LocalDateTime.of(LocalDate.of(2017, 2, 23), LocalTime.MIDNIGHT));
 
 	@Test
 	public void createTransactionTest() {
@@ -48,9 +50,10 @@ public class InvestorLoanTransactionIT {
 		ilt.setId("ILT_100");
 		ilt.setName("ILT_100");
 		ilt.setNetAmount(new BigDecimal(123.456));
-		ilt.setCreatedDate(java.sql.Date.valueOf("2017-02-23"));
+		ilt.setCreatedDate(today);
 		ilt.setAccountId("XYZ");
 		assertTrue(investorLoanTransactionDAO.create(ilt));
+		
 		List<InvestorLoanTransaction> transactions = investorLoanTransactionDAO.getAll();
 		assertEquals(1,transactions.size());
 		// These verify the named queries
@@ -65,11 +68,13 @@ public class InvestorLoanTransactionIT {
 		assertTrue(investorLoanTransactionDAO.update(ilt2));
 		InvestorLoanTransaction ilt3 = investorLoanTransactionDAO.getById(id);
 		assertEquals("ILT_101",ilt3.getName());
-		LocalDate start = LocalDate.of(2017, 2, 1);
-		LocalDate end = start.with(TemporalAdjusters.lastDayOfMonth());
-		LocalTime t = LocalTime.now();
-		List<String> accountIds = investorLoanTransactionDAO.getAccountIds(LocalDateTime.of(start, t),LocalDateTime.of(end, t));
+		LocalTime t = LocalTime.MIDNIGHT;
+		LocalDateTime start = LocalDateTime.of(LocalDate.of(2017, 2, 1), t);
+		LocalDateTime end = LocalDateTime.of(LocalDate.of(2017, 2, 1).with(TemporalAdjusters.lastDayOfMonth()), t);
+		List<String> accountIds = investorLoanTransactionDAO.getAccountIds(start,end);
 		assertEquals(1,accountIds.size());
+		transactions = investorLoanTransactionDAO.getAll();
+		assertEquals(1,transactions.size());
 	}
 	
 	@Test
@@ -78,14 +83,14 @@ public class InvestorLoanTransactionIT {
 		ilt.setId("ILT_150");
 		ilt.setName("ILT_150");
 		ilt.setNetAmount(new BigDecimal(123.456).setScale(2, BigDecimal.ROUND_HALF_DOWN));
-		ilt.setCreatedDate(java.sql.Date.valueOf("2017-02-23"));
+		ilt.setCreatedDate(today);
 		assertTrue(investorLoanTransactionDAO.create(ilt));
 		
 		ilt = new InvestorLoanTransaction();
 		ilt.setId("ILT_150");
 		ilt.setName("ILT_150");
 		ilt.setNetAmount(new BigDecimal(123.456).setScale(2, BigDecimal.ROUND_HALF_DOWN));
-		ilt.setCreatedDate(java.sql.Date.valueOf("2017-02-23"));
+		ilt.setCreatedDate(today);
 		ilt.setReversed(true);
 		ilt.setReversedOrRejectedDate(java.sql.Date.valueOf("2017-02-24"));
 		assertTrue(investorLoanTransactionDAO.update(ilt));

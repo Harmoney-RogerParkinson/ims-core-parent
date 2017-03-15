@@ -1,19 +1,22 @@
 package com.harmoney.ims.core.database.descriptors;
 
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.harmoney.ims.core.database.descriptors.ObjectDescriptor;
-import com.harmoney.ims.core.database.descriptors.Result;
 import com.harmoney.ims.core.instances.InvestorLoanTransaction;
 
 public class ObjectDescriptorTest {
@@ -29,8 +32,17 @@ public class ObjectDescriptorTest {
 		Assert.assertEquals("principalPaid", ObjectDescriptor.fixVariableFormat("loan__Principal_Paid__c"));
 		Assert.assertEquals("investorLoanTransactions", ObjectDescriptor.fixVariableFormat("InvestorLoanTransactions"));
 	}
-//	@Test
-//	public void dates() throws ParseException {
+	@Test
+	public void dates() throws ParseException {
+		
+		
+		LocalDateTime now = LocalDateTime.now();
+		System.out.println("Pre-Truncate:  " + now);
+		DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE_TIME;
+		System.out.println("Post-Truncate: " + now.truncatedTo(ChronoUnit.MICROS).format(dtf));
+		System.out.println("Post-Truncate: " + now.truncatedTo(ChronoUnit.MILLIS).format(dtf));
+		System.out.println("Post-Truncate: " + now.truncatedTo(ChronoUnit.NANOS).format(dtf));
+		
 //		String sampleDate = "2017-02-23T00:00:00.000Z";
 //		
 //		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
@@ -39,7 +51,7 @@ public class ObjectDescriptorTest {
 //		Timestamp result = java.sql.Timestamp.valueOf(ldt);
 //		OffsetDateTime odt = OffsetDateTime.parse(sampleDate);
 //		odt.toString();
-//	}
+	}
 	
 //	@Test
 //	public void testEnum() {
