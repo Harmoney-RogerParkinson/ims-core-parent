@@ -9,6 +9,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.harmoney.ims.core.database.InvestorLoanTransactionDAO;
@@ -25,6 +26,9 @@ public class InvestorLoanTransactionBalanceForward {
     private static final LocalTime LAST_MOMENT = LocalTime.of(23, 59, 59, 999999000);
 
     @Autowired private InvestorLoanTransactionDAO investorLoanTransactionDAO;
+	@Value("${InvestorLoanTransactionBalanceForward.testMode:false}")
+	public boolean testMode;
+
     
     /**
      * Generate or update balance forward records for every account id for the period given.
@@ -45,10 +49,13 @@ public class InvestorLoanTransactionBalanceForward {
     	log.debug("found {} accounts to process",accountIds.size());
     	for (String accountId: accountIds) {
     		log.debug("Starting account {}",accountId);
-    		investorLoanTransactionDAO.processBalanceForward(lastMomentOfLastMonth, lastMomentOfMonth, accountId);
+    		int i = investorLoanTransactionDAO.processBalanceForward(lastMomentOfLastMonth, lastMomentOfMonth, accountId);
+    		if (testMode) {
+    			ret.put(accountId,i);
+    		}
     		log.debug("Finished account {}",accountId);
     	}
-    	log.debug("Account processing complete");
+    	log.debug("Account processing complete\n");
     	return ret;
     	
     }

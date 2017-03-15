@@ -52,13 +52,15 @@ public class InvestorLoanTransactionDAO  extends AbstractDAO<InvestorLoanTransac
      * Scan for balance forward records in the transactions. We may find 0, 1 or 2 depending on if the process has run before this.
      * Then add up the transactions in this period including the first balance forward record if found, and save or update the
      * end balance forward record with the new totals.
+     * Return the total cound of balance forward records found in this period, including the ones we created. This is used for testing.
      * 
      * @param start
      * @param end
      * @param accountId
+     * @return balFwdCount
      */
 	@Transactional
-    public void processBalanceForward(LocalDateTime start, LocalDateTime end, String accountId) {
+    public int processBalanceForward(LocalDateTime start, LocalDateTime end, String accountId) {
     	
     	// The db calls still need to use the old Dates
     	Date startDate = Date.from(start.atZone(ZoneId.systemDefault()).toInstant());
@@ -72,7 +74,7 @@ public class InvestorLoanTransactionDAO  extends AbstractDAO<InvestorLoanTransac
     	boolean accumulating = false;
     	InvestorLoanTransaction iltTotals = new InvestorLoanTransaction();
     	ObjectDescriptor objectDescriptor = getObjectDescriptor();
-    	log.debug("Account {} balFwdCount found {}",accountId,balFwdCount);
+    	log.debug("Initial balFwdCount: {} Account: {} ",balFwdCount,accountId);
     	if (balFwdCount == 0) {
     		// If there were no balance forward records we have to go back to the beginning of time
     		// and sum all the transactions.
@@ -100,9 +102,10 @@ public class InvestorLoanTransactionDAO  extends AbstractDAO<InvestorLoanTransac
     			startDate = new Date(0L);
     		}
     	}
-    	log.debug("After adjustments: startDate {} balFwdCount {}",startDate,balFwdCount);
     	
     	List<InvestorLoanTransaction> list = getByAccountDate(start,end,accountId);
+    	log.debug("Starting account scan: startDate {} accumulating {} size {}",startDate,accumulating,list.size());
+
     	InvestorLoanTransaction secondBalfwd = null;
     	// sum all the summable things into the totals object
     	for (InvestorLoanTransaction ilt: list) {
@@ -134,14 +137,18 @@ public class InvestorLoanTransactionDAO  extends AbstractDAO<InvestorLoanTransac
     		// we have an end balance forward record so ensure it is updated
     		objectDescriptor.copy(iltTotals,secondBalfwd);
     		merge(secondBalfwd);
-    		log.debug("Updated existing balfwd");
+    		log.debug("Updated existing balfwd accountId: {}",accountId);
     	} else {
         	iltTotals.setAccountId(accountId);
         	iltTotals.setCreatedDate(endTimestamp);
         	iltTotals.setIltType(ItemType.BALANCE_FORWARD);
     		create(iltTotals);
-    		log.debug("Created new balfwd");
+    		log.debug("Created new balfwd accountId: {}",accountId);
+    		balFwdCount++;
     	}
+    	log.debug("Final balFwdCount: {} Account: {} ",balFwdCount,accountId);
+
+    	return balFwdCount;
     }
 
 	public List<String> getAccountIds(LocalDateTime start,
@@ -154,7 +161,8 @@ public class InvestorLoanTransactionDAO  extends AbstractDAO<InvestorLoanTransac
 		Query query = getEntityManager().createNamedQuery("InvestorLoanTransaction.accountIds");
 		query.setParameter("start", startTimestamp);
 		query.setParameter("end", endTimestamp);
-		List ret = query.getResultList();
+		@SuppressWarnings("unchecked")
+		List<String> ret = query.getResultList();
 		return ret;
 	}
 	
