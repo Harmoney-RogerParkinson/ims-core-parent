@@ -9,7 +9,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.harmoney.ims.core.database.AbstractDAO;
+import com.harmoney.ims.core.database.AbstractTransactionDAO;
 
 abstract class AbstractBalanceForward {
 
@@ -51,7 +51,7 @@ abstract class AbstractBalanceForward {
     	
     }
 
-    abstract AbstractDAO<?> getDAO();
+    abstract AbstractTransactionDAO<?> getDAO();
 
 	public void setTestMode(boolean testMode) {
 		this.testMode = testMode;
