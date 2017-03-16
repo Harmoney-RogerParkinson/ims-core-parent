@@ -585,7 +585,7 @@
 			</xsd:extension>
 		</xsd:complexContent>
 	</complexType>
-	<complexType name="AccountSummary">
+	<complexType name="Account">
 		<xsd:annotation>
 			<documentation>Salesforce name: account_summary__c
 			</documentation>
@@ -596,25 +596,53 @@
 				<annox:annotate>
 					<annox:annotate annox:class="javax.persistence.NamedQueries">
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
-							name="AccountSummary.imsid" query="select i from AccountSummary i where i.imsid=:imsid">
+							name="AccountSummary.imsid" query="select i from Account i where i.imsid=:imsid">
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
-							name="AccountSummary.id" query="select i from AccountSummary i where i.id=:id">
+							name="AccountSummary.id" query="select i from Account i where i.id=:id">
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
-							name="AccountSummary.all" query="select i from AccountSummary i">
+							name="AccountSummary.all" query="select i from Account i">
 						</annox:annotate>
 					</annox:annotate>
 				</annox:annotate> 
-				<hj:entity>
-					<orm:inheritance strategy="SINGLE_TABLE" />
-					<orm:discriminator-value>AccountSummary</orm:discriminator-value>
-				</hj:entity>
 			</xsd:appinfo>
 		</xsd:annotation>
-		<xsd:complexContent>
-			<xsd:extension base="tns:Transaction">
-				<xsd:sequence>
+		<xsd:sequence>
+				<element name="imsid" type="long">
+					<xsd:annotation>
+						<xsd:appinfo>
+							<hj:id>
+								<orm:generated-value strategy="AUTO" />
+							</hj:id>
+						</xsd:appinfo>
+					</xsd:annotation>
+				</element>
+				<element name="id" type="string">
+					<annotation>
+						<appinfo>
+							<annox:annotate>
+								<ims:SalesforceName fieldName="Id" />
+							</annox:annotate>
+						</appinfo>
+					</annotation>
+				</element>
+				<element name="name" type="string">
+					<annotation>
+						<appinfo>
+							<annox:annotate>
+								<ims:SalesforceName fieldName="Name" />
+							</annox:annotate>
+						</appinfo>
+					</annotation>
+				</element>
+				<element name="version" type="long">
+					<annotation>
+						<appinfo>
+							<hj:version />
+						</appinfo>
+					</annotation>
+				</element>
 						<element name="HarmoneyAccountNumber" type="string">
 							<annotation>
 								<appinfo>
@@ -762,8 +790,6 @@
 							</annotation>
 						</element>
 				</xsd:sequence>
-			</xsd:extension>
-		</xsd:complexContent>
 	</complexType>
 	<complexType name="InvestmentOrder">
 		<xsd:annotation>
@@ -786,15 +812,62 @@
 						</annox:annotate>
 					</annox:annotate>
 				</annox:annotate> 
-				<hj:entity>
-					<orm:inheritance strategy="SINGLE_TABLE" />
-					<orm:discriminator-value>InvestmentOrder</orm:discriminator-value>
-				</hj:entity>
 			</xsd:appinfo>
 		</xsd:annotation>
-		<xsd:complexContent>
-			<xsd:extension base="tns:Transaction">
 				<xsd:sequence>
+				<element name="imsid" type="long">
+					<xsd:annotation>
+						<xsd:appinfo>
+							<hj:id>
+								<orm:generated-value strategy="AUTO" />
+							</hj:id>
+						</xsd:appinfo>
+					</xsd:annotation>
+				</element>
+				<element name="id" type="string">
+					<annotation>
+						<appinfo>
+							<annox:annotate>
+								<ims:SalesforceName fieldName="Id" />
+							</annox:annotate>
+						</appinfo>
+					</annotation>
+				</element>
+				<element name="name" type="string">
+					<annotation>
+						<appinfo>
+							<annox:annotate>
+								<ims:SalesforceName fieldName="Name" />
+							</annox:annotate>
+						</appinfo>
+					</annotation>
+				</element>
+				<element name="version" type="long">
+					<annotation>
+						<appinfo>
+							<hj:version />
+						</appinfo>
+					</annotation>
+				</element>
+			<element name="createdDate" type="dateTime" nillable="false">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="CreatedDate" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+				<element name="accountId" type="string">
+					<annotation>
+						<appinfo>
+							<annox:annotate>
+								<ims:SalesforceName fieldName="loan__Account__c" />
+							</annox:annotate>
+						</appinfo>
+					</annotation>
+				</element>
+
 						<element name="InvestmentAmount" type="tns:currency">
 							<annotation>
 								<appinfo>
@@ -904,8 +977,6 @@
 							</annotation>
 						</element>
 				</xsd:sequence>
-			</xsd:extension>
-		</xsd:complexContent>
 	</complexType>
 	<xsd:simpleType name="ItemType">
 		<xsd:restriction base="xsd:string">

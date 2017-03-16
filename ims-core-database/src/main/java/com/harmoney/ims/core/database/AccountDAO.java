@@ -15,23 +15,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.harmoney.ims.core.database.descriptors.ObjectDescriptor;
 import com.harmoney.ims.core.database.descriptors.ObjectDescriptorGenerator;
-import com.harmoney.ims.core.database.descriptors.Result;
 import com.harmoney.ims.core.instances.Account;
-import com.harmoney.ims.core.instances.InvestmentOrder;
-import com.sforce.soap.partner.sobject.SObject;
 
 /**
  * @author Roger Parkinson
  *
  */
 @Repository
-public class InvestmentOrderDAO {
+public class AccountDAO {
 	
-	private static final Logger log = LoggerFactory.getLogger(InvestmentOrderDAO.class);
+	private static final Logger log = LoggerFactory.getLogger(AccountDAO.class);
 
 	@Autowired ObjectDescriptorGenerator objectDescriptorGenerator;
 	private ObjectDescriptor objectDescriptor;
-	private Class<InvestmentOrder> clazz;
+	private Class<Account> clazz;
 
 	@PersistenceContext(unitName="com.harmoney.ims.core.instances")
 	private EntityManager entityManager;
@@ -42,18 +39,18 @@ public class InvestmentOrderDAO {
 	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
-	    clazz = InvestmentOrder.class;
+	    clazz = Account.class;
 		byId = clazz.getSimpleName()+".id";
 		byIMSId = clazz.getSimpleName()+".imsid";
 		byAll = clazz.getSimpleName()+".all";
 		
 		objectDescriptor = objectDescriptorGenerator.build(clazz);
 	}
-	public Class<InvestmentOrder> getClazz() {
+	public Class<Account> getClazz() {
 		return clazz;
 	}
 	@Transactional
-	public boolean create(InvestmentOrder target) {
+	public boolean create(Account target) {
 		entityManager.persist(target);
 		entityManager.flush();
 		return true;
@@ -61,5 +58,4 @@ public class InvestmentOrderDAO {
 	public ObjectDescriptor getObjectDescriptor() {
 		return objectDescriptor;
 	}
-
 }

@@ -41,7 +41,7 @@ import com.harmoney.ims.core.messages.MessageHandlerImpl;
 import com.harmoney.ims.core.messages.MessageHandlerMap;
 import com.harmoney.ims.core.messages.MessageProcessorSpringConfig;
 import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
-import com.harmoney.ims.core.queries.AccountSummaryQuery;
+import com.harmoney.ims.core.queries.AccountQuery;
 import com.harmoney.ims.core.queries.InvestmentOrderQuery;
 import com.harmoney.ims.core.queries.QuerySpringConfig;
 import com.harmoney.ims.core.queuehandler.QueueHandlerSpringConfig;
@@ -86,7 +86,7 @@ public class SuperServerIT {
 	@Autowired EmpConnector empConnector;
     @Autowired ConfigurableApplicationContext context;
 	@Autowired PartnerConnection partnerConnection;
-	@Autowired AccountSummaryQuery accountSummaryquery;
+	@Autowired AccountQuery accountSummaryquery;
 	@Autowired InvestmentOrderQuery investmentOrderquery;
 	@Autowired DataSource dataSource;
 	@Autowired RabbitReceiver rabbitReceiver;

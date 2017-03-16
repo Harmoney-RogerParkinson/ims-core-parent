@@ -43,11 +43,6 @@ public abstract class AbstractDAO<T extends Transaction> {
 	
 	private static final Logger log = LoggerFactory.getLogger(AbstractDAO.class);
 	
-	/**
-	 * These fields are in the Transaction object but they are not always supplied by Account and Investment Order
-	 * So we use this to suppress unnecessary error messages. 
-	 */
-	private static final String IGNORE_NAMES = "Reverse_Rejected_Date__c,Account_ID__c,harMoney_Account_Number__c,loan__Account__c,CreatedDate";
 	
 	@Autowired ObjectDescriptorGenerator objectDescriptorGenerator;
 	private ObjectDescriptor objectDescriptor;
@@ -194,52 +189,6 @@ public abstract class AbstractDAO<T extends Transaction> {
 	public List<String> getSalesforceFields() {
 		return objectDescriptor.getSalesForceFields();
 	}
-	public Result unpack(SObject sobject, T target) {
-		Map<String, Object> fieldMap = new HashMap<>();
-		for (String fieldName : getSalesforceFields()) {
-			String[] fieldNames = StringUtils.delimitedListToStringArray(fieldName, ",");
-			if (fieldNames.length > 1) {
-				fieldNames[0].toString();
-			}
-			for (String name: fieldNames) {
-				String fieldValue;
-				try {
-					fieldValue = extractValueFromSObject(sobject,name);
-				} catch (Exception e) {
-					if (!IGNORE_NAMES.contains(name)) {
-						log.warn(e.getMessage());
-					}
-					continue;
-				}
-				fieldMap.put(name, fieldValue);
-			}
-		}
-		if (!fieldMap.containsKey("Reverse_Rejected_Date__c")) {
-			fieldMap.put("Reverse_Rejected_Date__c", null);
-		}
-		if (!fieldMap.containsKey("CreatedDate")) {
-			fieldMap.put("CreatedDate", null);
-		}
-		return unpack(fieldMap,target);
-	}
-	private String extractValueFromSObject(SObject sobject, String name) {
-		if (name.indexOf('.') == -1) {
-			if (sobject.getChild(name) == null) {
-				throw new RuntimeException("No field ["+name+"] found in SObject");
-			}
-			return (String)sobject.getField(name);
-		}
-		String split[] = StringUtils.split(name, ".");
-		SObject f = (SObject)sobject.getField(split[0]);
-		if (f == null) {
-			return null;
-		}
-		XmlObject xmlObject = f.getChild(split[1]);
-		if (xmlObject == null) {
-			throw new RuntimeException("No field ["+split[1]+"] found in SObject");
-		}
-		return (String)xmlObject.getValue();
-	}
 	/**
 	 * Unpack the values in the map into the fields in the given message.
 	 * 
@@ -260,17 +209,17 @@ public abstract class AbstractDAO<T extends Transaction> {
 	public Result unpack(Map<String, Object> sobject, T o) {
 		return objectDescriptor.unpack(sobject, o);
 	}
-	public Result unpack(Map<String, Object> sobject) {
-		T target;
-		try {
-			target = (T)clazz.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-		Result ret = objectDescriptor.unpack(sobject, target);
-		create(target);
-		return ret;
-	}
+//	public Result unpack(Map<String, Object> sobject) {
+//		T target;
+//		try {
+//			target = (T)clazz.newInstance();
+//		} catch (InstantiationException | IllegalAccessException e) {
+//			throw new RuntimeException(e);
+//		}
+//		Result ret = objectDescriptor.unpack(sobject, target);
+//		create(target);
+//		return ret;
+//	}
 	public ObjectDescriptor getObjectDescriptor() {
 		return objectDescriptor;
 	}

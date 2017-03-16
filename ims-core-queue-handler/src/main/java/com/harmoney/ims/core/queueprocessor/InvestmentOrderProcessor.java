@@ -21,13 +21,14 @@ public class InvestmentOrderProcessor {
     private static final Logger log = LoggerFactory.getLogger(InvestmentOrderProcessor.class);
 	
 	@Autowired private InvestmentOrderDAO investmentOrderDAO;
+	@Autowired private UnpackHelper unpackHelper;
 
 	@Transactional
 	public void processQuery(SObject[] records) {
 		LocalDateTime createdDate = LocalDateTime.now();
 		for (SObject sobject: records) {
 			InvestmentOrder investmentOrder = new InvestmentOrder();
-			Result result = investmentOrderDAO.unpack(sobject, investmentOrder);
+			Result result = unpackHelper.unpack(sobject, investmentOrder,investmentOrderDAO.getObjectDescriptor());
 			log.debug("Result: {}",result);
 			investmentOrder.setCreatedDate(Timestamp.valueOf(createdDate));
 			investmentOrderDAO.create(investmentOrder);

@@ -14,7 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.harmoney.ims.core.balanceforward.InvestorLoanTransactionBalanceForward;
-import com.harmoney.ims.core.queries.AccountSummaryQuery;
+import com.harmoney.ims.core.queries.AccountQuery;
 import com.harmoney.ims.core.queries.InvestmentOrderQuery;
 import com.sforce.ws.ConnectionException;
 
@@ -30,7 +30,7 @@ public class Scheduler {
 
     private static final Logger log = LoggerFactory.getLogger(Scheduler.class);
 
-	@Autowired AccountSummaryQuery accountSummaryQuery;
+	@Autowired AccountQuery accountSummaryQuery;
 	@Autowired InvestmentOrderQuery investmentOrderQuery;
 	@Autowired InvestorLoanTransactionBalanceForward investorLoanTransactionBalanceForward;
 

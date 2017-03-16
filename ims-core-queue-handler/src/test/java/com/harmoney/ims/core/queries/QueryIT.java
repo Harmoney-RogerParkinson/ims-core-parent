@@ -23,7 +23,7 @@ public class QueryIT {
 
 	@Autowired
 	ConfigurableApplicationContext context;
-	@Autowired AccountSummaryQuery accountSummaryquery;
+	@Autowired AccountQuery accountSummaryquery;
 	@Autowired InvestmentOrderQuery investmentOrderquery;
 
 	@Test

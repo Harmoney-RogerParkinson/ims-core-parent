@@ -6,7 +6,7 @@ package com.harmoney.ims.core.queries;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.harmoney.ims.core.queueprocessor.AccountSummaryProcessor;
+import com.harmoney.ims.core.queueprocessor.AccountProcessor;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.QueryResult;
 import com.sforce.soap.partner.sobject.SObject;
@@ -17,10 +17,10 @@ import com.sforce.ws.ConnectionException;
  *
  */
 @Component
-public class AccountSummaryQuery {
+public class AccountQuery {
 	
 	@Autowired private PartnerConnection partnerConnection;
-	@Autowired private AccountSummaryProcessor accountSummaryProcessor;
+	@Autowired private AccountProcessor accountSummaryProcessor;
 	
 	public int doQuery() throws ConnectionException {
 		String queryString = "Select Id                                 " +
