@@ -3,9 +3,15 @@
  */
 package com.harmoney.ims.core.database;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +35,7 @@ public class InvestmentOrderDAO {
 	
 	private static final Logger log = LoggerFactory.getLogger(InvestmentOrderDAO.class);
 
+	@Autowired UnpackHelper unpackHelper;
 	@Autowired ObjectDescriptorGenerator objectDescriptorGenerator;
 	private ObjectDescriptor objectDescriptor;
 	private Class<InvestmentOrder> clazz;
@@ -52,6 +59,34 @@ public class InvestmentOrderDAO {
 	public Class<InvestmentOrder> getClazz() {
 		return clazz;
 	}
+	@Transactional(readOnly=true)
+	public List<InvestmentOrder> getAll()
+	{
+		TypedQuery<InvestmentOrder> query =
+				  entityManager.createNamedQuery(byAll, clazz);
+		return query.getResultList();
+	}
+	@Transactional
+	public InvestmentOrder getByIMSId(Long imsid) {
+		TypedQuery<InvestmentOrder> query =
+				  entityManager.createNamedQuery(byIMSId, clazz);
+		query.setParameter("imsid", imsid);
+		InvestmentOrder existing = query.getSingleResult();
+		return existing;
+	}
+	@Transactional
+	public InvestmentOrder getById(String id) {
+		TypedQuery<InvestmentOrder> query =
+				  entityManager.createNamedQuery(byId, clazz);
+		query.setParameter("id", id);
+		InvestmentOrder existing;
+		try {
+			existing = query.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
+		return existing;
+	}
 	@Transactional
 	public boolean create(InvestmentOrder target) {
 		entityManager.persist(target);
@@ -60,6 +95,26 @@ public class InvestmentOrderDAO {
 	}
 	public ObjectDescriptor getObjectDescriptor() {
 		return objectDescriptor;
+	}
+	@Transactional
+	public Result createOrUpdate(SObject sobject) {
+		LocalDateTime lastModifiedDate = LocalDateTime.now();
+		
+		String id = (String)sobject.getField("Id");
+		InvestmentOrder account = getById(id);
+		Result result = null;
+		if (account == null) {
+			// new record
+			account = new InvestmentOrder();
+			result = unpackHelper.unpack(sobject, account,objectDescriptor);
+			account.setLastModifiedDate(Timestamp.valueOf(lastModifiedDate));
+			entityManager.persist(account);
+		} else {
+			result = unpackHelper.unpack(sobject, account,objectDescriptor);
+			account.setLastModifiedDate(Timestamp.valueOf(lastModifiedDate));
+		}
+		entityManager.flush();
+		return result;
 	}
 
 }

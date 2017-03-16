@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.harmoney.ims.core.queueprocessor;
+package com.harmoney.ims.core.database;
 
 import java.util.ArrayList;
 import java.util.HashMap;

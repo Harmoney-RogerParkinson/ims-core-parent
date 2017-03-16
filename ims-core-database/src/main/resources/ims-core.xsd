@@ -5,7 +5,7 @@
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
 	xmlns:tns="http://www.harcurrency.com/ims-core" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.harcurrency.com/ims-core"
-	jaxb:version="2.0" jaxb:extensionBindingPrefixes="orm hj xjc annox" 
+	jaxb:version="2.0" jaxb:extensionBindingPrefixes="orm hj xjc annox"
 	elementFormDefault="qualified">
 	<xsd:annotation>
 		<xsd:appinfo>
@@ -14,10 +14,9 @@
 				<jaxb:javaType name="java.math.BigDecimal" xmlType="tns:currency"
 					parseMethod="com.harmoney.ims.core.database.ConvertUtils.parseCurrency"
 					printMethod="com.harmoney.ims.core.database.ConvertUtils.printCurrency" />
-				<jaxb:javaType name="java.sql.Timestamp" xmlType="xsd:dateTime" 
-					parseMethod="com.harmoney.ims.core.database.ConvertUtils.parseTimestamp" 
-					printMethod="com.harmoney.ims.core.database.ConvertUtils.printTimestamp" 
-					/>
+				<jaxb:javaType name="java.sql.Timestamp" xmlType="xsd:dateTime"
+					parseMethod="com.harmoney.ims.core.database.ConvertUtils.parseTimestamp"
+					printMethod="com.harmoney.ims.core.database.ConvertUtils.printTimestamp" />
 				<jaxb:javaType name="java.util.Date" xmlType="xsd:date"
 					parseMethod="com.harmoney.ims.core.database.ConvertUtils.parseDate"
 					printMethod="com.harmoney.ims.core.database.ConvertUtils.printDate" />
@@ -28,30 +27,31 @@
 			</jaxb:schemaBindings>
 		</xsd:appinfo>
 	</xsd:annotation>
-	
+
 	<complexType name="Transaction">
-    <xsd:annotation>
-        <xsd:appinfo>
-			<annox:annotate>
-				<annox:annotate annox:class="javax.persistence.NamedQueries">
-					<annox:annotate annox:class="javax.persistence.NamedQuery"
-						name="TX.imsid" query="select i from Transaction i where i.imsid=:imsid">
-					</annox:annotate>
-					<annox:annotate annox:class="javax.persistence.NamedQuery"
-						name="TX.id" query="select i from Transaction i where i.id=:id">
-					</annox:annotate>
-					<annox:annotate annox:class="javax.persistence.NamedQuery"
-						name="TX.all" query="select i from Transaction i">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<annox:annotate>
+					<annox:annotate annox:class="javax.persistence.NamedQueries">
+						<annox:annotate annox:class="javax.persistence.NamedQuery"
+							name="TX.imsid" query="select i from Transaction i where i.imsid=:imsid">
+						</annox:annotate>
+						<annox:annotate annox:class="javax.persistence.NamedQuery"
+							name="TX.id" query="select i from Transaction i where i.id=:id">
+						</annox:annotate>
+						<annox:annotate annox:class="javax.persistence.NamedQuery"
+							name="TX.all" query="select i from Transaction i">
+						</annox:annotate>
 					</annox:annotate>
 				</annox:annotate>
-			</annox:annotate> 
 
-            <hj:entity>
-                <orm:inheritance strategy="SINGLE_TABLE"/>
-                <orm:discriminator-column name="txType" discriminator-type="STRING"/>
-            </hj:entity>
-        </xsd:appinfo>
-    </xsd:annotation>
+				<hj:entity>
+					<orm:inheritance strategy="SINGLE_TABLE" />
+					<orm:discriminator-column name="txType"
+						discriminator-type="STRING" />
+				</hj:entity>
+			</xsd:appinfo>
+		</xsd:annotation>
 		<sequence>
 			<element name="imsid" type="long">
 				<xsd:annotation>
@@ -91,7 +91,8 @@
 				<annotation>
 					<appinfo>
 						<annox:annotate>
-							<ims:SalesforceName fieldName="loan__Account__c,Account_ID__c,loan__Loan__c" />
+							<ims:SalesforceName
+								fieldName="loan__Account__c,Account_ID__c,loan__Loan__c" />
 						</annox:annotate>
 					</appinfo>
 				</annotation>
@@ -100,7 +101,8 @@
 				<annotation>
 					<appinfo>
 						<annox:annotate>
-							<ims:SalesforceName fieldName="loan__Account__c,Account_ID__c,harMoney_Account_Number__c" />
+							<ims:SalesforceName
+								fieldName="loan__Account__c,Account_ID__c,harMoney_Account_Number__c" />
 						</annox:annotate>
 					</appinfo>
 				</annotation>
@@ -116,7 +118,8 @@
 			</element>
 			<element name="reversedId" type="long">
 				<annotation>
-					<documentation>If the transaction was reversed then this points to the reversal transaction.
+					<documentation>If the transaction was reversed then this points to
+						the reversal transaction.
 					</documentation>
 				</annotation>
 			</element>
@@ -129,24 +132,24 @@
 					</appinfo>
 				</annotation>
 			</element>
-			<element name="txType" type="tns:ItemType"/>
+			<element name="txType" type="tns:ItemType" />
 		</sequence>
 	</complexType>
-	
+
 	<complexType name="shedlock">
-    <xsd:annotation>
-        <xsd:appinfo>
-            <hj:entity>
-                <orm:table name="shedlock"/>
-            </hj:entity>
-        </xsd:appinfo>
-    </xsd:annotation>
+		<xsd:annotation>
+			<xsd:appinfo>
+				<hj:entity>
+					<orm:table name="shedlock" />
+				</hj:entity>
+			</xsd:appinfo>
+		</xsd:annotation>
 		<sequence>
 			<element name="name" type="string" nillable="false">
 				<xsd:annotation>
 					<xsd:appinfo>
 						<hj:id>
-							<orm:column name="name" length="64"/>
+							<orm:column name="name" length="64" />
 						</hj:id>
 					</xsd:appinfo>
 				</xsd:annotation>
@@ -155,7 +158,7 @@
 				<annotation>
 					<appinfo>
 						<hj:basic>
-							<orm:column name="lock_until"/>
+							<orm:column name="lock_until" />
 						</hj:basic>
 					</appinfo>
 				</annotation>
@@ -164,7 +167,7 @@
 				<annotation>
 					<appinfo>
 						<hj:basic>
-							<orm:column name="locked_at"/>
+							<orm:column name="locked_at" />
 						</hj:basic>
 					</appinfo>
 				</annotation>
@@ -173,26 +176,27 @@
 				<annotation>
 					<appinfo>
 						<hj:basic>
-							<orm:column name="locked_by" nullable="false"/>
+							<orm:column name="locked_by" nullable="false" />
 						</hj:basic>
 					</appinfo>
 				</annotation>
 			</element>
 		</sequence>
 	</complexType>
-	
+
 	<complexType name="InvestorLoanTransaction">
-    <xsd:annotation>
+		<xsd:annotation>
 			<documentation>Salesforce name: loan__Investor_Loan_Account_Txns__c
 			</documentation>
-        <xsd:appinfo>
+			<xsd:appinfo>
 				<annox:annotate>
 					<ims:SalesforceName tableName="loan__Investor_Loan_Account_Txns__c" />
 				</annox:annotate>
 				<annox:annotate>
 					<annox:annotate annox:class="javax.persistence.NamedQueries">
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
-							name="InvestorLoanTransaction.imsid" query="select i from InvestorLoanTransaction i where i.imsid=:imsid">
+							name="InvestorLoanTransaction.imsid"
+							query="select i from InvestorLoanTransaction i where i.imsid=:imsid">
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
 							name="InvestorLoanTransaction.id" query="select i from InvestorLoanTransaction i where i.id=:id">
@@ -201,291 +205,337 @@
 							name="InvestorLoanTransaction.all" query="select i from InvestorLoanTransaction i">
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
-							name="InvestorLoanTransaction.accountdate" query="select i from InvestorLoanTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end and i.accountId=:accountId order by accountId,createdDate">
+							name="InvestorLoanTransaction.accountdate"
+							query="select i from InvestorLoanTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end and i.accountId=:accountId order by accountId,createdDate">
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
-							name="InvestorLoanTransaction.accountdatebalancefwd" query="select i from InvestorLoanTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end and i.accountId=:accountId and i.txType = 'BALANCE_FORWARD' order by accountId,createdDate">
+							name="InvestorLoanTransaction.accountdatebalancefwd"
+							query="select i from InvestorLoanTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end and i.accountId=:accountId and i.txType = 'BALANCE_FORWARD' order by accountId,createdDate">
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
-							name="InvestorLoanTransaction.accountIds" query="select i.accountId from InvestorLoanTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end group by accountId">
+							name="InvestorLoanTransaction.accountIds"
+							query="select i.accountId from InvestorLoanTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end group by accountId">
 						</annox:annotate>
 					</annox:annotate>
-				</annox:annotate> 
-             <hj:entity>
-                <orm:inheritance strategy="SINGLE_TABLE"/>
-                <orm:discriminator-value>InvestorLoanTransaction</orm:discriminator-value>
-            </hj:entity>
-        </xsd:appinfo>
-        </xsd:annotation>
-    <xsd:complexContent>
-        <xsd:extension base="tns:Transaction">
-            <xsd:sequence>
-			<element name="iltType" type="tns:ItemType">
-				<annotation>
-					<documentation>Salesforce name: loan__Txn_Type__c</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="loan__Txn_Type__c" />
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="investmentOrderId" type="string">
-				<annotation>
-					<documentation>Salesforce name: loan__Investor_Loan__c
-					</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="loan__Investor_Loan__c" />
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="investmentOrderStatus" type="string">
-				<annotation>
-					<documentation>Salesforce name: Investment_Order_Status__c
-					</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="Investment_Order_Status__c" />
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="netAmount" type="tns:currency">
-				<annotation>
-					<documentation>loan__Txn_Amount__c - loan__Tax__c - loan__Total_Service_Charge__c
-					</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="Net_Amount__c" />
-							<ims:Negateable/>
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="principalPaid" type="tns:currency">
-				<annotation>
-					<documentation>Salesforce name: loan__Principal_Paid__c
-					</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="loan__Principal_Paid__c" />
-							<ims:Negateable/>
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="interestPaid" type="tns:currency">
-				<annotation>
-					<documentation>Salesforce name: loan__Interest_Paid__c
-					</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="loan__Interest_Paid__c" />
-							<ims:Negateable/>
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="lateFeesPaid" type="tns:currency">
-				<annotation>
-					<documentation>Salesforce name: loan__Late_Fees_Paid__c
-					</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="loan__Late_Fees_Paid__c" />
-							<ims:Negateable/>
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="tax" type="tns:currency">
-				<annotation>
-					<documentation>Salesforce name: loan__Tax__c</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="loan__Tax__c" />
-							<ims:Negateable/>
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
- 
-			<element name="totalServiceCharge" type="tns:currency">
-				<annotation>
-					<documentation>Salesforce name: loan__Total_Service_Charge__c
-					</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="loan__Total_Service_Charge__c" />
-							<ims:Negateable/>
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="chargedOffDate" type="date">
-				<annotation>
-					<documentation>Salesforce name: loan__Charged_Off_Date__c
-					</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="loan__Charged_Off_Date__c" />
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="chargedOffFees" type="tns:currency">
-				<annotation>
-					<documentation>Salesforce name: loan__Charged_Off_Fees__c
-					</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="loan__Charged_Off_Fees__c" />
-							<ims:Negateable/>
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="chargedOffInterest" type="tns:currency">
-				<annotation>
-					<documentation>Salesforce name: loan__Charged_Off_Interest__c
-					</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="loan__Charged_Off_Interest__c" />
-							<ims:Negateable/>
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="chargedOffPrincipal" type="tns:currency">
-				<annotation>
-					<documentation>Salesforce name: loan__Charged_Off_Principal__c
-					</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="loan__Charged_Off_Principal__c" />
-							<ims:Negateable/>
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="investorTxnFee" type="tns:currency">
-				<annotation>
-					<documentation>Salesforce name: Investor_Txn_Fee__c</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="Investor_Txn_Fee__c" />
-							<ims:Negateable/>
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="txnCode" type="tns:TxnCode">
-				<annotation>
-					<documentation>Salesforce name: loan__Txn_Code__c</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="loan__Txn_Code__c" />
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="waived" type="boolean">
-				<annotation>
-					<documentation>Salesforce name: loan__Waived__c</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="loan__Waived__c" />
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="protectPrincipal" type="tns:currency">
-				<annotation>
-					<documentation>(loan__Principal_Paid__c * (loan__Loan_Payment_Transaction__r.loan__Loan_Account__r.loan__Protect_fee_amount__c / (loan__Loan_Payment_Transaction__r.loan__Loan_Account__r.loan__Loan_Amount__c - loan__Loan_Payment_Transaction__r.loan__Loan_Account__r.loan__Protect_fee_amount__c )))
-					</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="loan__Protect_Principal__c" />
-							<ims:Negateable/>
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="managementFeeRealised" type="tns:currency">
-				<annotation>
-					<documentation>
-					IF(OR(loan__Loan_Payment_Transaction__r.Remark__c == 'Full waiver', TEXT(loan__Txn_Code__c) == 'CHARGE OFF') ,loan__Investor_Loan__r.loan__Loan__r.Extra_Protect_Realised__c * loan__Investor_Loan__r.loan__Share_rounded__c, IF(OR(loan__Loan_Payment_Transaction__r.Remark__c == 'Early repayment - with waiver', CONTAINS(loan__Loan_Payment_Transaction__r.Remark__c, 'Rewrite')), (loan__Loan_Payment_Transaction__r.Original_Protect_Realised__c + loan__Investor_Loan__r.loan__Loan__r.Extra_Protect_Realised__c) * loan__Investor_Loan__r.loan__Share_rounded__c, Protect_Realised__c)) * loan__Investor_Loan__r.loan__Loan__r.HP_Management_Fee__c / loan__Investor_Loan__r.loan__Loan__r.loan__Protect_fee_amount__c
-					</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="Management_Fee_Realised__c" />
-							<ims:Negateable/>
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="salesCommissionFeeRealised" type="tns:currency">
-				<annotation>
-					<documentation>
-					IF(loan__Loan_Payment_Transaction__r.Remark__c == 'Early repayment - no waiver', (loan__Investor_Loan__r.loan__Loan__r.loan__Protect_fee_amount__c - loan__Investor_Loan__r.loan__Loan__r.Protect_Realised_Active__c + loan__Loan_Payment_Transaction__r.Original_Protect_Realised__c) * loan__Investor_Loan__r.loan__Share_rounded__c, IF(CONTAINS(loan__Loan_Payment_Transaction__r.Remark__c, 'Rewrite'), (loan__Loan_Payment_Transaction__r.Original_Protect_Realised__c + loan__Investor_Loan__r.loan__Loan__r.Extra_Protect_Realised__c) * loan__Investor_Loan__r.loan__Share_rounded__c, IF(TEXT(loan__Txn_Code__c) == 'CHARGE OFF', loan__Investor_Loan__r.loan__Loan__r.Protect_Charge_Off__c * loan__Investor_Loan__r.loan__Share_rounded__c, Protect_Realised__c))) * loan__Investor_Loan__r.loan__Loan__r.HP_Sale_Commission_Fee__c / loan__Investor_Loan__r.loan__Loan__r.loan__Protect_fee_amount__c
-					</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="Sales_Commission_Fee_Realised__c" />
-							<ims:Negateable/>
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="rebateAmountOnPayoff" type="tns:currency">
-				<annotation>
-					<documentation>Salesforce name: loan__Rebate_Amount_On_Payoff__c
-					</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="loan__Rebate_Amount_On_Payoff__c" />
-							<ims:Negateable/>
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="protectRealised" type="tns:currency">
-				<annotation>
-					<documentation>IF(loan__Investor_Loan__r.loan__Loan__r.loan__Protect_Enabled__c == TRUE, IF(TEXT(loan__Txn_Code__c) == 'CHARGE OFF', 0, loan__Loan_Payment_Transaction__r.Protect_Realised__c * loan__Investor_Loan__r.loan__Share_rounded__c), 0)
-</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="Protect_Realised__c" />
-							<ims:Negateable/>
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="rejected" type="boolean">
-				<annotation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="Rejected__c" />
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="reversed" type="boolean">
-				<annotation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="Reversed__c" />
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-            </xsd:sequence>
-         </xsd:extension>
-    </xsd:complexContent>
-    </complexType>
+				</annox:annotate>
+				<hj:entity>
+					<orm:inheritance strategy="SINGLE_TABLE" />
+					<orm:discriminator-value>InvestorLoanTransaction
+					</orm:discriminator-value>
+				</hj:entity>
+			</xsd:appinfo>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="tns:Transaction">
+				<xsd:sequence>
+					<element name="iltType" type="tns:ItemType">
+						<annotation>
+							<documentation>Salesforce name: loan__Txn_Type__c</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="loan__Txn_Type__c" />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="investmentOrderId" type="string">
+						<annotation>
+							<documentation>Salesforce name: loan__Investor_Loan__c
+							</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="loan__Investor_Loan__c" />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="investmentOrderStatus" type="string">
+						<annotation>
+							<documentation>Salesforce name: Investment_Order_Status__c
+							</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="Investment_Order_Status__c" />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="netAmount" type="tns:currency">
+						<annotation>
+							<documentation>loan__Txn_Amount__c - loan__Tax__c -
+								loan__Total_Service_Charge__c
+							</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="Net_Amount__c" />
+									<ims:Negateable />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="principalPaid" type="tns:currency">
+						<annotation>
+							<documentation>Salesforce name: loan__Principal_Paid__c
+							</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="loan__Principal_Paid__c" />
+									<ims:Negateable />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="interestPaid" type="tns:currency">
+						<annotation>
+							<documentation>Salesforce name: loan__Interest_Paid__c
+							</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="loan__Interest_Paid__c" />
+									<ims:Negateable />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="lateFeesPaid" type="tns:currency">
+						<annotation>
+							<documentation>Salesforce name: loan__Late_Fees_Paid__c
+							</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="loan__Late_Fees_Paid__c" />
+									<ims:Negateable />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="tax" type="tns:currency">
+						<annotation>
+							<documentation>Salesforce name: loan__Tax__c</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="loan__Tax__c" />
+									<ims:Negateable />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+
+					<element name="totalServiceCharge" type="tns:currency">
+						<annotation>
+							<documentation>Salesforce name: loan__Total_Service_Charge__c
+							</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="loan__Total_Service_Charge__c" />
+									<ims:Negateable />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="chargedOffDate" type="date">
+						<annotation>
+							<documentation>Salesforce name: loan__Charged_Off_Date__c
+							</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="loan__Charged_Off_Date__c" />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="chargedOffFees" type="tns:currency">
+						<annotation>
+							<documentation>Salesforce name: loan__Charged_Off_Fees__c
+							</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="loan__Charged_Off_Fees__c" />
+									<ims:Negateable />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="chargedOffInterest" type="tns:currency">
+						<annotation>
+							<documentation>Salesforce name: loan__Charged_Off_Interest__c
+							</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="loan__Charged_Off_Interest__c" />
+									<ims:Negateable />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="chargedOffPrincipal" type="tns:currency">
+						<annotation>
+							<documentation>Salesforce name: loan__Charged_Off_Principal__c
+							</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="loan__Charged_Off_Principal__c" />
+									<ims:Negateable />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="investorTxnFee" type="tns:currency">
+						<annotation>
+							<documentation>Salesforce name: Investor_Txn_Fee__c
+							</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="Investor_Txn_Fee__c" />
+									<ims:Negateable />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="txnCode" type="tns:TxnCode">
+						<annotation>
+							<documentation>Salesforce name: loan__Txn_Code__c</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="loan__Txn_Code__c" />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="waived" type="boolean">
+						<annotation>
+							<documentation>Salesforce name: loan__Waived__c</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="loan__Waived__c" />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="protectPrincipal" type="tns:currency">
+						<annotation>
+							<documentation>(loan__Principal_Paid__c *
+								(loan__Loan_Payment_Transaction__r.loan__Loan_Account__r.loan__Protect_fee_amount__c
+								/
+								(loan__Loan_Payment_Transaction__r.loan__Loan_Account__r.loan__Loan_Amount__c
+								-
+								loan__Loan_Payment_Transaction__r.loan__Loan_Account__r.loan__Protect_fee_amount__c
+								)))
+							</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="loan__Protect_Principal__c" />
+									<ims:Negateable />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="managementFeeRealised" type="tns:currency">
+						<annotation>
+							<documentation>
+								IF(OR(loan__Loan_Payment_Transaction__r.Remark__c == 'Full waiver', TEXT(loan__Txn_Code__c) == 'CHARGE OFF')
+								,loan__Investor_Loan__r.loan__Loan__r.Extra_Protect_Realised__c
+								* loan__Investor_Loan__r.loan__Share_rounded__c,
+								IF(OR(loan__Loan_Payment_Transaction__r.Remark__c == 'Early
+								repayment - with waiver',
+								CONTAINS(loan__Loan_Payment_Transaction__r.Remark__c,
+								'Rewrite')),
+								(loan__Loan_Payment_Transaction__r.Original_Protect_Realised__c
+								+
+								loan__Investor_Loan__r.loan__Loan__r.Extra_Protect_Realised__c)
+								* loan__Investor_Loan__r.loan__Share_rounded__c,
+								Protect_Realised__c)) *
+								loan__Investor_Loan__r.loan__Loan__r.HP_Management_Fee__c /
+								loan__Investor_Loan__r.loan__Loan__r.loan__Protect_fee_amount__c
+							</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="Management_Fee_Realised__c" />
+									<ims:Negateable />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="salesCommissionFeeRealised" type="tns:currency">
+						<annotation>
+							<documentation>
+								IF(loan__Loan_Payment_Transaction__r.Remark__c == 'Early repayment - no waiver',
+								(loan__Investor_Loan__r.loan__Loan__r.loan__Protect_fee_amount__c
+								-
+								loan__Investor_Loan__r.loan__Loan__r.Protect_Realised_Active__c
+								+
+								loan__Loan_Payment_Transaction__r.Original_Protect_Realised__c)
+								* loan__Investor_Loan__r.loan__Share_rounded__c,
+								IF(CONTAINS(loan__Loan_Payment_Transaction__r.Remark__c,
+								'Rewrite'),
+								(loan__Loan_Payment_Transaction__r.Original_Protect_Realised__c
+								+
+								loan__Investor_Loan__r.loan__Loan__r.Extra_Protect_Realised__c)
+								* loan__Investor_Loan__r.loan__Share_rounded__c,
+								IF(TEXT(loan__Txn_Code__c) == 'CHARGE OFF',
+								loan__Investor_Loan__r.loan__Loan__r.Protect_Charge_Off__c *
+								loan__Investor_Loan__r.loan__Share_rounded__c,
+								Protect_Realised__c))) *
+								loan__Investor_Loan__r.loan__Loan__r.HP_Sale_Commission_Fee__c /
+								loan__Investor_Loan__r.loan__Loan__r.loan__Protect_fee_amount__c
+							</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="Sales_Commission_Fee_Realised__c" />
+									<ims:Negateable />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="rebateAmountOnPayoff" type="tns:currency">
+						<annotation>
+							<documentation>Salesforce name: loan__Rebate_Amount_On_Payoff__c
+							</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="loan__Rebate_Amount_On_Payoff__c" />
+									<ims:Negateable />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="protectRealised" type="tns:currency">
+						<annotation>
+							<documentation>IF(loan__Investor_Loan__r.loan__Loan__r.loan__Protect_Enabled__c
+								== TRUE, IF(TEXT(loan__Txn_Code__c) == 'CHARGE OFF', 0,
+								loan__Loan_Payment_Transaction__r.Protect_Realised__c *
+								loan__Investor_Loan__r.loan__Share_rounded__c), 0)
+							</documentation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="Protect_Realised__c" />
+									<ims:Negateable />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="rejected" type="boolean">
+						<annotation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="Rejected__c" />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="reversed" type="boolean">
+						<annotation>
+							<appinfo>
+								<annox:annotate>
+									<ims:SalesforceName fieldName="Reversed__c" />
+								</annox:annotate>
+							</appinfo>
+						</annotation>
+					</element>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</complexType>
 
 	<complexType name="InvestorFundTransaction">
 		<xsd:annotation>
@@ -498,7 +548,8 @@
 				<annox:annotate>
 					<annox:annotate annox:class="javax.persistence.NamedQueries">
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
-							name="InvestorFundTransaction.imsid" query="select i from InvestorFundTransaction i where i.imsid=:imsid">
+							name="InvestorFundTransaction.imsid"
+							query="select i from InvestorFundTransaction i where i.imsid=:imsid">
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
 							name="InvestorFundTransaction.id" query="select i from InvestorFundTransaction i where i.id=:id">
@@ -507,19 +558,23 @@
 							name="InvestorFundTransaction.all" query="select i from InvestorFundTransaction i">
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
-							name="InvestorFundTransaction.accountdate" query="select i from InvestorFundTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end and i.accountId=:accountId order by accountId,createdDate">
+							name="InvestorFundTransaction.accountdate"
+							query="select i from InvestorFundTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end and i.accountId=:accountId order by accountId,createdDate">
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
-							name="InvestorFundTransaction.accountdatebalancefwd" query="select i from InvestorFundTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end and i.accountId=:accountId and i.txType = 'BALANCE_FORWARD' order by accountId,createdDate">
+							name="InvestorFundTransaction.accountdatebalancefwd"
+							query="select i from InvestorFundTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end and i.accountId=:accountId and i.txType = 'BALANCE_FORWARD' order by accountId,createdDate">
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
-							name="InvestorFundTransaction.accountIds" query="select i.accountId from InvestorFundTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end group by accountId">
+							name="InvestorFundTransaction.accountIds"
+							query="select i.accountId from InvestorFundTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end group by accountId">
 						</annox:annotate>
 					</annox:annotate>
-				</annox:annotate> 
+				</annox:annotate>
 				<hj:entity>
 					<orm:inheritance strategy="SINGLE_TABLE" />
-					<orm:discriminator-value>InvestorFundTransaction</orm:discriminator-value>
+					<orm:discriminator-value>InvestorFundTransaction
+					</orm:discriminator-value>
 				</hj:entity>
 			</xsd:appinfo>
 		</xsd:annotation>
@@ -596,200 +651,202 @@
 				<annox:annotate>
 					<annox:annotate annox:class="javax.persistence.NamedQueries">
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
-							name="AccountSummary.imsid" query="select i from Account i where i.imsid=:imsid">
+							name="Account.imsid" query="select i from Account i where i.imsid=:imsid">
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
-							name="AccountSummary.id" query="select i from Account i where i.id=:id">
+							name="Account.id" query="select i from Account i where i.id=:id">
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
-							name="AccountSummary.all" query="select i from Account i">
+							name="Account.all" query="select i from Account i">
 						</annox:annotate>
 					</annox:annotate>
-				</annox:annotate> 
+				</annox:annotate>
 			</xsd:appinfo>
 		</xsd:annotation>
 		<xsd:sequence>
-				<element name="imsid" type="long">
-					<xsd:annotation>
-						<xsd:appinfo>
-							<hj:id>
-								<orm:generated-value strategy="AUTO" />
-							</hj:id>
-						</xsd:appinfo>
-					</xsd:annotation>
-				</element>
-				<element name="id" type="string">
-					<annotation>
-						<appinfo>
-							<annox:annotate>
-								<ims:SalesforceName fieldName="Id" />
-							</annox:annotate>
-						</appinfo>
-					</annotation>
-				</element>
-				<element name="name" type="string">
-					<annotation>
-						<appinfo>
-							<annox:annotate>
-								<ims:SalesforceName fieldName="Name" />
-							</annox:annotate>
-						</appinfo>
-					</annotation>
-				</element>
-				<element name="version" type="long">
-					<annotation>
-						<appinfo>
-							<hj:version />
-						</appinfo>
-					</annotation>
-				</element>
-						<element name="HarmoneyAccountNumber" type="string">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="harMoney_Account_Number__c" />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="OutstandingPrincipal" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="Outstanding_Principal__c" />
-										<ims:Negateable />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="DeployedFunds" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="loan__Deployed_Funds__c" />
-										<ims:Negateable />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="UndeployedFunds" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="loan__Undeployed_Funds__c" />
-										<ims:Negateable />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="TotalPaidOffAmount" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="Total_Paid_Off_Amount__c" />
-										<ims:Negateable />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="InterestsReceived" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="Interests_Recived__c" />
-										<ims:Negateable />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="LateFees" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="Late_Fees__c" />
-										<ims:Negateable />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="ServiceFees" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="Service_Fees__c" />
-										<ims:Negateable />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="TotalTax" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="Total_Tax__c" />
-										<ims:Negateable />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="TotalChargedOffPrincipal" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="Total_Charged_Off_Principal__c" />
-										<ims:Negateable />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="TotalDeposit" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="Total_Deposit__c" />
-										<ims:Negateable />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="TotalWithdrawal" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="Total_Withdrawal__c" />
-										<ims:Negateable />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="TaxPercentage" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="loan__Investor_Tax_Configuration__r.loan__Tax_Percentage__c" />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="IRDNumber" type="string">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="IRD_Number__c" />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="AccountSummary" type="string">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="Account_Summary__c" />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-				</xsd:sequence>
+			<element name="imsid" type="long">
+				<xsd:annotation>
+					<xsd:appinfo>
+						<hj:id>
+							<orm:generated-value strategy="AUTO" />
+						</hj:id>
+					</xsd:appinfo>
+				</xsd:annotation>
+			</element>
+			<element name="id" type="string">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Id" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="name" type="string">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Name" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="version" type="long">
+				<annotation>
+					<appinfo>
+						<hj:version />
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="lastModifiedDate" type="dateTime" nillable="false" />
+			<element name="HarmoneyAccountNumber" type="string">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="harMoney_Account_Number__c" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="OutstandingPrincipal" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Outstanding_Principal__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="DeployedFunds" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="loan__Deployed_Funds__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="UndeployedFunds" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="loan__Undeployed_Funds__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="TotalPaidOffAmount" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Total_Paid_Off_Amount__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="InterestsReceived" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Interests_Recived__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="LateFees" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Late_Fees__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="ServiceFees" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Service_Fees__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="TotalTax" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Total_Tax__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="TotalChargedOffPrincipal" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Total_Charged_Off_Principal__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="TotalDeposit" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Total_Deposit__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="TotalWithdrawal" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Total_Withdrawal__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="TaxPercentage" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName
+								fieldName="loan__Investor_Tax_Configuration__r.loan__Tax_Percentage__c" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="IRDNumber" type="string">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="IRD_Number__c" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="AccountSummary" type="string">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Account_Summary__c" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+		</xsd:sequence>
 	</complexType>
 	<complexType name="InvestmentOrder">
 		<xsd:annotation>
@@ -811,44 +868,45 @@
 							name="InvestmentOrder.all" query="select i from InvestmentOrder i">
 						</annox:annotate>
 					</annox:annotate>
-				</annox:annotate> 
+				</annox:annotate>
 			</xsd:appinfo>
 		</xsd:annotation>
-				<xsd:sequence>
-				<element name="imsid" type="long">
-					<xsd:annotation>
-						<xsd:appinfo>
-							<hj:id>
-								<orm:generated-value strategy="AUTO" />
-							</hj:id>
-						</xsd:appinfo>
-					</xsd:annotation>
-				</element>
-				<element name="id" type="string">
-					<annotation>
-						<appinfo>
-							<annox:annotate>
-								<ims:SalesforceName fieldName="Id" />
-							</annox:annotate>
-						</appinfo>
-					</annotation>
-				</element>
-				<element name="name" type="string">
-					<annotation>
-						<appinfo>
-							<annox:annotate>
-								<ims:SalesforceName fieldName="Name" />
-							</annox:annotate>
-						</appinfo>
-					</annotation>
-				</element>
-				<element name="version" type="long">
-					<annotation>
-						<appinfo>
-							<hj:version />
-						</appinfo>
-					</annotation>
-				</element>
+		<xsd:sequence>
+			<element name="imsid" type="long">
+				<xsd:annotation>
+					<xsd:appinfo>
+						<hj:id>
+							<orm:generated-value strategy="AUTO" />
+						</hj:id>
+					</xsd:appinfo>
+				</xsd:annotation>
+			</element>
+			<element name="id" type="string">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Id" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="name" type="string">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Name" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="version" type="long">
+				<annotation>
+					<appinfo>
+						<hj:version />
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="lastModifiedDate" type="dateTime" nillable="false" />
 			<element name="createdDate" type="dateTime" nillable="false">
 				<annotation>
 					<appinfo>
@@ -858,125 +916,125 @@
 					</appinfo>
 				</annotation>
 			</element>
-				<element name="accountId" type="string">
-					<annotation>
-						<appinfo>
-							<annox:annotate>
-								<ims:SalesforceName fieldName="loan__Account__c" />
-							</annox:annotate>
-						</appinfo>
-					</annotation>
-				</element>
+			<element name="accountId" type="string">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="loan__Account__c" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
 
-						<element name="InvestmentAmount" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="loan__Investment_Amount__c" />
-										<ims:Negateable />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="HMInvestmentAmount" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="HM_Investment_Amount__c" />
-										<ims:Negateable />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="ProtectInvestmentAmount" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="Protect_Investment_Amount__c" />
-										<ims:Negateable />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="ChargedOffPrincipal" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="loan__Charged_Off_Principal__c" />
-										<ims:Negateable />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="ChargedOffDate" type="date">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="loan__Charged_Off_Date__c" />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="LoanStatus" type="string">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="loan__Loan_Status__c" />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="PaymentProtectManagementFees" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="Payment_Protect_Management_Fees__c" />
-										<ims:Negateable />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="PaymentProtectSalesCommissionFees" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="Payment_Protect_Sales_Commission_Fees__c" />
-										<ims:Negateable />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="PaymentProtectFee" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="Payment_Protect_Fee__c" />
-										<ims:Negateable />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="PaymentProtectRebatedAmount" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="Payment_Protect_Rebated_Amount__c" />
-										<ims:Negateable />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-						<element name="HMRollupOutstandingPrincipal" type="tns:currency">
-							<annotation>
-								<appinfo>
-									<annox:annotate>
-										<ims:SalesforceName fieldName="HM_Rollup_Outstanding_Principal__c" />
-										<ims:Negateable />
-									</annox:annotate>
-								</appinfo>
-							</annotation>
-						</element>
-				</xsd:sequence>
+			<element name="InvestmentAmount" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="loan__Investment_Amount__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="HMInvestmentAmount" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="HM_Investment_Amount__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="ProtectInvestmentAmount" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Protect_Investment_Amount__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="ChargedOffPrincipal" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="loan__Charged_Off_Principal__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="ChargedOffDate" type="date">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="loan__Charged_Off_Date__c" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="LoanStatus" type="string">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="loan__Loan_Status__c" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="PaymentProtectManagementFees" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Payment_Protect_Management_Fees__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="PaymentProtectSalesCommissionFees" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Payment_Protect_Sales_Commission_Fees__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="PaymentProtectFee" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Payment_Protect_Fee__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="PaymentProtectRebatedAmount" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Payment_Protect_Rebated_Amount__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="HMRollupOutstandingPrincipal" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="HM_Rollup_Outstanding_Principal__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+		</xsd:sequence>
 	</complexType>
 	<xsd:simpleType name="ItemType">
 		<xsd:restriction base="xsd:string">
