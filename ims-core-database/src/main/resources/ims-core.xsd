@@ -87,6 +87,15 @@
 					</appinfo>
 				</annotation>
 			</element>
+			<element name="accountId" type="string">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="loan__Account__c,Account_ID__c,loan__Loan__c" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
 			<element name="customerId" type="string" nillable="false">
 				<annotation>
 					<appinfo>
@@ -120,6 +129,7 @@
 					</appinfo>
 				</annotation>
 			</element>
+			<element name="txType" type="tns:ItemType"/>
 		</sequence>
 	</complexType>
 	
@@ -194,8 +204,8 @@
 							name="InvestorLoanTransaction.accountdate" query="select i from InvestorLoanTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end and i.accountId=:accountId order by accountId,createdDate">
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
-							name="InvestorLoanTransaction.accountdatebalancefwd" query="select i from InvestorLoanTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end and i.accountId=:accountId and i.iltType = 'BALANCE_FORWARD' order by accountId,createdDate">
-						</annox:annotate> -->
+							name="InvestorLoanTransaction.accountdatebalancefwd" query="select i from InvestorLoanTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end and i.accountId=:accountId and i.txType = 'BALANCE_FORWARD' order by accountId,createdDate">
+						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
 							name="InvestorLoanTransaction.accountIds" query="select i.accountId from InvestorLoanTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end group by accountId">
 						</annox:annotate>
@@ -250,16 +260,6 @@
 						<annox:annotate>
 							<ims:SalesforceName fieldName="Net_Amount__c" />
 							<ims:Negateable/>
-						</annox:annotate>
-					</appinfo>
-				</annotation>
-			</element>
-			<element name="accountId" type="string">
-				<annotation>
-					<documentation>Salesforce name: Account_ID__c</documentation>
-					<appinfo>
-						<annox:annotate>
-							<ims:SalesforceName fieldName="Account_ID__c" />
 						</annox:annotate>
 					</appinfo>
 				</annotation>
@@ -506,6 +506,15 @@
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
 							name="InvestorFundTransaction.all" query="select i from InvestorFundTransaction i">
 						</annox:annotate>
+						<annox:annotate annox:class="javax.persistence.NamedQuery"
+							name="InvestorFundTransaction.accountdate" query="select i from InvestorFundTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end and i.accountId=:accountId order by accountId,createdDate">
+						</annox:annotate>
+						<annox:annotate annox:class="javax.persistence.NamedQuery"
+							name="InvestorFundTransaction.accountdatebalancefwd" query="select i from InvestorFundTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end and i.accountId=:accountId and i.txType = 'BALANCE_FORWARD' order by accountId,createdDate">
+						</annox:annotate>
+						<annox:annotate annox:class="javax.persistence.NamedQuery"
+							name="InvestorFundTransaction.accountIds" query="select i.accountId from InvestorFundTransaction i where i.createdDate &gt;= :start and i.createdDate &lt;= :end group by accountId">
+						</annox:annotate>
 					</annox:annotate>
 				</annox:annotate> 
 				<hj:entity>
@@ -517,15 +526,6 @@
 		<xsd:complexContent>
 			<xsd:extension base="tns:Transaction">
 				<xsd:sequence>
-					<element name="account" type="string">
-						<annotation>
-							<appinfo>
-								<annox:annotate>
-									<ims:SalesforceName fieldName="loan__Account__c" />
-								</annox:annotate>
-							</appinfo>
-						</annotation>
-					</element>
 					<element name="transactionAmount" type="tns:currency">
 						<annotation>
 							<appinfo>
@@ -795,15 +795,6 @@
 		<xsd:complexContent>
 			<xsd:extension base="tns:Transaction">
 				<xsd:sequence>
-					<element name="AccountId" type="string">
-						<annotation>
-							<appinfo>
-								<annox:annotate>
-									<ims:SalesforceName fieldName="loan__Loan__c" />
-								</annox:annotate>
-							</appinfo>
-						</annotation>
-					</element>
 						<element name="InvestmentAmount" type="tns:currency">
 							<annotation>
 								<appinfo>

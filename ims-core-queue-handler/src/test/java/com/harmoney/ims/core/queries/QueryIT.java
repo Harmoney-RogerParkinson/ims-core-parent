@@ -7,12 +7,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.harmoney.ims.core.database.DatabaseSpringConfig;
 import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
 
 @RunWith(SpringJUnit4ClassRunner.class)
+@TestPropertySource("/QueryTest.properties")
 @ContextConfiguration(classes = { QuerySpringConfig.class, PartnerConnectionSpringConfig.class,DatabaseSpringConfig.class})
 public class QueryIT {
 

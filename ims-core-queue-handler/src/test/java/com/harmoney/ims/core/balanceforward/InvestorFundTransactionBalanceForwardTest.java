@@ -2,69 +2,51 @@ package com.harmoney.ims.core.balanceforward;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.FileInputStream;
 import java.math.BigDecimal;
-import java.sql.CallableStatement;
-import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
-import org.dbunit.database.DatabaseConfig;
-import org.dbunit.database.DatabaseConnection;
-import org.dbunit.database.IDatabaseConnection;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
-import org.dbunit.dataset.xml.FlatXmlProducer;
-import org.dbunit.ext.h2.H2DataTypeFactory;
-import org.dbunit.ext.postgresql.PostgresqlDataTypeFactory;
-import org.dbunit.operation.DatabaseOperation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.util.StringUtils;
-import org.xml.sax.InputSource;
 
 import com.harmoney.ims.core.database.DatabaseSpringConfig;
-import com.harmoney.ims.core.database.InvestorLoanTransactionDAO;
+import com.harmoney.ims.core.database.InvestorFundTransactionDAO;
 import com.harmoney.ims.core.instances.InvestorFundTransaction;
-import com.harmoney.ims.core.instances.InvestorLoanTransaction;
 import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
 import com.harmoney.ims.core.queries.QuerySpringConfig;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource("/BalanceForwardTest.properties")
 @ContextConfiguration(classes = { QuerySpringConfig.class, PartnerConnectionSpringConfig.class,DatabaseSpringConfig.class})
-public class InvestorLoanTransactionBalanceForwardTest {
+public class InvestorFundTransactionBalanceForwardTest {
 
-    private static final Logger log = LoggerFactory.getLogger(InvestorLoanTransactionBalanceForwardTest.class);
+    private static final Logger log = LoggerFactory.getLogger(InvestorFundTransactionBalanceForwardTest.class);
 
+	@Autowired InvestorFundTransactionBalanceForward investorFundTransactionBalanceForward;
+	@Autowired InvestorFundTransactionDAO investorFundTransactionDAO;
 	@Autowired DatabaseLoader databaseLoader;
-	@Autowired InvestorLoanTransactionBalanceForward investorLoanTransactionBalanceForward;
-	@Autowired InvestorLoanTransactionDAO investorLoanTransactionDAO;
     private static final String dbLocation = "balanceforward.xml";
 
 	@Test
 	public void processBalanceForward() throws Exception {
-
+		
 		databaseLoader.loadDatabase(dbLocation);
-		investorLoanTransactionBalanceForward.setTestMode(true);
+		investorFundTransactionBalanceForward.setTestMode(true);
 
-		LocalDate period1 = LocalDate.of(2016, 7, 15);
-		LocalDate period2 = LocalDate.of(2016, 8, 15);
-		LocalDate period3 = LocalDate.of(2016, 9, 15);
+		
+		LocalDate period1 = LocalDate.of(2017, 2, 15);
+		LocalDate period2 = LocalDate.of(2017, 3, 15);
 
 		Map<String,BigDecimal> netAmountByAccountIdPeriod1 = new HashMap<>();
 		Map<String,BigDecimal> netAmountByAccountIdPeriod2 = new HashMap<>();
-		Map<String,BigDecimal> netAmountByAccountIdPeriod3 = new HashMap<>();
 
 		// Run the first period. Should be three account ids and no existing balfwds, so we create three.
 		processPeriod(period1, netAmountByAccountIdPeriod1, true);
@@ -78,15 +60,10 @@ public class InvestorLoanTransactionBalanceForwardTest {
 		// rerun period 2 and verify the balance forwards and totals are the same
 		processPeriod(period2,  netAmountByAccountIdPeriod2, false);
 
-		processPeriod(period3, netAmountByAccountIdPeriod3, true);
-		// rerun period 2 and verify the balance forwards and totals are the same
-		processPeriod(period3,  netAmountByAccountIdPeriod3, false);
-
 		// Rerun all the periods (again)
 		// verify the balfwd counts and the final totals do not change
 		processPeriod(period1, netAmountByAccountIdPeriod1, false);
 		processPeriod(period2, netAmountByAccountIdPeriod2, false);
-		processPeriod(period3, netAmountByAccountIdPeriod3, false);
 	}
 	
 	/**
@@ -105,10 +82,10 @@ public class InvestorLoanTransactionBalanceForwardTest {
 		
 		log.debug("*** Processing Period {} {}",periodDate,put);
 
-		BalanceForwardDTO balanceForwardDTO = investorLoanTransactionBalanceForward.processBalanceForward(periodDate);
+		BalanceForwardDTO balanceForwardDTO = investorFundTransactionBalanceForward.processBalanceForward(periodDate);
 
 		for (String accountId: balanceForwardDTO.getAccountIds()) {
-			List<InvestorLoanTransaction> balfwdlist = investorLoanTransactionDAO.getByAccountDateBalFwd(
+			List<InvestorFundTransaction> balfwdlist = investorFundTransactionDAO.getByAccountDateBalFwd(
 					balanceForwardDTO.getStart(),
 					balanceForwardDTO.getEnd(),
 					accountId
@@ -116,10 +93,11 @@ public class InvestorLoanTransactionBalanceForwardTest {
 			int s = balfwdlist.size();
 			assertEquals(balanceForwardDTO.get(accountId),s);
 			if (put) {
-				netAmountByAccountId.put(accountId, balfwdlist.get(s-1).getNetAmount());
+				netAmountByAccountId.put(accountId, balfwdlist.get(s-1).getTransactionAmount());
 			} else {
-				assertEquals(netAmountByAccountId.get(accountId),balfwdlist.get(s-1).getNetAmount());
+				assertEquals(netAmountByAccountId.get(accountId),balfwdlist.get(s-1).getTransactionAmount());
 			}
 		}
 	}
+
 }
