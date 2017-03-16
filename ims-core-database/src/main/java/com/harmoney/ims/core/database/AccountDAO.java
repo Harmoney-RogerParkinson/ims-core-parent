@@ -23,6 +23,7 @@ import com.harmoney.ims.core.database.descriptors.ObjectDescriptor;
 import com.harmoney.ims.core.database.descriptors.ObjectDescriptorGenerator;
 import com.harmoney.ims.core.database.descriptors.Result;
 import com.harmoney.ims.core.instances.Account;
+import com.harmoney.ims.core.instances.InvestmentOrder;
 import com.sforce.soap.partner.sobject.SObject;
 
 /**
@@ -30,71 +31,12 @@ import com.sforce.soap.partner.sobject.SObject;
  *
  */
 @Repository
-public class AccountDAO {
+public class AccountDAO extends AbstractDAO<Account>{
 	
 	private static final Logger log = LoggerFactory.getLogger(AccountDAO.class);
 
 	@Autowired UnpackHelper unpackHelper;
-	@Autowired ObjectDescriptorGenerator objectDescriptorGenerator;
-	private ObjectDescriptor objectDescriptor;
-	private Class<Account> clazz;
 
-	@PersistenceContext(unitName="com.harmoney.ims.core.instances")
-	private EntityManager entityManager;
-	private String byId;
-	private String byIMSId;
-	private String byAll;
-
-	@SuppressWarnings("unchecked")
-	@PostConstruct
-	public void init() {
-	    clazz = Account.class;
-		byId = clazz.getSimpleName()+".id";
-		byIMSId = clazz.getSimpleName()+".imsid";
-		byAll = clazz.getSimpleName()+".all";
-		
-		objectDescriptor = objectDescriptorGenerator.build(clazz);
-	}
-	public Class<Account> getClazz() {
-		return clazz;
-	}
-	@Transactional(readOnly=true)
-	public List<Account> getAll()
-	{
-		TypedQuery<Account> query =
-				  entityManager.createNamedQuery(byAll, clazz);
-		return query.getResultList();
-	}
-	@Transactional
-	public Account getByIMSId(Long imsid) {
-		TypedQuery<Account> query =
-				  entityManager.createNamedQuery(byIMSId, clazz);
-		query.setParameter("imsid", imsid);
-		Account existing = query.getSingleResult();
-		return existing;
-	}
-	@Transactional
-	public Account getById(String id) {
-		TypedQuery<Account> query =
-				  entityManager.createNamedQuery(byId, clazz);
-		query.setParameter("id", id);
-		Account existing;
-		try {
-			existing = query.getSingleResult();
-		} catch (NoResultException e) {
-			return null;
-		}
-		return existing;
-	}
-	@Transactional
-	public boolean create(Account target) {
-		entityManager.persist(target);
-		entityManager.flush();
-		return true;
-	}
-	public ObjectDescriptor getObjectDescriptor() {
-		return objectDescriptor;
-	}
 	@Transactional
 	public Result createOrUpdate(SObject sobject) {
 		LocalDateTime lastModifiedDate = LocalDateTime.now();
@@ -114,5 +56,8 @@ public class AccountDAO {
 		}
 		entityManager.flush();
 		return result;
+	}
+	@Override
+	protected void localInit() {
 	}
 }

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import com.harmoney.ims.core.instances.InvestorFundTransaction;
 
 @Repository
-public class InvestorFundTransactionDAO extends AbstractDAO<InvestorFundTransaction> {
+public class InvestorFundTransactionDAO extends AbstractTransactionDAO<InvestorFundTransaction> {
 
 	private static final Logger log = LoggerFactory.getLogger(InvestorFundTransactionDAO.class);
 

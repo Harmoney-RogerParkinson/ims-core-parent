@@ -30,7 +30,7 @@ public class Scheduler {
 
     private static final Logger log = LoggerFactory.getLogger(Scheduler.class);
 
-	@Autowired AccountQuery accountSummaryQuery;
+	@Autowired AccountQuery accountQuery;
 	@Autowired InvestmentOrderQuery investmentOrderQuery;
 	@Autowired InvestorLoanTransactionBalanceForward investorLoanTransactionBalanceForward;
 
@@ -38,7 +38,7 @@ public class Scheduler {
 	@SchedulerLock(name = "scheduledQueries")
 	public void runQueries() {
 		try {
-			accountSummaryQuery.doQuery();
+			accountQuery.doQuery();
 		} catch (ConnectionException e) {
 			log.error(e.getMessage(),e);
 		}
