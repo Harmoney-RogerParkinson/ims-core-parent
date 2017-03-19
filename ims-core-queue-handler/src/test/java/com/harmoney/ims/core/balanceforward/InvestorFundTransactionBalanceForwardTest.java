@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +19,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.harmoney.ims.core.database.ConvertUtils;
 import com.harmoney.ims.core.database.DatabaseSpringConfig;
 import com.harmoney.ims.core.database.InvestorFundTransactionDAO;
 import com.harmoney.ims.core.instances.InvestorFundTransaction;
@@ -40,7 +43,6 @@ public class InvestorFundTransactionBalanceForwardTest {
 		
 		databaseLoader.loadDatabase(dbLocation);
 		investorFundTransactionBalanceForward.setTestMode(true);
-
 		
 		LocalDate period1 = LocalDate.of(2017, 2, 15);
 		LocalDate period2 = LocalDate.of(2017, 3, 15);
@@ -84,6 +86,13 @@ public class InvestorFundTransactionBalanceForwardTest {
 
 		BalanceForwardDTO balanceForwardDTO = investorFundTransactionBalanceForward.processBalanceForward(periodDate);
 
+		if (!put) {
+			log.debug("Checking accounts");
+			for (Map.Entry<String, BigDecimal> entry: netAmountByAccountId.entrySet()) {
+				log.debug("AccountId: {} amount: {}",entry.getKey(),entry.getValue());
+			}
+		}
+		log.debug("Account checking complete\n");
 		for (String accountId: balanceForwardDTO.getAccountIds()) {
 			List<InvestorFundTransaction> balfwdlist = investorFundTransactionDAO.getByAccountDateBalFwd(
 					balanceForwardDTO.getStart(),
@@ -95,9 +104,20 @@ public class InvestorFundTransactionBalanceForwardTest {
 			if (put) {
 				netAmountByAccountId.put(accountId, balfwdlist.get(s-1).getTransactionAmount());
 			} else {
+				log.debug("AccountId: {} amount: {}",netAmountByAccountId.get(accountId),balfwdlist.get(s-1).getTransactionAmount());
+				dumpTransactions(accountId,balanceForwardDTO);
 				assertEquals(netAmountByAccountId.get(accountId),balfwdlist.get(s-1).getTransactionAmount());
 			}
 		}
+	}
+	
+	private void dumpTransactions(String accountId, BalanceForwardDTO balanceForwardDTO) {
+//		List<InvestorFundTransaction> ifts = investorFundTransactionDAO.getByAccountDate(balanceForwardDTO.getStart(), balanceForwardDTO.getEnd(), accountId);
+//		log.debug("Dumping transactions {} {} {}",accountId,balanceForwardDTO.getStart(),balanceForwardDTO.getEnd());
+//		for (InvestorFundTransaction ift: ifts) {
+//			log.debug("Account: {} type: {} date: {}: amount: {}",
+//					ift.getAccountId(), ift.getTxType(), ConvertUtils.convertTolocalDateTime(ift.getCreatedDate()),ift.getTransactionAmount());
+//		}
 	}
 
 }

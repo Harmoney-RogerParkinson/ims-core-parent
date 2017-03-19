@@ -29,7 +29,7 @@
 		<jaxb2_commons.version>0.6.2</jaxb2_commons.version>
 		<slf4j.version>1.7.12</slf4j.version>
 		<logback.version>1.1.3</logback.version>
-		<hyperjaxb3.version>0.6.2-SNAPSHOT</hyperjaxb3.version>
+		<hyperjaxb3.version>0.6.1</hyperjaxb3.version>
    		<timestamp>${maven.build.timestamp}</timestamp>
    		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
 		<skipITs>true</skipITs>
@@ -93,6 +93,11 @@
 			<dependency>
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-orm</artifactId>
+				<version>${spring.framework.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-beans</artifactId>
 				<version>${spring.framework.version}</version>
 			</dependency>
 			<dependency>

@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import com.harmoney.ims.core.database.ConvertUtils;
 import com.harmoney.ims.core.database.InvestorLoanTransactionDAO;
 import com.harmoney.ims.core.database.descriptors.Result;
 import com.harmoney.ims.core.instances.InvestorLoanTransaction;
@@ -39,7 +40,7 @@ public class ReceiverMock {
         Result result = investorLoanTransactionDAO.unpackMessage(message, target);
         log.debug("{}",result);
         Assert.assertEquals("a6fN00000008giLIAQ",target.getId());
-        Assert.assertEquals(Timestamp.valueOf(LocalDateTime.parse("2017-02-23T00:00")),target.getCreatedDate());
+        Assert.assertEquals(LocalDateTime.parse("2017-02-23T00:00"),ConvertUtils.convertTolocalDateTime(target.getCreatedDate()));
         Assert.assertEquals(new BigDecimal(200D).longValue(),target.getPrincipalPaid().longValue());
         latch.countDown();
     }

@@ -3,29 +3,24 @@
  */
 package com.harmoney.ims.core.database;
 
-import java.lang.reflect.ParameterizedType;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import com.harmoney.ims.core.database.descriptors.ObjectDescriptor;
-import com.harmoney.ims.core.database.descriptors.ObjectDescriptorGenerator;
 import com.harmoney.ims.core.database.descriptors.Result;
 import com.harmoney.ims.core.instances.ItemType;
 import com.harmoney.ims.core.instances.Transaction;
@@ -47,7 +42,7 @@ public abstract class AbstractTransactionDAO<T extends Transaction> extends Abst
 	public boolean createReversal(T target, T oldRecord) {
 		objectDescriptor.negate(target);
 		target.setId(null);
-        target.setCreatedDate(new Timestamp(System.currentTimeMillis()));
+        target.setCreatedDate(new GregorianCalendar());
         target.setReversedId(oldRecord.getImsid());
         entityManager.persist(target);
         oldRecord.setReversedId(target.getImsid());
@@ -59,7 +54,7 @@ public abstract class AbstractTransactionDAO<T extends Transaction> extends Abst
 	public boolean delete(T target)
 	{
 		getObjectDescriptor().negate(target);
-        target.setCreatedDate(new Timestamp(System.currentTimeMillis()));
+        target.setCreatedDate(new GregorianCalendar());
         T oldRecord = getById(target.getId());
         if (oldRecord == null) {
         	// we don't know about this record. Can't delete it
@@ -147,8 +142,8 @@ public abstract class AbstractTransactionDAO<T extends Transaction> extends Abst
 		TypedQuery<T> query =
 				  getEntityManager().createNamedQuery(byAccountdate, clazz);
 		query.setParameter("accountId", accountId);
-		query.setParameter("start", Timestamp.valueOf(start));
-		query.setParameter("end", Timestamp.valueOf(end));
+		query.setParameter("start", ConvertUtils.convertToCalendar(start));
+		query.setParameter("end", ConvertUtils.convertToCalendar(end));
 		return query.getResultList();
 	}
 
@@ -156,8 +151,8 @@ public abstract class AbstractTransactionDAO<T extends Transaction> extends Abst
 		TypedQuery<T> query =
 				  getEntityManager().createNamedQuery(byAccountdatebalancefwd, clazz);
 		query.setParameter("accountId", accountId);
-		query.setParameter("start", Timestamp.valueOf(start));
-		query.setParameter("end", Timestamp.valueOf(end));
+		query.setParameter("start", ConvertUtils.convertToCalendar(start));
+		query.setParameter("end", ConvertUtils.convertToCalendar(end));
 		return query.getResultList();
 	}
     /**
@@ -178,7 +173,7 @@ public abstract class AbstractTransactionDAO<T extends Transaction> extends Abst
     	// The db calls still need to use the old Dates
     	Date startDate = Date.from(start.atZone(ZoneId.systemDefault()).toInstant());
     	Date endDate = Date.from(end.atZone(ZoneId.systemDefault()).toInstant());
-    	Timestamp endTimestamp = Timestamp.valueOf(end);
+    	Calendar endTimestamp = ConvertUtils.convertToCalendar(end);
     	
     	// the balfwdlist has the balance forward records already created for this
     	// period. We expect 0, 1 or 2, depending on if this process had been run before for the period
@@ -204,7 +199,7 @@ public abstract class AbstractTransactionDAO<T extends Transaction> extends Abst
     		// We found one balance forward record.
     		T balfwd1 = balfwdlist.get(0);
     		// Here we figure out if it is the first one or the last one
-    		LocalDateTime createdDate = balfwd1.getCreatedDate().toLocalDateTime();
+    		LocalDateTime createdDate = ConvertUtils.convertTolocalDateTime(balfwd1.getCreatedDate());
     		if (createdDate.equals(start)) {
     			// it was the first one, we're fine
     			// The flag will ensure we ignore up to that first balfwd
@@ -231,7 +226,7 @@ public abstract class AbstractTransactionDAO<T extends Transaction> extends Abst
 			if (!accumulating) {
 				if (ilt.getTxType() == ItemType.BALANCE_FORWARD) {
 					// If this is the first balfwd then accumulate and flag
-					if (ilt.getCreatedDate().toLocalDateTime().equals(start)) {
+					if (ConvertUtils.convertTolocalDateTime(ilt.getCreatedDate()).equals(start)) {
 						objectDescriptor.accumulate(ilt,iltTotals);
 						accumulating = true;
 					}
@@ -241,7 +236,7 @@ public abstract class AbstractTransactionDAO<T extends Transaction> extends Abst
 			} else {
 				if (ilt.getTxType() == ItemType.BALANCE_FORWARD) {
 					// If this is the last balfwd then save it for update (which will exit the loop)
-					if (ilt.getCreatedDate().toLocalDateTime().equals(end)) {
+					if (ConvertUtils.convertTolocalDateTime(ilt.getCreatedDate()).equals(end)) {
 						secondBalfwd = ilt;
 					}
 				} else {
@@ -274,8 +269,8 @@ public abstract class AbstractTransactionDAO<T extends Transaction> extends Abst
 			LocalDateTime end) {
     	
     	// The db calls still need to use the old Dates
-		Timestamp startTimestamp = Timestamp.valueOf(start);
-		Timestamp endTimestamp = Timestamp.valueOf(end);
+		Calendar startTimestamp = ConvertUtils.convertToCalendar(start);
+		Calendar endTimestamp = ConvertUtils.convertToCalendar(end);
     	
 		Query query = getEntityManager().createNamedQuery(byAccountIds);
 		query.setParameter("start", startTimestamp);

@@ -5,13 +5,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Calendar;
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -42,7 +43,8 @@ public class InvestorLoanTransactionIT {
 			.getLogger(InvestorLoanTransactionIT.class);
 	
 	@Autowired private InvestorLoanTransactionDAO investorLoanTransactionDAO;
-	private Timestamp today = Timestamp.valueOf(LocalDateTime.of(LocalDate.of(2017, 2, 23), LocalTime.MIDNIGHT));
+//	private Timestamp today = Timestamp.valueOf(LocalDateTime.of(LocalDate.of(2017, 2, 23), LocalTime.MIDNIGHT));
+	private Calendar today = ConvertUtils.convertToCalendar(LocalDateTime.of(LocalDate.of(2017, 2, 23), LocalTime.MIDNIGHT));
 
 	@Test
 	public void createTransactionTest() {

@@ -9,7 +9,8 @@
 <!-- 	<logger name="com.harmoney.ims.core.queuehandler" level="debug"/>
 	<logger name="org.hibernate.SQL" level="debug" />
 	<logger name="org.hibernate.type" level="trace" /> -->
-	
+	<logger name="com.harmoney.ims.core.balanceforward.InvestorFundTransactionBalanceForwardTest" level="debug" />
+	<logger name="com.harmoney.ims.core.database.AbstractTransactionDAO" level="debug" />
 	<logger name="com.harmoney.ims.core.balanceforward" level="debug"/>
 	<logger name="com.harmoney.ims.core.database.AbstractDAO" level="debug" />
 	<logger name="com.harmoney.ims.core.database.InvestorLoanTransactionDAO" level="debug" />

@@ -5,6 +5,7 @@ package com.harmoney.ims.core.database;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -43,16 +44,18 @@ public class AccountDAO extends AbstractDAO<Account>{
 		
 		String id = (String)sobject.getField("Id");
 		Account account = getById(id);
+		Calendar calendar = ConvertUtils.convertToCalendar(lastModifiedDate);
+
 		Result result = null;
 		if (account == null) {
 			// new record
 			account = new Account();
 			result = unpackHelper.unpack(sobject, account,objectDescriptor);
-			account.setLastModifiedDate(Timestamp.valueOf(lastModifiedDate));
+			account.setLastModifiedDate(calendar);
 			entityManager.persist(account);
 		} else {
 			result = unpackHelper.unpack(sobject, account,objectDescriptor);
-			account.setLastModifiedDate(Timestamp.valueOf(lastModifiedDate));
+			account.setLastModifiedDate(calendar);
 		}
 		entityManager.flush();
 		return result;

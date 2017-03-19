@@ -93,7 +93,17 @@
 		</dependency>
   	</dependencies>
   <build>
+ 		<resources>
+			<resource>
+				<directory>${basedir}/target/generated-sources/xjc/META-INF</directory>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>
+				<filtering>false</filtering>
+			</resource>
+		</resources>
   	<plugins>
+
 		<plugin>
 			<groupId>org.jvnet.hyperjaxb3</groupId>
 			<artifactId>maven-hyperjaxb3-plugin</artifactId>
@@ -122,6 +132,10 @@
 			</configuration>
 		</plugin>
 <!-- 
+The preferred approach is to use the hyperjaxb3 as a jaxb plugin rather than use this
+plugin (from a comment by Lexi, the author), but I haven't seen a way to specify
+variant = jpa2 that works, except by using the custom plugin
+ 
 		<plugin>
 		    <groupId>org.jvnet.jaxb2.maven2</groupId>
 		    <artifactId>maven-jaxb2-plugin</artifactId>
@@ -156,7 +170,7 @@
 		        </execution>
 		    </executions>
 		</plugin>
-		 -->
+-->
 		<plugin>
 		  <groupId>org.apache.maven.plugins</groupId>
 		  <artifactId>maven-failsafe-plugin</artifactId>

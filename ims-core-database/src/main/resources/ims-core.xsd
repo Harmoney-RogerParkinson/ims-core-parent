@@ -14,9 +14,9 @@
 				<jaxb:javaType name="java.math.BigDecimal" xmlType="tns:currency"
 					parseMethod="com.harmoney.ims.core.database.ConvertUtils.parseCurrency"
 					printMethod="com.harmoney.ims.core.database.ConvertUtils.printCurrency" />
-				<jaxb:javaType name="java.sql.Timestamp" xmlType="xsd:dateTime"
-					parseMethod="com.harmoney.ims.core.database.ConvertUtils.parseTimestamp"
-					printMethod="com.harmoney.ims.core.database.ConvertUtils.printTimestamp" />
+				<jaxb:javaType name="java.util.Calendar" xmlType="xsd:dateTime"
+					parseMethod="com.harmoney.ims.core.database.ConvertUtils.parseCalendar"
+					printMethod="com.harmoney.ims.core.database.ConvertUtils.printCalendar" />
 				<jaxb:javaType name="java.util.Date" xmlType="xsd:date"
 					parseMethod="com.harmoney.ims.core.database.ConvertUtils.parseDate"
 					printMethod="com.harmoney.ims.core.database.ConvertUtils.printDate" />

@@ -16,9 +16,9 @@ abstract class AbstractBalanceForward {
     private static final Logger log = LoggerFactory.getLogger(AbstractBalanceForward.class);
     /**
      * A few nanoseconds before midnight, should be the last thing that happens that day.
-     * The database doesn't store precision more than 999999000, though Java default is 999999999
+     * The database (actually the Calendar object) doesn't store precision more than 999000000, though Java default is 999999999
      */
-    private static final LocalTime LAST_MOMENT = LocalTime.of(23, 59, 59, 999999000);
+    private static final LocalTime LAST_MOMENT = LocalTime.of(23, 59, 59, 999000000);
 
 	public boolean testMode;
     /**
