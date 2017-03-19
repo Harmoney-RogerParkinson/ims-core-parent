@@ -38,6 +38,7 @@ public class MessageHandlerImpl implements MessageHandler {
 	@Override
 	public void processMessage(Map<String, Object> message) {
 		log.debug("Received:\n{}", message);
+		@SuppressWarnings("unchecked")
 		Map<String,Object> sobject = (Map<String,Object>)message.get("sobject");
 		fieldResolver.resolve(sobject);
 		if (log.isDebugEnabled()) {
@@ -47,10 +48,8 @@ public class MessageHandlerImpl implements MessageHandler {
 		if (latch != null) {
 			latch.countDown();
 		}
-		if (rabbitTemplate != null) {
-			rabbitTemplate.convertAndSend(rabbitQueue, message);
-			log.debug("Sent to: {}", rabbitQueue);
-		}
+		rabbitTemplate.convertAndSend(rabbitQueue, message);
+		log.debug("Sent to: {}", rabbitQueue);
 		count++;
 	}
 

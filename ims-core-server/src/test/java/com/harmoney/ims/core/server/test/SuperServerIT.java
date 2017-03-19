@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -37,8 +36,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.StringUtils;
 
 import com.harmoney.ims.core.database.DatabaseSpringConfig;
-import com.harmoney.ims.core.messages.MessageHandlerImpl;
-import com.harmoney.ims.core.messages.MessageHandlerMap;
 import com.harmoney.ims.core.messages.MessageProcessorSpringConfig;
 import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
 import com.harmoney.ims.core.queries.AccountQuery;
@@ -72,7 +69,8 @@ import com.sforce.ws.ConnectionException;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource("/SuperServerIT.properties")
-@ContextConfiguration(classes={MessageProcessorSpringConfig.class,
+@ContextConfiguration(classes={
+		MessageProcessorSpringConfig.class,
 		PartnerConnectionSpringConfig.class,
 		QueueHandlerSpringConfig.class,
 		DatabaseSpringConfig.class,

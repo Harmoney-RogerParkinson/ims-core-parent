@@ -5,8 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +18,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.util.StringUtils;
 
 import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
 import com.salesforce.emp.connector.EmpConnector;
@@ -78,7 +75,6 @@ public class IFTMessagingIT {
 		List<SObject> updates = new ArrayList<>();
 		int count = 0;
 		int saved = 0;
-		Calendar now = new GregorianCalendar();
 		SObject[] records = qr.getRecords();
 		for (SObject r: records) {
 			String id = (String)r.getField("Id");

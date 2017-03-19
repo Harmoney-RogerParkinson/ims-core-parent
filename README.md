@@ -13,6 +13,7 @@ Consists of several projects that make up the ims core JEE server.
  * Scheduled lock
  * W/S API
  * db indexes (need to index all records by API and probably Account by Harmoney customer number)
+ * default.properties in ims-server project needs verifying/rationalising
 
   
  

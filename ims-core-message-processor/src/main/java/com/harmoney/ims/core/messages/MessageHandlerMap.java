@@ -36,7 +36,7 @@ public class MessageHandlerMap {
     @Value("${salesforce.replayFrom:-1}")
 	public long replayFrom;
 	@Autowired private EmpConnector empConnector;
-	@Autowired(required=false) private RabbitTemplate rabbitTemplate;
+	@Autowired private RabbitTemplate rabbitTemplate;
 	
 	private Map<String,MessageHandler> map = new HashMap<>();
 		
@@ -51,11 +51,7 @@ public class MessageHandlerMap {
 	}
 	private MessageHandler getMessageHandler(String rabbitQueue, FieldResolver fieldResolver) {
 		MessageHandler messageHandler = null;
-//		if (rabbitTemplate != null) {
-			messageHandler = new MessageHandlerImpl(rabbitTemplate,rabbitQueue,fieldResolver);
-//		} else {
-//			messageHandler = new MessageHandlerMock(fieldResolver);
-//		}
+		messageHandler = new MessageHandlerImpl(rabbitTemplate,rabbitQueue,fieldResolver);
 		return messageHandler;
 	}
 	private void subscribe(EmpConnector connector, String thisTopic, MessageHandler thisMessageHandler) {

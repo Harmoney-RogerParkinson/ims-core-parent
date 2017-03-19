@@ -20,7 +20,6 @@ public class MessageHandlerMock implements com.harmoney.ims.core.messages.Messag
 	
     private static final Logger log = LoggerFactory.getLogger(MessageHandlerMock.class);
     private CountDownLatch latch = new CountDownLatch(1);
-	private String name;
 	private FieldResolver fieldResolver;
     
 	public MessageHandlerMock(FieldResolver fieldResolver) {
@@ -29,6 +28,7 @@ public class MessageHandlerMock implements com.harmoney.ims.core.messages.Messag
 	@Override
 	public void processMessage(Map<String, Object> message) {
 		log.debug("Received:\n{}", message);
+		@SuppressWarnings("unchecked")
 		Map<String,Object> sobject = (Map<String,Object>)message.get("sobject");
 		fieldResolver.resolve(sobject);
 		log.debug("sobject:\n {}",getSobject(sobject));

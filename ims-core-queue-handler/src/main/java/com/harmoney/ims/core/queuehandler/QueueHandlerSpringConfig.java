@@ -10,11 +10,11 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
@@ -39,13 +39,6 @@ public class QueueHandlerSpringConfig {
 	 public static String ILTQUEUE = "ilt-queue"; 
 	 public static String IFTQUEUE = "ift-queue"; 
 	 
-	 /**
-	 * Although the rabbitTemplate is not used here the only other place the
-	 * template is injected is a required=false (where false is okay for testing)
-	 * We seem to need to have a required=true here to force it to inject there.
-	 */
-	private @Autowired RabbitTemplate rabbitTemplate;
-
 	// needed for @PropertySource
 	@Bean
 	public static PropertySourcesPlaceholderConfigurer propertyConfigInProd() {
@@ -112,6 +105,7 @@ public class QueueHandlerSpringConfig {
 //	}
 
 	@Bean
+	@Profile({"queue-handler-dev","queue-handler-prod"})
 	RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
 		RabbitTemplate ret = new RabbitTemplate(connectionFactory);
 		ret.setExchange(exchangeName);

@@ -3,20 +3,19 @@ package com.harmoney.ims.core.messages;
 import static com.salesforce.emp.connector.LoginHelper.login;
 
 import java.net.URL;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.amqp.rabbit.core.RabbitTemplateMock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 import com.salesforce.emp.connector.BayeuxParameters;
@@ -73,6 +72,12 @@ public class MessageProcessorSpringConfig {
 			throw new MessageHandlerException("failed to start", e);
 		}
 		return connector;
+	}
+	@Bean
+	@Profile("message-processor-dev")
+	RabbitTemplate rabbitTemplate() {
+		RabbitTemplate ret = new RabbitTemplateMock();
+		return ret;
 	}
 
 }
