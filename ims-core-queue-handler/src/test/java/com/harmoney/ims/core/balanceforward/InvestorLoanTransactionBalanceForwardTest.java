@@ -2,47 +2,32 @@ package com.harmoney.ims.core.balanceforward;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.FileInputStream;
 import java.math.BigDecimal;
-import java.sql.CallableStatement;
-import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
-import org.dbunit.database.DatabaseConfig;
-import org.dbunit.database.DatabaseConnection;
-import org.dbunit.database.IDatabaseConnection;
-import org.dbunit.dataset.xml.FlatXmlDataSet;
-import org.dbunit.dataset.xml.FlatXmlProducer;
-import org.dbunit.ext.h2.H2DataTypeFactory;
-import org.dbunit.ext.postgresql.PostgresqlDataTypeFactory;
-import org.dbunit.operation.DatabaseOperation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.util.StringUtils;
-import org.xml.sax.InputSource;
 
 import com.harmoney.ims.core.database.DatabaseSpringConfig;
 import com.harmoney.ims.core.database.InvestorLoanTransactionDAO;
-import com.harmoney.ims.core.instances.InvestorFundTransaction;
+import com.harmoney.ims.core.databaseloader.DatabaseLoader;
+import com.harmoney.ims.core.databaseloader.DatabaseLoaderSpringConfig;
 import com.harmoney.ims.core.instances.InvestorLoanTransaction;
 import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
 import com.harmoney.ims.core.queries.QuerySpringConfig;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource("/BalanceForwardTest.properties")
-@ContextConfiguration(classes = { QuerySpringConfig.class, PartnerConnectionSpringConfig.class,DatabaseSpringConfig.class})
+@ContextConfiguration(classes = { QuerySpringConfig.class, PartnerConnectionSpringConfig.class,DatabaseLoaderSpringConfig.class,DatabaseSpringConfig.class})
 public class InvestorLoanTransactionBalanceForwardTest {
 
     private static final Logger log = LoggerFactory.getLogger(InvestorLoanTransactionBalanceForwardTest.class);

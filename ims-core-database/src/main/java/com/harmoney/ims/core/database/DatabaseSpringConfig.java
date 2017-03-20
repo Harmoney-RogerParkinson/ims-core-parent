@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -28,18 +29,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @ComponentScan("com.harmoney.ims.core.database")
 public class DatabaseSpringConfig {
 	
-	@Value("${database.dialect:org.hibernate.dialect.PostgreSQLDialect}")
-	public String dialect;
-	@Value("${database.datasource.class:org.postgresql.Driver}")
-	public String datasourceClass;
-	@Value("${database.url:jdbc:postgresql:imscore}")
-	public String datasourceURL;
-	@Value("${database.user:postgres}")
-	public String user;
-	@Value("${database.password:postgres}")
-	public String password;
-	@Value("${database.hbm2ddl.auto:}")
-	public String hbm2ddlAuto;
+	@Autowired ConfiguredDatabaseParameters configuredParameters;
 
 	// needed for @PropertySource
 	@Bean
@@ -50,10 +40,10 @@ public class DatabaseSpringConfig {
 	  public DataSource dataSource() {
 
 	    DriverManagerDataSource driver = new DriverManagerDataSource();
-	    driver.setDriverClassName(datasourceClass);
-	    driver.setUrl(datasourceURL);
-	    driver.setUsername(user);
-	    driver.setPassword(password);
+	    driver.setDriverClassName(configuredParameters.getDatasourceClass());
+	    driver.setUrl(configuredParameters.getDatasourceURL());
+	    driver.setUsername(configuredParameters.getUser());
+	    driver.setPassword(configuredParameters.getPassword());
 	    return driver;	  
 	  }
 
@@ -62,7 +52,7 @@ public class DatabaseSpringConfig {
 
 	    HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 	    vendorAdapter.setGenerateDdl(true);
-	    vendorAdapter.setDatabasePlatform(dialect);
+	    vendorAdapter.setDatabasePlatform(configuredParameters.getDialect());
 
 	    LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
 	    factory.setJpaVendorAdapter(vendorAdapter);
@@ -70,10 +60,10 @@ public class DatabaseSpringConfig {
 //	    factory.setPackagesToScan("com.harmoney.ims.core.instances");
 	    Properties jpaProperties = new Properties();
 //	    jpaProperties.put("hibernate.transaction.jta.platform", "nz.co.senanque.hibernate.SpringJtaPlatformAdapter");
-	    jpaProperties.put("hibernate.dialect", dialect);
+	    jpaProperties.put("hibernate.dialect", configuredParameters.getDialect());
 	    jpaProperties.put("hibernate.format_sql", true);
 	    jpaProperties.put("hibernate.connection.autocommit", false);
-	    jpaProperties.put("hibernate.hbm2ddl.auto", hbm2ddlAuto);
+	    jpaProperties.put("hibernate.hbm2ddl.auto", configuredParameters.getHbm2ddlAuto());
 	    factory.setJpaProperties(jpaProperties);
 	    return factory;
 	  }

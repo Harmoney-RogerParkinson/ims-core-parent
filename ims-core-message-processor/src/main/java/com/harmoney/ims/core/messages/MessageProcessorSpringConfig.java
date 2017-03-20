@@ -11,13 +11,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplateMock;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
+import com.harmoney.ims.core.partner.ConfiguredSalesforceParameters;
 import com.salesforce.emp.connector.BayeuxParameters;
 import com.salesforce.emp.connector.EmpConnector;
 
@@ -31,17 +32,8 @@ import com.salesforce.emp.connector.EmpConnector;
 @Configuration
 @ComponentScan("com.harmoney.ims.core.messages")
 public class MessageProcessorSpringConfig {
-
-	@Value("${salesforce.url}")
-	public String salesforceURL;
-	@Value("${salesforce.username}")
-	public String username;
-	@Value("${salesforce.password}")
-	public String password;
-	@Value("${salesforce.security.token}")
-	public String securityToken;
-	@Value("${salesforce.timeout:5}")
-	public long timeout;
+	
+	@Autowired ConfiguredSalesforceParameters configuredParameters;
 	
     private static final Logger log = LoggerFactory.getLogger(MessageProcessorSpringConfig.class);
 
@@ -57,16 +49,16 @@ public class MessageProcessorSpringConfig {
 
 		BayeuxParameters params = null;
 		try {
-			log.debug("starting login: {} {}",salesforceURL,username);
-			params = login(new URL(salesforceURL), username, password);
-			log.debug("login successful: {} {}",salesforceURL,username);
+			log.debug("starting login: {} {}",configuredParameters.getSalesforceURL(),configuredParameters.getUsername());
+			params = login(new URL(configuredParameters.getSalesforceURL()), configuredParameters.getUsername(), configuredParameters.getPassword());
+			log.debug("login successful: {} {}",configuredParameters.getSalesforceURL(),configuredParameters.getUsername());
 		} catch (Exception e) {
 			throw new MessageHandlerException("failed to login",e);
 		}
 		EmpConnector connector = new EmpConnector(params);
 
 		try {
-			connector.start().get(timeout, TimeUnit.SECONDS);
+			connector.start().get(configuredParameters.getTimeout(), TimeUnit.SECONDS);
 			log.debug("connector started");
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			throw new MessageHandlerException("failed to start", e);

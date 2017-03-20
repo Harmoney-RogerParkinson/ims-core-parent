@@ -10,7 +10,7 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -23,21 +23,9 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 @ComponentScan(value={"com.harmoney.ims.core.queuehandler","com.harmoney.ims.core.queueprocessor"})
 @PropertySource(value = { "classpath:test.properties" }, ignoreResourceNotFound = true)
 public class QueueHandlerSpringConfig {
+	
+	@Autowired ConfiguredQueueParameters configuredQueueParameters;
 
-	 @Value("${rabbitmq.host:localhost}")
-	 public String rabbitMQHost;
-	 @Value("${rabbitmq.vhost:harmoney}")
-	 public String rabbitMQvHost;
-	 @Value("${rabbitmq.port:31761}")
-	 public int rabbitmqPort;
-	 @Value("${rabbitmq.username:harmoney}")
-	 public String rabbitmqUsername;
-	 @Value("${rabbitmq.password:harmoney}")
-	 public String rabbitmqPassword;
-	 @Value("${rabbitmq.exchange:transaction-exchange}")
-	 public String exchangeName;
-	 public static String ILTQUEUE = "ilt-queue"; 
-	 public static String IFTQUEUE = "ift-queue"; 
 	 
 	// needed for @PropertySource
 	@Bean
@@ -51,10 +39,10 @@ public class QueueHandlerSpringConfig {
 	 */
 	@Bean(destroyMethod = "destroy")
 	public ConnectionFactory rabbitConnectionFactory() {
-	    CachingConnectionFactory factory = new CachingConnectionFactory(rabbitMQHost);
-	    factory.setUsername(rabbitmqUsername);
-	    factory.setPassword(rabbitmqPassword);
-	    factory.setVirtualHost(rabbitMQvHost);
+	    CachingConnectionFactory factory = new CachingConnectionFactory(configuredQueueParameters.getRabbitMQHost());
+	    factory.setUsername(configuredQueueParameters.getRabbitmqUsername());
+	    factory.setPassword(configuredQueueParameters.getRabbitmqPassword());
+	    factory.setVirtualHost(configuredQueueParameters.getRabbitMQvHost());
 
 	    return factory;
 	}
@@ -65,27 +53,27 @@ public class QueueHandlerSpringConfig {
 	}
 	@Bean
 	TopicExchange exchange() {
-		return new TopicExchange(exchangeName);
+		return new TopicExchange(configuredQueueParameters.getExchangeName());
 	}
 
 	@Bean
 	Queue iltqueue() {
-		return new Queue(ILTQUEUE, true);
+		return new Queue(ConfiguredQueueParameters.ILTQUEUE, true);
 	}
 
 	@Bean
 	Binding iltbinding(Queue iltqueue, TopicExchange exchange) {
-		return BindingBuilder.bind(iltqueue).to(exchange).with(ILTQUEUE);
+		return BindingBuilder.bind(iltqueue).to(exchange).with(ConfiguredQueueParameters.ILTQUEUE);
 	}
 
 	@Bean
 	Queue iftqueue() {
-		return new Queue(IFTQUEUE, true);
+		return new Queue(ConfiguredQueueParameters.IFTQUEUE, true);
 	}
 
 	@Bean
 	Binding iftbinding(Queue iftqueue, TopicExchange exchange) {
-		return BindingBuilder.bind(iftqueue).to(exchange).with(IFTQUEUE);
+		return BindingBuilder.bind(iftqueue).to(exchange).with(ConfiguredQueueParameters.IFTQUEUE);
 	}
 
 //	@Bean
@@ -108,7 +96,7 @@ public class QueueHandlerSpringConfig {
 	@Profile({"queue-handler-dev","queue-handler-prod"})
 	RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
 		RabbitTemplate ret = new RabbitTemplate(connectionFactory);
-		ret.setExchange(exchangeName);
+		ret.setExchange(configuredQueueParameters.getExchangeName());
 		return ret;
 	}
 

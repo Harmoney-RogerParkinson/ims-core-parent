@@ -35,6 +35,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.StringUtils;
 
+import com.harmoney.ims.core.database.ConfiguredDatabaseParameters;
 import com.harmoney.ims.core.database.DatabaseSpringConfig;
 import com.harmoney.ims.core.messages.MessageProcessorSpringConfig;
 import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
@@ -88,19 +89,18 @@ public class SuperServerIT {
 	@Autowired InvestmentOrderQuery investmentOrderquery;
 	@Autowired DataSource dataSource;
 	@Autowired RabbitReceiver rabbitReceiver;
+	@Autowired ConfiguredDatabaseParameters configuredParameters;
 	@Value("${com.harmoney.ims.core.server.test.SuperServerIT.transactionsOnly:false}")
 	private boolean transactionsOnly;
 	@Value("${com.harmoney.ims.core.server.test.SuperServerIT.saveData:/tmp/ims.xml}")
 	private String dbLocation;
-	@Value("${database.dialect}")
-	private String databaseDialect;
 
 	@Test
 	public void testEverythingFromSalesforce() throws Exception {
 		assertNotNull(empConnector);
 		
 		log.info("Transactions only: {}",transactionsOnly);
-		log.info("Database: {}",databaseDialect);
+		log.info("Database: {}",configuredParameters.getDialect());
 		CountDownLatch latch = null;
 		int iltCount = 0;
 		int iftCount = 0;
@@ -141,7 +141,7 @@ public class SuperServerIT {
 	}
 	
 	private void shutownDatabase() throws SQLException{
-        if (databaseDialect.equals("org.hibernate.dialect.H2Dialect")) {
+        if (configuredParameters.getDialect().equals("org.hibernate.dialect.H2Dialect")) {
         	dataSource.getConnection().createStatement().execute("SHUTDOWN");
         }
 	}
@@ -151,7 +151,7 @@ public class SuperServerIT {
 		IDatabaseConnection connection = new DatabaseConnection(jdbcCconnection);
 		DatabaseConfig dbConfig = connection.getConfig();
 		dbConfig.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new H2DataTypeFactory());
-        if (databaseDialect.equals("org.hibernate.dialect.PostgreSQLDialect")) {
+        if (configuredParameters.getDialect().equals("org.hibernate.dialect.PostgreSQLDialect")) {
     		dbConfig.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new PostgresqlDataTypeFactory());
         }
         IDataSet fullDataSet = connection.createDataSet();

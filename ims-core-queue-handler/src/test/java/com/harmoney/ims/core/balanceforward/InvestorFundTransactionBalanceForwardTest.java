@@ -19,13 +19,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.harmoney.ims.core.database.DatabaseSpringConfig;
 import com.harmoney.ims.core.database.InvestorFundTransactionDAO;
+import com.harmoney.ims.core.databaseloader.DatabaseLoader;
+import com.harmoney.ims.core.databaseloader.DatabaseLoaderSpringConfig;
 import com.harmoney.ims.core.instances.InvestorFundTransaction;
 import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
 import com.harmoney.ims.core.queries.QuerySpringConfig;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource("/BalanceForwardTest.properties")
-@ContextConfiguration(classes = { QuerySpringConfig.class, PartnerConnectionSpringConfig.class,DatabaseSpringConfig.class})
+@ContextConfiguration(classes = { QuerySpringConfig.class, PartnerConnectionSpringConfig.class,DatabaseLoaderSpringConfig.class,DatabaseSpringConfig.class})
 public class InvestorFundTransactionBalanceForwardTest {
 
     private static final Logger log = LoggerFactory.getLogger(InvestorFundTransactionBalanceForwardTest.class);

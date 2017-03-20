@@ -86,7 +86,7 @@ public class MessageSenderIT {
 		map2.put("Reversed__c", new Boolean(false));
 		map2.put("Rejected__c", new Boolean(false));
 		map2.put("transactionType", "ACTIVE");
-		rabbitTemplate.convertAndSend(QueueHandlerSpringConfig.ILTQUEUE, map);
+		rabbitTemplate.convertAndSend(ConfiguredQueueParameters.ILTQUEUE, map);
 		assertTrue("Did not reach expected count",
 				receiver.getLatch().await(100000, TimeUnit.MILLISECONDS));
 		context.close();

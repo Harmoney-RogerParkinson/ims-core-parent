@@ -13,6 +13,7 @@
 	<logger name="com.harmoney.ims.core.database.AbstractTransactionDAO" level="debug" />
 	<logger name="com.harmoney.ims.core.balanceforward" level="debug"/>
 	<logger name="com.harmoney.ims.core.database.AbstractDAO" level="debug" />
+	<logger name="com.harmoney.ims.core.databaseloader" level="debug" />
 	<logger name="com.harmoney.ims.core.database.InvestorLoanTransactionDAO" level="debug" />
 	<logger name="com.harmoney.ims" level="info" />
 	<root level="warn">

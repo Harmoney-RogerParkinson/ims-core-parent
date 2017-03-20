@@ -13,9 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.harmoney.ims.core.partner.ConfiguredSalesforceParameters;
 import com.salesforce.emp.connector.EmpConnector;
 
 /**
@@ -33,8 +33,8 @@ public class MessageHandlerMap {
 	
     private static final Logger log = LoggerFactory.getLogger(MessageHandlerMap.class);
 
-    @Value("${salesforce.replayFrom:-1}")
-	public long replayFrom;
+    @Autowired ConfiguredSalesforceParameters configuredParameters;
+
 	@Autowired private EmpConnector empConnector;
 	@Autowired private RabbitTemplate rabbitTemplate;
 	
@@ -59,9 +59,9 @@ public class MessageHandlerMap {
 			Consumer<Map<String, Object>> consumer = event -> {
 				thisMessageHandler.processMessage(event);
 				};
-			connector.subscribe(thisTopic, replayFrom,
+			connector.subscribe(thisTopic, configuredParameters.getReplayFrom(),
 					consumer).get(5, TimeUnit.SECONDS);
-			log.debug("subscription created: {} replayFrom {}",thisTopic, replayFrom);
+			log.debug("subscription created: {} replayFrom {}",thisTopic, configuredParameters.replayFrom);
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			throw new MessageHandlerException("failed to subscribe",e);
 		}

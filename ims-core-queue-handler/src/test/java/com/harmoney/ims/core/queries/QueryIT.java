@@ -5,12 +5,12 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.harmoney.ims.core.database.ConfiguredDatabaseParameters;
 import com.harmoney.ims.core.database.DatabaseSpringConfig;
 import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
 
@@ -26,22 +26,19 @@ public class QueryIT {
 	ConfigurableApplicationContext context;
 	@Autowired AccountQuery accountquery;
 	@Autowired InvestmentOrderQuery investmentOrderquery;
-    @Value("${database.hbm2ddl.auto:}")
-    private String hbm2ddlauto;
-	@Value("${database.dialect:org.hibernate.dialect.PostgreSQLDialect}")
-	private String databaseDialect;
+	@Autowired ConfiguredDatabaseParameters configuredParameters;
 
 	@Test
 	public void testAccountSummaryQuery() throws Exception {
 		
-		log.info("Database hbm2ddlauto={} database dialect {}",hbm2ddlauto,databaseDialect);
+		log.info("Database hbm2ddlauto={} database dialect {}",configuredParameters.getHbm2ddlAuto(),configuredParameters.getDialect());
 		accountquery.doQuery();
 	}
 
 	@Test
 	public void testInvestmentOrderQuery() throws Exception {
 		
-		log.info("Database hbm2ddlauto={} database dialect {}",hbm2ddlauto,databaseDialect);
+		log.info("Database hbm2ddlauto={} database dialect {}",configuredParameters.getHbm2ddlAuto(),configuredParameters.getDialect());
 		investmentOrderquery.doQuery();
 	}
 
