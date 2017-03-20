@@ -16,6 +16,10 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+			</plugin>
+			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<source>1.8</source>
@@ -37,7 +41,7 @@
 				<configuration>
 					<clearOutputDir>false</clearOutputDir>
 					<outputDirectory>target/generated/xjc</outputDirectory>
-					<schemaDirectory>WebContent/schemas</schemaDirectory>
+					<schemaDirectory>schemas</schemaDirectory>
 					<includeSchema>**/*.xsd</includeSchema>
 					<bindingDirectory>src/main/resources/bindings</bindingDirectory>
 					<enableIntrospection>false</enableIntrospection>
@@ -112,10 +116,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.ws</groupId>

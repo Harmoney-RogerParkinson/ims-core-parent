@@ -53,7 +53,7 @@ public class Scheduler {
 	 * at 01:00 AM using Pacific/Auckland time.
 	 */
 	@Scheduled(
-				cron="${com.harmoney.ims.core.server.web.Scheduler.balanceForward:0 0 1 1 1/1 ? *}",
+				cron="${com.harmoney.ims.core.server.web.Scheduler.balanceForward:0 0 1 1 1/1 ?}",
 				zone="${com.harmoney.ims.core.server.web.Scheduler.balanceForwardtz:Pacific/Auckland}"
 				)
 	@SchedulerLock(name = "scheduledBalanceForward")
