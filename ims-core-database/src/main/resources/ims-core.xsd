@@ -3,8 +3,8 @@
 	xmlns:hj="http://hyperjaxb3.jvnet.org/ejb/schemas/customizations"
 	xmlns:ims="http://annox.dev.java.net/com.harmoney.ims.core.annotations"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
-	xmlns:tns="http://www.harcurrency.com/ims-core" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
-	xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.harcurrency.com/ims-core"
+	xmlns:tns="http://www.harmoney.com/ims-core" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.harmoney.com/ims-core"
 	jaxb:version="2.0" jaxb:extensionBindingPrefixes="orm hj xjc annox"
 	elementFormDefault="qualified">
 	<xsd:annotation>
@@ -1067,5 +1067,55 @@
 			<fractionDigits value="2" />
 		</restriction>
 	</simpleType>
+
+	<xsd:element name="AccountRequest" >
+		<xsd:complexType>
+			<xsd:annotation>
+				<xsd:appinfo>
+					<hj:ignored/>
+				</xsd:appinfo>
+			</xsd:annotation>
+			<xsd:sequence>
+				<xsd:element name="harmoneyAccountNumber" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="AccountResponse">
+		<xsd:complexType>
+			<xsd:annotation>
+				<xsd:appinfo>
+					<hj:ignored/>
+				</xsd:appinfo>
+			</xsd:annotation>
+			<xsd:sequence>
+				<xsd:element name="Account" type="tns:Account" minOccurs="0" maxOccurs="1"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="InvestorLoanTransactionRequest">
+		<xsd:complexType>
+			<xsd:annotation>
+				<xsd:appinfo>
+					<hj:ignored/>
+				</xsd:appinfo>
+			</xsd:annotation>
+			<xsd:sequence>
+				<xsd:element name="queryDate" type="xsd:date"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="InvestorLoanTransactionResponse">
+		<xsd:complexType>
+			<xsd:annotation>
+				<xsd:appinfo>
+					<hj:ignored/>
+				</xsd:appinfo>
+			</xsd:annotation>
+			<xsd:sequence>
+				<xsd:element name="InvestorLoanTransaction" type="tns:InvestorLoanTransaction" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
 
 </schema>

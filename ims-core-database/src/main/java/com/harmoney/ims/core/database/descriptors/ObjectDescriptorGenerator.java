@@ -5,7 +5,6 @@ package com.harmoney.ims.core.database.descriptors;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
-import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -14,9 +13,7 @@ import org.apache.commons.beanutils.PropertyUtilsBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 
-import com.harmoney.ims.core.annotations.Negateable;
 import com.harmoney.ims.core.annotations.SalesforceName;
 
 /**
