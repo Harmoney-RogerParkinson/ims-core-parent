@@ -11,3 +11,5 @@ A second thread is created to read from the internal queue (created by the [Queu
 
 url (for the moment) is http://localhost:8080/ims-core-server/
 Displays a blank page with a title in the browser window title
+
+WSDL is at [http://localhost:8080/ims-core-server/endpoints/ims-core.wsdl](http://localhost:8080/ims-core-server/endpoints/ims-core.wsdl)

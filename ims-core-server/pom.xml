@@ -23,27 +23,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jaxb2-maven-plugin</artifactId>
-				<version>1.4</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>xjc</goal>
-						</goals>
-						<phase>generate-sources</phase>
-					</execution>
-				</executions>
-				<configuration>
-					<clearOutputDir>false</clearOutputDir>
-					<outputDirectory>target/generated/xjc</outputDirectory>
-					<schemaDirectory>WebContent/schemas</schemaDirectory>
-					<includeSchema>**/*.xsd</includeSchema>
-					<bindingDirectory>src/main/resources/bindings</bindingDirectory>
-					<enableIntrospection>false</enableIntrospection>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
 			</plugin>
