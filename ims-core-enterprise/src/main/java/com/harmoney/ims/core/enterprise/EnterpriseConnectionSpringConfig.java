@@ -31,8 +31,6 @@ public class EnterpriseConnectionSpringConfig {
 	public String password;
 	@Value("${salesforce.security.token}")
 	public String securityToken;
-	@Value("${salesforce.topic}")
-	public String topic;
 	@Value("${salesforce.replayFrom:-1}")
 	public long replayFrom;
 	@Value("${salesforce.timeout:5}")
