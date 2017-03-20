@@ -79,7 +79,7 @@ public class ConvertUtils
         {
             return null;
         }
-        return s_dateTimeFormat.format(c);
+        return s_dateTimeFormat.format(c.getTime());
     }
     public static final Date parseDateTime(String d)
     {

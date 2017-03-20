@@ -3,9 +3,11 @@
  */
 package com.harmoney.ims.core.database;
 
-import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -37,6 +39,18 @@ public abstract class AbstractTransactionDAO<T extends Transaction> extends Abst
 	private String byAccountIds;
 	private String byAccountdatebalancefwd;
 	private String byAccountdate;
+    /**
+     * A few nanoseconds before midnight, should be the last thing that happens that day.
+     * The database (actually the Calendar object) doesn't store precision more than 999000000, though Java default is 999999999
+     */
+    private static final LocalTime LAST_MOMENT = LocalTime.of(23, 59, 59, 999000000);
+    
+    public LocalDateTime getLastMomentOfLastMonth(LocalDate date) {
+    	return date.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()).atTime(LAST_MOMENT);
+    }
+    public LocalDateTime getLastMomentOfMonth(LocalDate date) {
+    	return date.with(TemporalAdjusters.lastDayOfMonth()).atTime(LAST_MOMENT);
+    }
 	
 	@Transactional
 	public boolean createReversal(T target, T oldRecord) {

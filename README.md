@@ -11,9 +11,10 @@ Consists of several projects that make up the ims core JEE server.
  Tricky stuff that needs testing/fixing:
 
  * Scheduled lock
- * W/S API
+ * W/S API (needs more testing, ie with actual data)
  * db indexes (need to index all records by API and probably Account by Harmoney customer number)
  * default.properties in ims-server project needs verifying/rationalising
+ * move to Harmoney repo
 
   
  

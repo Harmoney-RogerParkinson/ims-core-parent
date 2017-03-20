@@ -659,6 +659,9 @@
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
 							name="Account.all" query="select i from Account i">
 						</annox:annotate>
+						<annox:annotate annox:class="javax.persistence.NamedQuery"
+							name="Account.harmoneyAccountNumber" query="select i from Account i where i.harmoneyAccountNumber=:harmoneyAccountNumber">
+						</annox:annotate>
 					</annox:annotate>
 				</annox:annotate>
 			</xsd:appinfo>
@@ -865,7 +868,7 @@
 							name="InvestmentOrder.id" query="select i from InvestmentOrder i where i.id=:id">
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
-							name="InvestmentOrder.all" query="select i from InvestmentOrder i">
+							name="InvestmentOrder.all" query="select i from InvestmentOrder i order by createdDate">
 						</annox:annotate>
 					</annox:annotate>
 				</annox:annotate>
@@ -1102,6 +1105,7 @@
 			</xsd:annotation>
 			<xsd:sequence>
 				<xsd:element name="queryDate" type="xsd:date"/>
+				<xsd:element name="accountId" type="xsd:string"/>
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>
@@ -1114,6 +1118,60 @@
 			</xsd:annotation>
 			<xsd:sequence>
 				<xsd:element name="InvestorLoanTransaction" type="tns:InvestorLoanTransaction" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="InvestorFundTransactionRequest">
+		<xsd:complexType>
+			<xsd:annotation>
+				<xsd:appinfo>
+					<hj:ignored/>
+				</xsd:appinfo>
+			</xsd:annotation>
+			<xsd:sequence>
+				<xsd:element name="queryDate" type="xsd:date"/>
+				<xsd:element name="accountId" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="InvestorFundTransactionResponse">
+		<xsd:complexType>
+			<xsd:annotation>
+				<xsd:appinfo>
+					<hj:ignored/>
+				</xsd:appinfo>
+			</xsd:annotation>
+			<xsd:sequence>
+				<xsd:element name="InvestorFundTransaction" type="tns:InvestorFundTransaction" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="InvestmentOrderRequest">
+		<xsd:complexType>
+			<xsd:annotation>
+				<xsd:appinfo>
+					<hj:ignored/>
+				</xsd:appinfo>
+			</xsd:annotation>
+			<xsd:sequence>
+<!-- Seems to need no args? 			
+				<xsd:element name="queryDate" type="xsd:date"/>
+				<xsd:element name="accountId" type="xsd:string"/>
+ -->
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="InvestmentOrderResponse">
+		<xsd:complexType>
+			<xsd:annotation>
+				<xsd:appinfo>
+					<hj:ignored/>
+				</xsd:appinfo>
+			</xsd:annotation>
+			<xsd:sequence>
+				<xsd:element name="InvestmentOrder" type="tns:InvestmentOrder" minOccurs="0" maxOccurs="unbounded"/>
 			</xsd:sequence>
 		</xsd:complexType>
 	</xsd:element>

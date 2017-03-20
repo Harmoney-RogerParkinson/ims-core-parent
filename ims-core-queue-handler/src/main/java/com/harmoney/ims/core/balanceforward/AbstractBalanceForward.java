@@ -2,8 +2,6 @@ package com.harmoney.ims.core.balanceforward;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -14,11 +12,6 @@ import com.harmoney.ims.core.database.AbstractTransactionDAO;
 abstract class AbstractBalanceForward {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractBalanceForward.class);
-    /**
-     * A few nanoseconds before midnight, should be the last thing that happens that day.
-     * The database (actually the Calendar object) doesn't store precision more than 999000000, though Java default is 999999999
-     */
-    private static final LocalTime LAST_MOMENT = LocalTime.of(23, 59, 59, 999000000);
 
 	public boolean testMode;
     /**
@@ -30,10 +23,10 @@ abstract class AbstractBalanceForward {
      * @return BalanceForwardDTO
      */
     public BalanceForwardDTO processBalanceForward(LocalDate date) {
+
+    	LocalDateTime lastMomentOfLastMonth = getDAO().getLastMomentOfLastMonth(date);
+    	LocalDateTime lastMomentOfMonth = getDAO().getLastMomentOfMonth(date);
     	
-    	LocalDateTime lastMomentOfLastMonth = date.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()).atTime(LAST_MOMENT);   	 
-    	LocalDateTime lastMomentOfMonth = date.with(TemporalAdjusters.lastDayOfMonth()).atTime(LAST_MOMENT);
-   	
     	List<String> accountIds = getDAO().getAccountIds(lastMomentOfLastMonth,lastMomentOfMonth);
     	BalanceForwardDTO ret = new BalanceForwardDTO(lastMomentOfLastMonth,lastMomentOfMonth,accountIds);
 
@@ -56,4 +49,5 @@ abstract class AbstractBalanceForward {
 	public void setTestMode(boolean testMode) {
 		this.testMode = testMode;
 	}
+	
 }
