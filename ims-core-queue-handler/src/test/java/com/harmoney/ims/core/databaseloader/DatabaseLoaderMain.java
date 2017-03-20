@@ -18,7 +18,7 @@ import com.harmoney.ims.core.database.DatabaseSpringConfig;
  */
 public class DatabaseLoaderMain {
 	
-    private static final String dbLocation = "balanceforward.xml";
+    private static final String dbLocation = "full.xml";
 
 	
 	public static void main(String[] args) throws Exception {
