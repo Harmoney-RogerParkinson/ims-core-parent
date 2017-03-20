@@ -185,8 +185,8 @@ public abstract class AbstractTransactionDAO<T extends Transaction> extends Abst
     public int processBalanceForward(LocalDateTime start, LocalDateTime end, String accountId) {
     	
     	// The db calls still need to use the old Dates
-    	Date startDate = Date.from(start.atZone(ZoneId.systemDefault()).toInstant());
-    	Date endDate = Date.from(end.atZone(ZoneId.systemDefault()).toInstant());
+//    	Date startDate = Date.from(start.atZone(ZoneId.systemDefault()).toInstant());
+//    	Date endDate = Date.from(end.atZone(ZoneId.systemDefault()).toInstant());
     	Calendar endTimestamp = ConvertUtils.convertToCalendar(end);
     	
     	// the balfwdlist has the balance forward records already created for this
@@ -206,7 +206,7 @@ public abstract class AbstractTransactionDAO<T extends Transaction> extends Abst
     	if (balFwdCount == 0) {
     		// If there were no balance forward records we have to go back to the beginning of time
     		// and sum all the transactions.
-    		startDate = new Date(0L);
+    		start = LocalDateTime.of(1970, 1, 1, 0, 0);
     		accumulating = true;
     	}
     	if (balFwdCount == 1) {
@@ -222,17 +222,17 @@ public abstract class AbstractTransactionDAO<T extends Transaction> extends Abst
     			// it was the last one. Fake finding the first one
     			// and make it look like we found 2 and search from the beginning of time.
     			accumulating = true;
-    			startDate = new Date(0L);
+    			start = LocalDateTime.of(1970, 1, 1, 0, 0);;
     		} else {
     			// we have a screw up
     			// The best we can do is assume we have none
     			accumulating = true;
-    			startDate = new Date(0L);
+    			start = LocalDateTime.of(1970, 1, 1, 0, 0);
     		}
     	}
     	
     	List<T> list = getByAccountDate(start,end,accountId);
-    	log.debug("Starting account scan: startDate {} accumulating {} size {}",startDate,accumulating,list.size());
+    	log.debug("Starting account scan: startDate {} accumulating {} size {}",start,accumulating,list.size());
 
     	T secondBalfwd = null;
     	// sum all the summable things into the totals object
