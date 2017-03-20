@@ -6,7 +6,7 @@
 			<pattern>%-20(%d{HH:mm:ss.SSS} [%thread]) %-5level %logger{35} - %F:%L %msg%n</pattern>
 		</encoder>
 	</appender>
-	<logger name="com.harmoney.ims" level="warn" />
+	<logger name="com.harmoney.ims" level="info" />
 <!-- 	<logger name="org.springframework.ws" level="debug" /> -->
 	
 	<root level="warn">

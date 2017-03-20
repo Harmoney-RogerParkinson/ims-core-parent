@@ -45,11 +45,8 @@ public class PartnerConnectionSpringConfig {
 		connection = new PartnerConnection(config);
 
 		// display some current settings
-		log.info("Auth EndPoint:{}",config.getAuthEndpoint());
-		log.info("Service EndPoint: {}", config.getServiceEndpoint());
-		log.info("Username: {}", config.getUsername());
-		log.info("SessionId: {}", config.getSessionId());
-		log.info("Service endpoint: {}",config.getServiceEndpoint());
+		log.info("Salesforce Connection:\nAuth EndPoint: {}\nService EndPoint: {}\nUsername: {}\nSessionId: {}",
+				config.getAuthEndpoint(),config.getServiceEndpoint(),config.getUsername(),config.getSessionId());
 		return connection;
 	}
 
