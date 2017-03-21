@@ -47,7 +47,7 @@
 
 				<hj:entity>
 					<orm:inheritance strategy="SINGLE_TABLE" />
-					<orm:discriminator-column name="txType"
+					<orm:discriminator-column name="txClass"
 						discriminator-type="STRING" />
 				</hj:entity>
 			</xsd:appinfo>

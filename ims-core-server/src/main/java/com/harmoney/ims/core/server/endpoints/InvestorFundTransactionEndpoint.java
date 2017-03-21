@@ -13,6 +13,7 @@ import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
+import com.harmoney.ims.core.database.ConvertUtils;
 import com.harmoney.ims.core.database.InvestorFundTransactionDAO;
 import com.harmoney.ims.core.instances.InvestorFundTransaction;
 import com.harmoney.ims.core.instances.InvestorFundTransactionRequest;
@@ -40,7 +41,7 @@ public class InvestorFundTransactionEndpoint
     	List<InvestorFundTransaction> ret = investorFundTransactionDAO.getByAccountDate(lastMomentOfLastMonth, lastMomentOfMonth, request.getAccountId());
     	if (ret.size() > 0) {
     		Transaction lastRecord = ret.get(ret.size()-1);
-    		if (lastRecord.getCreatedDate().equals(lastMomentOfMonth) && lastRecord.getTxType() == ItemType.BALANCE_FORWARD) {
+    		if (ConvertUtils.convertTolocalDateTime(lastRecord.getCreatedDate()).equals(lastMomentOfMonth) && lastRecord.getTxType() == ItemType.BALANCE_FORWARD) {
     			ret.remove(lastRecord);
     		}
     	}

@@ -69,13 +69,13 @@ public class DatabaseLoader {
 	}
 	
 	public void calculateBalanceForward() {
-		LocalDate period1 = LocalDate.of(2017, 2, 15);
-		LocalDate period2 = LocalDate.of(2017, 3, 15);
 
-		investorLoanTransactionBalanceForward.processBalanceForward(period1);
-		investorFundTransactionBalanceForward.processBalanceForward(period1);
-		investorLoanTransactionBalanceForward.processBalanceForward(period2);
-		investorFundTransactionBalanceForward.processBalanceForward(period2);
+		investorFundTransactionBalanceForward.processBalanceForward(LocalDate.of(2017, 2, 15));
+		investorFundTransactionBalanceForward.processBalanceForward(LocalDate.of(2017, 3, 15));
+
+		investorLoanTransactionBalanceForward.processBalanceForward(LocalDate.of(2016, 7, 15));
+		investorLoanTransactionBalanceForward.processBalanceForward(LocalDate.of(2016, 8, 15));
+		investorLoanTransactionBalanceForward.processBalanceForward(LocalDate.of(2016, 9, 15));
 		
 	}
 }
