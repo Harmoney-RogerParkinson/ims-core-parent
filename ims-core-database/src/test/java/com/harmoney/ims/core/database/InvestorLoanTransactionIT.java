@@ -12,11 +12,8 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
@@ -39,9 +36,6 @@ import com.harmoney.ims.core.instances.InvestorLoanTransaction;
 @Rollback // rollback all db changes
 public class InvestorLoanTransactionIT {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(InvestorLoanTransactionIT.class);
-	
 	@Autowired private InvestorLoanTransactionDAO investorLoanTransactionDAO;
 //	private Timestamp today = Timestamp.valueOf(LocalDateTime.of(LocalDate.of(2017, 2, 23), LocalTime.MIDNIGHT));
 	private Calendar today = ConvertUtils.convertToCalendar(LocalDateTime.of(LocalDate.of(2017, 2, 23), LocalTime.MIDNIGHT));

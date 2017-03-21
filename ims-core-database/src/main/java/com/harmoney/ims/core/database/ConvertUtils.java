@@ -159,8 +159,6 @@ public class ConvertUtils
 		GregorianCalendar calendar = new GregorianCalendar();
 		Timestamp ts = Timestamp.valueOf(localDateTime);
 		calendar.setTimeInMillis(ts.getTime());
-		ts = new Timestamp(calendar.getTimeInMillis());
-		String s = ts.toString();
 		return calendar;
 
     }

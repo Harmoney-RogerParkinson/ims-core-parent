@@ -2,7 +2,6 @@ package com.harmoney.ims.core.database.descriptors;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;

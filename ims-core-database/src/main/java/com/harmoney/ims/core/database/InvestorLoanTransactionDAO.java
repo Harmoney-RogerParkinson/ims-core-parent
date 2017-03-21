@@ -16,7 +16,5 @@ import com.harmoney.ims.core.instances.InvestorLoanTransaction;
 @Repository
 public class InvestorLoanTransactionDAO  extends AbstractTransactionDAO<InvestorLoanTransaction>{
 	
-	private static final Logger log = LoggerFactory.getLogger(InvestorLoanTransactionDAO.class);
-
 
 }

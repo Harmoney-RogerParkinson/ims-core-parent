@@ -40,7 +40,7 @@
 							name="TX.id" query="select i from Transaction i where i.id=:id">
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
-							name="TX.all" query="select i from Transaction i">
+							name="TX.all" query="select i from Transaction i order by createdDate">
 						</annox:annotate>
 					</annox:annotate>
 				</annox:annotate>

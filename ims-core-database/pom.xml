@@ -198,7 +198,7 @@ variant = jpa2 that works, except by using the custom plugin
 			</executions>
 			<configuration>
 				<persistenceFile>${basedir}/target/generated-sources/xjc/META-INF/persistence.xml</persistenceFile>
-				<persistenceUnit>com.harmoney.ims.core.instancesw</persistenceUnit>
+				<persistenceUnit>com.harmoney.ims.core.instances</persistenceUnit>
 				<dialect>org.hibernate.dialect.PostgreSQLDialect</dialect>
 				<drops>false</drops>
 			</configuration>
