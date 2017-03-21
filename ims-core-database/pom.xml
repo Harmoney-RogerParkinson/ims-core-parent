@@ -131,11 +131,11 @@
 			<configuration>
 				<variant>jpa2</variant>
 				<extension>true</extension>
-		                <args>
-		                    <arg>-extension</arg>
-		                    <arg>-XtoString</arg>
-		                    <arg>-Xannotate</arg>
-		                </args>
+	                <args>
+	                    <arg>-extension</arg>
+	                    <arg>-XtoString</arg>
+	                    <arg>-Xannotate</arg>
+	                </args>
 			</configuration>
 		</plugin>
 <!-- 

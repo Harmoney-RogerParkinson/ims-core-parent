@@ -20,7 +20,7 @@
 				<jaxb:javaType name="java.util.Date" xmlType="xsd:date"
 					parseMethod="com.harmoney.ims.core.database.ConvertUtils.parseDate"
 					printMethod="com.harmoney.ims.core.database.ConvertUtils.printDate" />
-				<xjc:serializable />
+				<xjc:serializable uid="100"/>
 			</jaxb:globalBindings>
 			<jaxb:schemaBindings>
 				<jaxb:package name="com.harmoney.ims.core.instances" />
