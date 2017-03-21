@@ -10,11 +10,9 @@ Consists of several projects that make up the ims core JEE server.
  
  Tricky stuff that needs testing/fixing:
 
- * Scheduled lock
- * W/S API (needs more testing, ie with actual data)
- * db indexes (need to index all records by API and probably Account by Harmoney customer number)
- * default.properties in ims-server project needs verifying/rationalising
  * move to Harmoney repo
+ * in a multi server environment we want just one server to subscribe to the pushTopic, if that server goes down another should pick it up. This is working for the scheduled queries, but not yet added for the subscribers.
+ * possibly simplify the xsd to have the named queries outside it, other stuff too? The issue is that we have too much in the wsdl file which is generated from the xsd. Not sure that splitting them would actually help. Need to try it. 
 
   
  
