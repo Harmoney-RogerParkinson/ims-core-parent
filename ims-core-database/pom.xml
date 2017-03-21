@@ -108,6 +108,13 @@
 				</includes>
 				<filtering>false</filtering>
 			</resource>
+			<resource>
+				<directory>${basedir}/target/generated-sources/xjc/</directory>
+				<includes>
+					<include>**/*.xsd</include>
+				</includes>
+				<filtering>false</filtering>
+			</resource>
 		</resources>
   	<plugins>
 
@@ -129,6 +136,7 @@
 				</execution>
 			</executions>
 			<configuration>
+				<schemaDirectory>${basedir}/schema</schemaDirectory>
 				<variant>jpa2</variant>
 				<extension>true</extension>
 	                <args>
@@ -211,7 +219,27 @@ variant = jpa2 that works, except by using the custom plugin
 				</dependency>
 			</dependencies>
 		</plugin>
-
+		<plugin>
+			<groupId>org.codehaus.mojo</groupId>
+			<artifactId>xml-maven-plugin</artifactId>
+			<version>1.0.1</version>
+			<executions>
+				<execution>
+					<goals>
+						<goal>transform</goal>
+					</goals>
+				</execution>
+			</executions>
+			<configuration>
+				<transformationSets>
+					<transformationSet>
+						<dir>${basedir}/schema</dir>
+						<stylesheet>file://${basedir}/ims-core.xsl</stylesheet>
+						<outputDir>${project.build.directory}/generated-sources/xjc</outputDir>
+					</transformationSet>
+				</transformationSets>
+			</configuration>
+		</plugin>
   	</plugins>
   	<pluginManagement>
   		<plugins>
@@ -256,6 +284,25 @@ variant = jpa2 that works, except by using the custom plugin
   									<goals>
   										<goal>run</goal>
   										<goal>hbm2ddl</goal>
+  									</goals>
+  								</pluginExecutionFilter>
+  								<action>
+  									<ignore></ignore>
+  								</action>
+  							</pluginExecution>
+  							<pluginExecution>
+  								<pluginExecutionFilter>
+  									<groupId>
+  										org.codehaus.mojo
+  									</groupId>
+  									<artifactId>
+  										xml-maven-plugin
+  									</artifactId>
+  									<versionRange>
+  										[1.0.1,)
+  									</versionRange>
+  									<goals>
+  										<goal>transform</goal>
   									</goals>
   								</pluginExecutionFilter>
   								<action>

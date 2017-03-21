@@ -12,7 +12,7 @@ Consists of several projects that make up the ims core JEE server.
 
  * move to Harmoney repo
  * in a multi server environment we want just one server to subscribe to the pushTopic, if that server goes down another should pick it up. This is working for the scheduled queries, but not yet added for the subscribers.
- * possibly simplify the xsd to have the named queries outside it, other stuff too? The issue is that we have too much in the wsdl file which is generated from the xsd. Not sure that splitting them would actually help. Need to try it. 
+ * If they want to adjust/add/remove old transactions we need to run the balance forward process on the relevant accounts/periods (including all periods from that period to the present). This is not catered for yet. 
 
   
  
