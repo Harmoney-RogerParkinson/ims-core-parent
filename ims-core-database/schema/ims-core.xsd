@@ -1039,6 +1039,132 @@
 			</element>
 		</xsd:sequence>
 	</complexType>
+	<complexType name="AmortizationSchedule">
+		<xsd:annotation>
+			<documentation>loan__Repayment_Schedule__c	
+			</documentation>
+			<xsd:appinfo>
+				<annox:annotate>
+					<ims:SalesforceName tableName="loan__Repayment_Schedule__c	" />
+				</annox:annotate>
+				<annox:annotate>
+					<annox:annotate annox:class="javax.persistence.NamedQueries">
+						<annox:annotate annox:class="javax.persistence.NamedQuery"
+							name="AmortizationSchedule.imsid" query="select i from AmortizationSchedule i where i.imsid=:imsid">
+						</annox:annotate>
+						<annox:annotate annox:class="javax.persistence.NamedQuery"
+							name="AmortizationSchedule.id" query="select i from AmortizationSchedule i where i.id=:id">
+						</annox:annotate>
+						<annox:annotate annox:class="javax.persistence.NamedQuery"
+							name="AmortizationSchedule.all" query="select i from AmortizationSchedule i">
+						</annox:annotate>
+					</annox:annotate>
+				</annox:annotate>
+			</xsd:appinfo>
+		</xsd:annotation>
+		<xsd:sequence>
+			<element name="imsid" type="long">
+				<xsd:annotation>
+					<xsd:appinfo>
+						<hj:id>
+							<orm:generated-value strategy="AUTO" />
+						</hj:id>
+					</xsd:appinfo>
+				</xsd:annotation>
+			</element>
+			<element name="id" type="string">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Id" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="name" type="string">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Name" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="version" type="long">
+				<annotation>
+					<appinfo>
+						<hj:version />
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="accountId" type="string">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="loan__Loan_Account__c" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="TransactionAmount" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="loan__Transaction_Amount__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="ProtectRealised" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Protect_Realised__c" />
+							<ims:Negateable />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+		</xsd:sequence>
+	</complexType>
+	<complexType name="ProtectRealised">
+		<xsd:annotation>
+			<xsd:appinfo>
+				<annox:annotate>
+					<annox:annotate annox:class="javax.persistence.NamedQueries">
+						<annox:annotate annox:class="javax.persistence.NamedQuery"
+							name="ProtectRealised.imsid" query="select i from ProtectRealised i where i.imsid=:imsid">
+						</annox:annotate>
+						<annox:annotate annox:class="javax.persistence.NamedQuery"
+							name="ProtectRealised.all" query="select i from ProtectRealised i">
+						</annox:annotate>
+					</annox:annotate>
+				</annox:annotate>
+			</xsd:appinfo>
+		</xsd:annotation>
+		<xsd:sequence>
+			<element name="imsid" type="long">
+				<xsd:annotation>
+					<xsd:appinfo>
+						<hj:id>
+							<orm:generated-value strategy="AUTO" />
+						</hj:id>
+					</xsd:appinfo>
+				</xsd:annotation>
+			</element>
+			<element name="version" type="long">
+				<annotation>
+					<appinfo>
+						<hj:version />
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="investmentOrderId" type="long"/>
+			<element name="ProtectRealised" type="tns:currency"/>
+			<!-- more fields to come -->
+		</xsd:sequence>
+	</complexType>
 	<xsd:simpleType name="ItemType">
 		<xsd:restriction base="xsd:string">
 			<xsd:enumeration value="Interest" />

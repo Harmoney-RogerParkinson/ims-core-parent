@@ -22,32 +22,8 @@ import com.sforce.soap.partner.sobject.SObject;
  *
  */
 @Repository
-public class AccountDAO extends AbstractDAO<Account>{
+public class AccountDAO extends AbstractSimpleDAO<Account>{
 	
-	@Autowired UnpackHelper unpackHelper;
-
-	@Transactional
-	public Result createOrUpdate(SObject sobject) {
-		LocalDateTime lastModifiedDate = LocalDateTime.now();
-		
-		String id = (String)sobject.getField("Id");
-		Account account = getById(id);
-		Calendar calendar = ConvertUtils.convertToCalendar(lastModifiedDate);
-
-		Result result = null;
-		if (account == null) {
-			// new record
-			account = new Account();
-			result = unpackHelper.unpack(sobject, account,objectDescriptor);
-			account.setLastModifiedDate(calendar);
-			entityManager.persist(account);
-		} else {
-			result = unpackHelper.unpack(sobject, account,objectDescriptor);
-			account.setLastModifiedDate(calendar);
-		}
-		entityManager.flush();
-		return result;
-	}
 	@Override
 	protected void localInit() {
 	}
@@ -57,5 +33,12 @@ public class AccountDAO extends AbstractDAO<Account>{
 				  entityManager.createNamedQuery("Account.harmoneyAccountNumber", Account.class);
 		query.setParameter("harmoneyAccountNumber", harmoneyAccountNumber);
 		return query.getSingleResult();
+	}
+
+	@Override
+	protected void fieldUpdates(Account object) {
+		LocalDateTime lastModifiedDate = LocalDateTime.now();
+		Calendar calendar = ConvertUtils.convertToCalendar(lastModifiedDate);
+		object.setLastModifiedDate(calendar);
 	}
 }
