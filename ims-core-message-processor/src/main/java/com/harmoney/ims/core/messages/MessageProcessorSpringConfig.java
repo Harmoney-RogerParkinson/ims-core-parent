@@ -51,7 +51,7 @@ public class MessageProcessorSpringConfig {
 		try {
 			log.debug("starting login: {} {}",configuredParameters.getSalesforceURL(),configuredParameters.getUsername());
 			params = login(new URL(configuredParameters.getSalesforceURL()), configuredParameters.getUsername(), configuredParameters.getPassword());
-			log.debug("login successful: {} {}",configuredParameters.getSalesforceURL(),configuredParameters.getUsername());
+			log.info("login successful: {} {}",configuredParameters.getSalesforceURL(),configuredParameters.getUsername());
 		} catch (Exception e) {
 			throw new MessageHandlerException("failed to login",e);
 		}

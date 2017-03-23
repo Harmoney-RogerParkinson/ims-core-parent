@@ -38,6 +38,7 @@ public class PartnerConnectionSpringConfig {
 	public PartnerConnection partnerConnection() throws ConnectionException {
 
 		PartnerConnection connection = null;
+		log.info("Salesforce Connection...");
 		ConnectorConfig config = new ConnectorConfig();
 		config.setUsername(configuredParameters.getUsername());
 		config.setPassword(configuredParameters.getPassword());
