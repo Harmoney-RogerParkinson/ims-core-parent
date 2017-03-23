@@ -1,6 +1,7 @@
 package com.harmoney.ims.core.messages;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -28,12 +29,10 @@ import com.salesforce.emp.connector.EmpConnector;
 @Component
 public class MessageHandlerMap {
 	
-	public static final String ILTIMS = "/topic/ILTIMS";
-	public static final String IFTIMS = "/topic/IFTIMS";
-	
     private static final Logger log = LoggerFactory.getLogger(MessageHandlerMap.class);
 
     @Autowired ConfiguredSalesforceParameters configuredParameters;
+    @Autowired List<MessageConfigurationEntry> messageConfiguration;
 
 	@Autowired private EmpConnector empConnector;
 	@Autowired private RabbitTemplate rabbitTemplate;
@@ -45,9 +44,10 @@ public class MessageHandlerMap {
 	}
 	@PostConstruct
 	public void init() {
-		subscribe(empConnector,ILTIMS,getMessageHandler("ilt-queue",new FieldResolverILT()));
-		subscribe(empConnector,IFTIMS,getMessageHandler("ift-queue",new FieldResolverIFT()));
-
+		for (MessageConfigurationEntry messageConfigurationEntry: messageConfiguration) {
+			subscribe(empConnector,messageConfigurationEntry.getPushTopic(),
+					getMessageHandler(messageConfigurationEntry.getRabbitQueue(),messageConfigurationEntry.getFieldResolver()));
+		}
 	}
 	private MessageHandler getMessageHandler(String rabbitQueue, FieldResolver fieldResolver) {
 		MessageHandler messageHandler = null;

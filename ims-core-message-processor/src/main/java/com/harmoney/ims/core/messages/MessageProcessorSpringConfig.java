@@ -3,6 +3,8 @@ package com.harmoney.ims.core.messages;
 import static com.salesforce.emp.connector.LoginHelper.login;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -71,5 +73,19 @@ public class MessageProcessorSpringConfig {
 		RabbitTemplate ret = new RabbitTemplateMock();
 		return ret;
 	}
+	
+	/**
+	 * The queueing handlers are defined here, including the mapping between pushtopics and rabbit queues.
+	 * There is also an optional field resolver class.
+	 * @return
+	 */
+	@Bean
+	List<MessageConfigurationEntry> getMessageConfiguration() {
+		List<MessageConfigurationEntry> ret = new ArrayList<>();
+		ret.add(new MessageConfigurationEntry("/topic/ILTIMS","ilt-queue",new FieldResolverILT()));
+		ret.add(new MessageConfigurationEntry("/topic/IFTIMS","ift-queue"));
+		return ret;
+	}
+	
 
 }

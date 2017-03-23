@@ -60,7 +60,7 @@ public class ILTMessagingIT {
 	@Test
 	public void testSubscription() throws ConnectionException, InterruptedException {
 		assertNotNull(empConnector);
-		MessageHandler messageHandler = messageHandlerMap.getMessageHandler(MessageHandlerMap.ILTIMS);
+		MessageHandler messageHandler = messageHandlerMap.getMessageHandler("/topic/ILTIMS");
 		int saved = updateInvestorLoanTransaction();
 		CountDownLatch latch = new CountDownLatch(saved);
 		messageHandler.setLatch(latch);

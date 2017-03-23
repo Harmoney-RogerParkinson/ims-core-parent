@@ -59,7 +59,7 @@ public class IFTMessagingIT {
 	@Test
 	public void testSubscription() throws ConnectionException, InterruptedException {
 		assertNotNull(empConnector);
-		MessageHandler messageHandler = messageHandlerMap.getMessageHandler(MessageHandlerMap.IFTIMS);
+		MessageHandler messageHandler = messageHandlerMap.getMessageHandler("/topic/IFTIMS");
 		int saved = updateInvestorLoanTransaction();
 		CountDownLatch latch = new CountDownLatch(saved);
 		messageHandler.setLatch(latch);
