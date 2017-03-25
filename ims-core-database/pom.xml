@@ -95,62 +95,15 @@
   <build>
  		<resources>
 			<resource>
-				<directory>${basedir}/target/generated-sources/xjc/META-INF</directory>
-				<includes>
-					<include>**/*.xml</include>
-				</includes>
-				<filtering>false</filtering>
-			</resource>
-			<resource>
-				<directory>${basedir}/src/main/resources</directory>
-				<includes>
-					<include>**/*.xsd</include>
-				</includes>
-				<filtering>false</filtering>
-			</resource>
-			<resource>
 				<directory>${basedir}/target/generated-sources/xjc/</directory>
 				<includes>
 					<include>**/*.xsd</include>
+					<include>**/*.xml</include>
 				</includes>
 				<filtering>false</filtering>
 			</resource>
 		</resources>
   	<plugins>
-
-		<plugin>
-			<groupId>org.jvnet.hyperjaxb3</groupId>
-			<artifactId>maven-hyperjaxb3-plugin</artifactId>
-		    <dependencies>
-				<dependency>
-					<groupId>com.harmoney</groupId>
-					<artifactId>ims-core-partner</artifactId>
-					<version>${project.version}</version>
-				</dependency>
- 		    </dependencies>
-			<executions>
-				<execution>
-					<goals>
-						<goal>generate</goal>
-					</goals>
-				</execution>
-			</executions>
-			<configuration>
-				<schemaDirectory>${basedir}/schema</schemaDirectory>
-				<variant>jpa2</variant>
-				<extension>true</extension>
-	                <args>
-	                    <arg>-extension</arg>
-	                    <arg>-XtoString</arg>
-	                    <arg>-Xannotate</arg>
-	                </args>
-			</configuration>
-		</plugin>
-<!-- 
-The preferred approach is to use the hyperjaxb3 as a jaxb plugin rather than use this
-plugin (from a comment by Lexi, the author), but I haven't seen a way to specify
-variant = jpa2 that works, except by using the custom plugin
- 
 		<plugin>
 		    <groupId>org.jvnet.jaxb2.maven2</groupId>
 		    <artifactId>maven-jaxb2-plugin</artifactId>
@@ -168,9 +121,11 @@ variant = jpa2 that works, except by using the custom plugin
 		            </goals>
 		            <configuration>
 		                <extension>true</extension>
+		                <schemaDirectory>${basedir}/schema</schemaDirectory>
 		                <schemaIncludes>
 		                    <include>ims-core.xsd</include>
 		                </schemaIncludes>
+		                <generateDirectory>${basedir}/target/generated-sources/xjc</generateDirectory>
 		                <removeOldOutput>true</removeOldOutput>
 		                <verbose>true</verbose>
 		                <args>
@@ -179,13 +134,13 @@ variant = jpa2 that works, except by using the custom plugin
 		                    <arg>-XtoString</arg>
 		                    <arg>-Xannotate</arg>
 		                    <arg>-XhashCode</arg>
- 		                    <arg>-Xhyperjaxb3-ejb</arg>
+ 		                    <arg>-Xhyperjaxb3-jpa2</arg>
 		                </args>
 		            </configuration>
 		        </execution>
 		    </executions>
 		</plugin>
--->
+
 		<plugin>
 		  <groupId>org.apache.maven.plugins</groupId>
 		  <artifactId>maven-failsafe-plugin</artifactId>
