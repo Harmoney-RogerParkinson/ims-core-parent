@@ -6,9 +6,8 @@ package com.harmoney.ims.core.queries;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.harmoney.ims.core.queueprocessor.AccountProcessor;
-import com.sforce.soap.partner.PartnerConnection;
-import com.sforce.soap.partner.QueryResult;
+import com.harmoney.ims.core.queueprocessor.BillProcessor;
+import com.harmoney.ims.core.queueprocessor.PartnerConnectionWrapper;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 
@@ -19,8 +18,8 @@ import com.sforce.ws.ConnectionException;
 @Component
 public class BillQuery {
 	
-	@Autowired private PartnerConnection partnerConnection;
-	@Autowired private AccountProcessor accountSummaryProcessor;
+	@Autowired private PartnerConnectionWrapper partnerConnection;
+	@Autowired private BillProcessor processor;
 	
 	public int doQuery() throws ConnectionException {
 		String queryString = "SELECT  Id,Name,loan__Loan_Account__c, loan__Transaction_Date__c, "
@@ -28,9 +27,8 @@ public class BillQuery {
 				+ "loan__waiver_applied__c "
 				+ "FROM loan__Loan_account_Due_Details__c";
 
-		QueryResult qr = partnerConnection.query(queryString);
-		SObject[] records = qr.getRecords();
-		accountSummaryProcessor.processQuery(records);
+		SObject[] records = partnerConnection.query(queryString);
+		processor.processQuery(records);
 		return records.length;
 	}
 

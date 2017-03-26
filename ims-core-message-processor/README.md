@@ -124,4 +124,42 @@ insert pushTopic;
 ```
 *The Salesforce Apex window where you enter this code only accepts one topic at a time. It looks like 'execute highlight' will work but it doesn't*
 
+PushTopic for Bill
+
+```
+List<PushTopic> pts = [SELECT Id FROM PushTopic WHERE Name = 'BILL'];
+Database.delete(pts);
+
+PushTopic pushTopic = new PushTopic();
+pushTopic.Name = 'BILL';
+pushTopic.Query = 'SELECT  Id,Name,loan__Loan_Account__c, loan__Transaction_Date__c,CreatedDate, loan__Due_Date__c, loan__Due_Amt__c,loan__Payment_Satisfied__c,loan__waiver_applied__c FROM loan__Loan_account_Due_Details__c';
+pushTopic.ApiVersion = 38.0;
+pushTopic.NotifyForOperationCreate = true;
+pushTopic.NotifyForOperationUpdate = true;
+pushTopic.NotifyForOperationUndelete = true;
+pushTopic.NotifyForOperationDelete = true;
+pushTopic.NotifyForFields = 'All';
+insert pushTopic;
+```
+
+PushTopic for LoanAccount
+
+```
+List<PushTopic> pts = [SELECT Id FROM PushTopic WHERE Name = 'LOANACCOUNT'];
+Database.delete(pts);
+
+PushTopic pushTopic = new PushTopic();
+pushTopic.Name = 'LOANACCOUNT';
+pushTopic.Query = 'SELECT harMoney_Account_Number__c,Id,loan__Loan_Status__c,Name FROM loan__Loan_Account__c';
+pushTopic.ApiVersion = 38.0;
+pushTopic.NotifyForOperationCreate = true;
+pushTopic.NotifyForOperationUpdate = true;
+pushTopic.NotifyForOperationUndelete = true;
+pushTopic.NotifyForOperationDelete = true;
+pushTopic.NotifyForFields = 'All';
+insert pushTopic;
+```
+
+
+
 

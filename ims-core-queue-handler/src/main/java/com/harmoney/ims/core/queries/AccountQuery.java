@@ -7,8 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.harmoney.ims.core.queueprocessor.AccountProcessor;
-import com.sforce.soap.partner.PartnerConnection;
-import com.sforce.soap.partner.QueryResult;
+import com.harmoney.ims.core.queueprocessor.PartnerConnectionWrapper;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 
@@ -19,7 +18,7 @@ import com.sforce.ws.ConnectionException;
 @Component
 public class AccountQuery {
 	
-	@Autowired private PartnerConnection partnerConnection;
+	@Autowired private PartnerConnectionWrapper partnerConnection;
 	@Autowired private AccountProcessor accountSummaryProcessor;
 	
 	public int doQuery() throws ConnectionException {
@@ -43,8 +42,7 @@ public class AccountQuery {
                 "      ,Account_Summary__c                 " +
                 "From   Account                       ";
 
-		QueryResult qr = partnerConnection.query(queryString);
-		SObject[] records = qr.getRecords();
+		SObject[] records = partnerConnection.query(queryString);
 		accountSummaryProcessor.processQuery(records);
 		return records.length;
 	}

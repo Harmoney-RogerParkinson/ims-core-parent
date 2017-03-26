@@ -27,11 +27,15 @@ public class ObjectDescriptor {
 	private final Map<String,PropertyHolder> map = new HashMap<>();
 	private final Class<?> clazz;
 	private Method idMethod;
-	private final String tableName;
+	private String tableName;
 	
 	public ObjectDescriptor(Class<?> clazz) {
 		this.clazz = clazz;
-		tableName = clazz.getAnnotation(SalesforceName.class).tableName();
+		try {
+			tableName = clazz.getAnnotation(SalesforceName.class).tableName();
+		} catch (NullPointerException e) {
+			tableName="";
+		}
 	}
 
 	public void put(String name, Method readMethod, Method writeMethod, Column column) {

@@ -193,12 +193,7 @@ public abstract class AbstractTransactionDAO<T extends Transaction> extends Abst
     	List<T> balfwdlist = getByAccountDateBalFwd(start,end,accountId);
     	int balFwdCount = balfwdlist.size();
     	boolean accumulating = false;
-		T iltTotals;
-		try {
-			iltTotals = (T)clazz.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
+		T iltTotals = getInstance();
 
     	ObjectDescriptor objectDescriptor = getObjectDescriptor();
     	log.debug("Initial balFwdCount: {} Account: {} ",balFwdCount,accountId);

@@ -18,9 +18,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.harmoney.ims.core.database.DatabaseSpringConfig;
+import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = { QueueHandlerSpringConfig.class,
+@ContextConfiguration(classes = { QueueHandlerSpringConfig.class,PartnerConnectionSpringConfig.class,
 		DatabaseSpringConfig.class })
 @ActiveProfiles("queue-handler-dev")
 public class MessageSenderIT {

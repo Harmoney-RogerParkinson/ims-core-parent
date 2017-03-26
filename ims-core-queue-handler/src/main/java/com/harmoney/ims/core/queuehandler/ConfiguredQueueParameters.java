@@ -33,6 +33,8 @@ public class ConfiguredQueueParameters {
 	 private String exchangeName;
 	 public static String ILTQUEUE = "ilt-queue"; 
 	 public static String IFTQUEUE = "ift-queue"; 
+	 public static String BILLQUEUE = "bill-queue"; 
+	 public static String LOANACCOUNT = "loanaccount-queue"; 
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

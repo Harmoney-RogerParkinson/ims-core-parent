@@ -14,10 +14,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import com.harmoney.ims.core.queueprocessor.BillProcessor;
 import com.harmoney.ims.core.queueprocessor.InvestorFundTransactionProcessor;
 import com.harmoney.ims.core.queueprocessor.InvestorLoanTransactionProcessor;
+import com.harmoney.ims.core.queueprocessor.LoanAccountProcessor;
 
 /**
+ * This is where the rabbit messages arrive and are subsequently dispatched to their
+ * respective processors. The count() method is there to help with debugging and the
+ * CountdownLatch is only used during testing, not production.
+ * 
  * @author Roger Parkinson
  *
  */
@@ -29,6 +35,8 @@ public class RabbitReceiver {
     
     @Autowired private InvestorLoanTransactionProcessor investorLoanTransactionProcessor;
     @Autowired private InvestorFundTransactionProcessor investorFundTransactionProcessor;
+    @Autowired private BillProcessor billProcessor;
+    @Autowired private LoanAccountProcessor loanAccountProcessor;
 
 	private CountDownLatch latch;
 	private long count = 0;
@@ -47,12 +55,36 @@ public class RabbitReceiver {
         count();
     }
 
+    @AMPQReceiver(queueName="bill-queue")
+    public void receiveBillMessage(Map<String, Map<String, Object>> message) {
+        log.debug("Received <{}>", message);
+        billProcessor.receiveMessage(message);
+        count();
+    }
+
+    @AMPQReceiver(queueName="loanaccount-queue")
+    public void receiveLoanAccountMessage(Map<String, Map<String, Object>> message) {
+        log.debug("Received <{}>", message);
+        loanAccountProcessor.receiveMessage(message);
+        count();
+    }
+
+	/**
+	 * If a latch is set then count down any items that were
+	 * processed before now. This ensures the latch is accurate.
+	 * @param latch
+	 */
 	public void setLatch(CountDownLatch latch) {
 		this.latch = latch;
 		for (int i = 0; i<count; i++) {
 			latch.countDown();
 		}
 	}
+	/**
+	 * This method counts down the latch is one is set (which it is only in testing)
+	 * It also supports a lock on this object, allowing the test to block processing of incoming
+	 * messages until it is ready to monitor them.
+	 */
 	private void count() {
 		if (latch != null) {
 			synchronized(this) {

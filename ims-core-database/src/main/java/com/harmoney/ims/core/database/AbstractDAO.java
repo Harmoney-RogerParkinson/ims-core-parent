@@ -48,6 +48,17 @@ abstract class AbstractDAO<T> {
 				  entityManager.createNamedQuery(byAll, clazz);
 		return query.getResultList();
 	}
+	public T getInstance() {
+		try {
+			T ret = (T)clazz.newInstance();
+			return ret;
+		} catch (InstantiationException | IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	public void accumulate(T source, T totals) {
+		objectDescriptor.accumulate(source, totals);
+	}
 	
 	@Transactional
 	public T getByIMSId(Long imsid) {
@@ -84,6 +95,12 @@ abstract class AbstractDAO<T> {
 		entityManager.persist(target);
 		entityManager.flush();
 		return true;
+	}
+	@Transactional
+	public boolean merge(T target) {
+		entityManager.merge(target);
+		entityManager.flush();
+        return true;
 	}
 	public String getSalesforceTableName() {
 		return objectDescriptor.getSalesforceTableName();

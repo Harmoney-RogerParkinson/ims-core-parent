@@ -922,11 +922,20 @@
 					</appinfo>
 				</annotation>
 			</element>
-			<element name="status" type="string">
+			<element name="status" type="tns:LoanAccountStatus">
 				<annotation>
 					<appinfo>
 						<annox:annotate>
 							<ims:SalesforceName fieldName="loan__Loan_Status__c" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="waived" type="boolean">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="Waived__c" />
 						</annox:annotate>
 					</appinfo>
 				</annotation>
@@ -1194,6 +1203,15 @@
 					</appinfo>
 				</annotation>
 			</element>
+			<element name="LoanShare" type="tns:currency">
+				<annotation>
+					<appinfo>
+						<annox:annotate>
+							<ims:SalesforceName fieldName="loan__Share__c" />
+						</annox:annotate>
+					</appinfo>
+				</annotation>
+			</element>
 			<element name="PaymentProtectManagementFees" type="tns:currency">
 				<annotation>
 					<appinfo>
@@ -1337,6 +1355,9 @@
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
 							name="ProtectRealisedRevenue.all" query="select i from ProtectRealisedRevenue i">
 						</annox:annotate>
+						<annox:annotate annox:class="javax.persistence.NamedQuery"
+							name="ProtectRealisedRevenue.investmentOrderIdAndDueDate" query="select i from ProtectRealisedRevenue i where i.investmentOrderId=:investmentOrderId and i.dueDate=:dueDate">
+						</annox:annotate>
 					</annox:annotate>
 				</annox:annotate>
 			</xsd:appinfo>
@@ -1445,6 +1466,19 @@
 			<xsd:enumeration value="Return" />
 			<xsd:enumeration value="Tax" />
 			<xsd:enumeration value="BalanceForward" />
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="LoanAccountStatus">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Pending Approval" />
+			<xsd:enumeration value="Active - Good Standing" />
+			<xsd:enumeration value="Active - Bad Standing" />
+			<xsd:enumeration value="Active - Matured" />
+			<xsd:enumeration value="Approved" />
+			<xsd:enumeration value="Canceled" />
+			<xsd:enumeration value="Closed - Obligations met" />
+			<xsd:enumeration value="Closed- Written Off" />
+			<xsd:enumeration value="Partial Application" />
 		</xsd:restriction>
 	</xsd:simpleType>
 	<xsd:simpleType name="TxnCode">

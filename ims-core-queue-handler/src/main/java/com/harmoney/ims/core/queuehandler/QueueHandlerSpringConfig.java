@@ -76,6 +76,26 @@ public class QueueHandlerSpringConfig {
 		return BindingBuilder.bind(iftqueue).to(exchange).with(ConfiguredQueueParameters.IFTQUEUE);
 	}
 
+	@Bean
+	Queue billqueue() {
+		return new Queue(ConfiguredQueueParameters.BILLQUEUE, true);
+	}
+
+	@Bean
+	Binding billbinding(Queue iftqueue, TopicExchange exchange) {
+		return BindingBuilder.bind(iftqueue).to(exchange).with(ConfiguredQueueParameters.BILLQUEUE);
+	}
+
+	@Bean
+	Queue loanaccountqueue() {
+		return new Queue(ConfiguredQueueParameters.LOANACCOUNT, true);
+	}
+
+	@Bean
+	Binding loanaccountbinding(Queue iftqueue, TopicExchange exchange) {
+		return BindingBuilder.bind(iftqueue).to(exchange).with(ConfiguredQueueParameters.LOANACCOUNT);
+	}
+
 //	@Bean
 //	SimpleMessageListenerContainer container(
 //			ConnectionFactory connectionFactory,

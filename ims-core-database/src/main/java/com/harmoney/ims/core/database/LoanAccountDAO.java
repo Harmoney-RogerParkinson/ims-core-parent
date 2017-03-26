@@ -13,13 +13,14 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.harmoney.ims.core.instances.Account;
+import com.harmoney.ims.core.instances.LoanAccount;
 
 /**
  * @author Roger Parkinson
  *
  */
 @Repository
-public class AccountDAO extends AbstractSimpleDAO<Account>{
+public class LoanAccountDAO extends AbstractSimpleDAO<LoanAccount>{
 	
 	@Override
 	protected void localInit() {
@@ -27,13 +28,13 @@ public class AccountDAO extends AbstractSimpleDAO<Account>{
 	@Transactional(readOnly=true)
 	public Account getByHarmoneyAccountNumber(String harmoneyAccountNumber) throws NoResultException {
 		TypedQuery<Account> query =
-				  entityManager.createNamedQuery("Account.harmoneyAccountNumber", Account.class);
+				  entityManager.createNamedQuery("LoanAccount.harmoneyAccountNumber", Account.class);
 		query.setParameter("harmoneyAccountNumber", harmoneyAccountNumber);
 		return query.getSingleResult();
 	}
 
 	@Override
-	protected void fieldUpdates(Account object) {
+	protected void fieldUpdates(LoanAccount object) {
 		LocalDateTime lastModifiedDate = LocalDateTime.now();
 		Calendar calendar = ConvertUtils.convertToCalendar(lastModifiedDate);
 		object.setLastModifiedDate(calendar);
