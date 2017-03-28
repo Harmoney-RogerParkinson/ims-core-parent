@@ -1,6 +1,7 @@
 package com.harmoney.ims.core.queueprocessor;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 
 import org.slf4j.Logger;
@@ -17,7 +18,6 @@ import com.harmoney.ims.core.database.ProtectRealisedRevenueDAO;
 import com.harmoney.ims.core.database.UnpackHelper;
 import com.harmoney.ims.core.database.descriptors.Result;
 import com.harmoney.ims.core.instances.AmortizationSchedule;
-import com.harmoney.ims.core.instances.InvestmentOrder;
 import com.harmoney.ims.core.instances.ProtectRealisedRevenue;
 import com.harmoney.ims.core.queries.AmortizationScheduleQuery;
 import com.harmoney.ims.core.queries.InvestmentOrderQuery;
@@ -131,29 +131,30 @@ public class AmortizationScheduleProcessor {
 	/**
 	 * The Loan Account status has just been changed to 'Active - Good Standing'
 	 * Create the initial ProtectRealisedRevenue records but only populate them with fees.
+     * -- discarded in favour of doing it on Bill creation so this does nothing.
 	 * 
 	 * @param loanAccountId
 	 * @throws ConnectionException 
 	 */
-	@Transactional
+//	@Transactional
 	public void loanAccountStatusActive(String loanAccountId) {
-		String queryString = AmortizationScheduleQuery.SOQL
-				+ "WHERE loan__Loan_Account__c = '"+loanAccountId+"' order by loan__Due_Date__c";
-
-		SObject[] records;
-		try {
-			records = partnerConnection.query(queryString);
-		} catch (ConnectionException e) {
-			log.error(e.getMessage());
-			throw new ProtectRealisedException(e);
-		}
-		if (records.length == 0) {
-			String message = MessageFormatter.format("failed to find any Amortization Schedule entry for {}. Ignoring.",loanAccountId).toString();
-			log.error(message);
-			throw new ProtectRealisedException(message);
-		}
-		AmortizationSchedule amortizationSchedule = amortizationScheduleDAO.unpack(records[0]); // only interested in the first one
-		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule);
+//		String queryString = AmortizationScheduleQuery.SOQL
+//				+ "WHERE loan__Loan_Account__c = '"+loanAccountId+"' order by loan__Due_Date__c";
+//
+//		SObject[] records;
+//		try {
+//			records = partnerConnection.query(queryString);
+//		} catch (ConnectionException e) {
+//			log.error(e.getMessage());
+//			throw new ProtectRealisedException(e);
+//		}
+//		if (records.length == 0) {
+//			String message = "failed to find any Amortization Schedule entry for "+loanAccountId+". Ignoring.";
+//			log.error(message);
+//			throw new ProtectRealisedException(message);
+//		}
+//		AmortizationSchedule amortizationSchedule = amortizationScheduleDAO.unpack(records[0]); // only interested in the first one
+//		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule);
 	}
 	
 	/**
@@ -167,27 +168,28 @@ public class AmortizationScheduleProcessor {
 	private void createOrUpdateProtectRealisedRevenue(String loanAccountId, AmortizationSchedule amortizationSchedule, boolean full, boolean waiver) {
 		SObject[] records;
 		try {
-			records = partnerConnection.query(InvestmentOrderQuery.SOQL
-					+ "WHERE loan__Account__c = '"+loanAccountId);
+			records = partnerConnection.query(InvestmentOrderQuery.SOQL2
+					+ "WHERE loan__Account__c = '"+loanAccountId+"'");
 		} catch (ConnectionException e) {
 			log.error(e.getMessage());
 			throw new ProtectRealisedException(e);
 		}
 		for (SObject sobject: records) {
-			InvestmentOrder investmentOrder = investmentOrderDAO.unpack(sobject);
+			String investmentOrderId = (String)sobject.getField("Id");
+			String investmentOrderLoanShare = (String)sobject.getField("loan__Share__c");
 			ProtectRealisedRevenue protectRealisedRevenue;
-			protectRealisedRevenue = protectRealisedRevenueDAO.getByInvestmentOrderIdAndDate(investmentOrder.getId(),amortizationSchedule.getDueDate());
+			protectRealisedRevenue = protectRealisedRevenueDAO.getByInvestmentOrderIdAndDate(investmentOrderId,amortizationSchedule.getDueDate());
 			if (protectRealisedRevenue == null) {
 				protectRealisedRevenue = new ProtectRealisedRevenue();
-				protectRealisedRevenue.setInvestmentOrderId(investmentOrder.getId());
+				protectRealisedRevenue.setInvestmentOrderId(investmentOrderId);
 				protectRealisedRevenue.setDueDate(amortizationSchedule.getDueDate());
 				protectRealisedRevenueDAO.create(protectRealisedRevenue);
 			}
-			BigDecimal proportion = investmentOrder.getLoanShare();
-			protectRealisedRevenue.setManagementFeeRealised(amortizationSchedule.getManagementFeeRealised().divide(proportion));
-			protectRealisedRevenue.setSalesCommissionFeeRealised(amortizationSchedule.getSalesCommissionRealised().divide(proportion));
+			BigDecimal proportion = new BigDecimal(investmentOrderLoanShare);
+			protectRealisedRevenue.setManagementFeeRealised(safeDivide(amortizationSchedule.getManagementFeeRealised(),proportion));
+			protectRealisedRevenue.setSalesCommissionFeeRealised(safeDivide(amortizationSchedule.getSalesCommissionRealised(),proportion));
 			if (full) {
-				protectRealisedRevenue.setProtectRealised(amortizationSchedule.getProtectRealised().divide(proportion));
+				protectRealisedRevenue.setProtectRealised(safeDivide(amortizationSchedule.getProtectRealised(),proportion));
 				if (waiver) {
 					protectRealisedRevenue.setProtectWaived(protectRealisedRevenue.getProtectRealised());
 				} else {
@@ -195,6 +197,16 @@ public class AmortizationScheduleProcessor {
 				}
 			}
 			protectRealisedRevenueDAO.merge(protectRealisedRevenue);
+		}
+	}
+	private BigDecimal safeDivide(BigDecimal value, BigDecimal proportion) {
+		if (value == null || proportion == null || proportion.doubleValue() < 0.001D) {
+			return BigDecimal.ZERO;
+		}
+		try {
+			return value.divide(proportion,2, RoundingMode.HALF_UP);
+		} catch (ArithmeticException e) {
+			throw e;
 		}
 	}
 	private void createOrUpdateProtectRealisedRevenue(String loanAccountId, AmortizationSchedule amortizationSchedule) {
@@ -213,7 +225,7 @@ public class AmortizationScheduleProcessor {
 			throw new ProtectRealisedException(e);
 		}
 		if (records.length != 1) {
-			String message = MessageFormatter.format("failed to find exactly one Amortization Schedule entry for {} {}, found {}. Ignoring.",new Object[]{loanAccountId,ConvertUtils.printDate(dueDate),records.length}).toString();
+			String message = "failed to find exactly one Amortization Schedule entry for "+loanAccountId+" "+ConvertUtils.printDate(dueDate)+", found "+records.length+". Ignoring.";
 			log.error(message);
 			throw new ProtectRealisedException(message);
 		}

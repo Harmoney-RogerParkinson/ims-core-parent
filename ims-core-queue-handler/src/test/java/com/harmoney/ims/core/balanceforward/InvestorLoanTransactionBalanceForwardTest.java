@@ -27,7 +27,7 @@ import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
 import com.harmoney.ims.core.queries.QuerySpringConfig;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@TestPropertySource("/BalanceForwardTest.properties")
+@TestPropertySource("/H2Test.properties")
 @ContextConfiguration(classes = { QuerySpringConfig.class, PartnerConnectionSpringConfig.class,DatabaseLoaderSpringConfig.class,DatabaseSpringConfig.class})
 @ActiveProfiles("queue-handler-prod")
 public class InvestorLoanTransactionBalanceForwardTest {

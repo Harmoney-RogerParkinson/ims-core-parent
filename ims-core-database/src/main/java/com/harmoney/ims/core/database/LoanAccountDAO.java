@@ -12,7 +12,6 @@ import javax.persistence.TypedQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.harmoney.ims.core.instances.Account;
 import com.harmoney.ims.core.instances.LoanAccount;
 
 /**
@@ -26,9 +25,9 @@ public class LoanAccountDAO extends AbstractSimpleDAO<LoanAccount>{
 	protected void localInit() {
 	}
 	@Transactional(readOnly=true)
-	public Account getByHarmoneyAccountNumber(String harmoneyAccountNumber) throws NoResultException {
-		TypedQuery<Account> query =
-				  entityManager.createNamedQuery("LoanAccount.harmoneyAccountNumber", Account.class);
+	public LoanAccount getByHarmoneyAccountNumber(String harmoneyAccountNumber) throws NoResultException {
+		TypedQuery<LoanAccount> query =
+				  entityManager.createNamedQuery("LoanAccount.harmoneyAccountNumber", LoanAccount.class);
 		query.setParameter("harmoneyAccountNumber", harmoneyAccountNumber);
 		return query.getSingleResult();
 	}

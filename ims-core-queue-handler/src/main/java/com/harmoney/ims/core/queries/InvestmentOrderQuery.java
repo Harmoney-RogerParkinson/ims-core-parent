@@ -21,7 +21,7 @@ public class InvestmentOrderQuery {
 	@Autowired private PartnerConnectionWrapper partnerConnection;
 	@Autowired private InvestmentOrderProcessor investmentOrderProcessor;
 	
-	public static String SOQL = "Select Id                                       " +
+	public static String SOQL = "SELECT Id                                       " +
             "      ,Name                                     " +
             "      ,CreatedDate                              " +
             "      ,loan__Account__c                         " +
@@ -38,8 +38,9 @@ public class InvestmentOrderQuery {
             "      ,Payment_Protect_Fee__c                   " +
             "      ,Payment_Protect_Rebated_Amount__c        " +
             "      ,HM_Rollup_Outstanding_Principal__c       " +
-            "From   loan__Investor_Loan__c ";
+            "FROM   loan__Investor_Loan__c ";
 
+	public static String SOQL2 = "SELECT Id,loan__Account__c,loan__Share__c,loan__Loan_Status__c FROM   loan__Investor_Loan__c ";
 	
 	public int doQuery() throws ConnectionException {
 

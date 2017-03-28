@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 
 import javax.persistence.Column;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 
 import org.springframework.util.Assert;
@@ -21,8 +22,10 @@ public class PropertyHolder {
 	private Class<?> columnType;
 	private String salesforceName;
 	private Method enumValueOf;
+	private Method enumFromValue;
 	private boolean joinColumn;
 	private boolean negateable;
+	private boolean idColumn;
 
 	protected PropertyHolder(String name, Method readMethod,Method writeMethod, Column column, Class<?> clazz) {
 		this.writeMethod = writeMethod;
@@ -40,9 +43,15 @@ public class PropertyHolder {
 			} catch (NoSuchMethodException e) {
 				throw new RuntimeException("Need a 'valueOf' method on enum type "+columnType.getName(),e);
 			}
+			try {
+				enumFromValue = columnType.getMethod("fromValue", String.class);
+			} catch (NoSuchMethodException e) {
+				throw new RuntimeException("Need a 'fromValue' method on enum type "+columnType.getName(),e);
+			}
 		}
 		joinColumn = (readMethod.getAnnotation(JoinColumn.class) != null);
 		negateable = (readMethod.getAnnotation(Negateable.class) != null);
+		idColumn = (readMethod.getAnnotation(Id.class) != null);
 		if (negateable && !columnType.equals(BigDecimal.class)) {
 			throw new RuntimeException("Column "+name+" is negatable but not BigDecimal");
 		}
@@ -84,7 +93,12 @@ public class PropertyHolder {
 			return enumValueOf.invoke(null, value.replace(' ', '_').replace('-', '_'));
 		} catch (IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException e) {
-			throw new RuntimeException(e);
+			try {
+				return enumFromValue.invoke(null, value);
+			} catch (IllegalAccessException | IllegalArgumentException
+					| InvocationTargetException e1) {
+				throw new RuntimeException(e1);
+			}
 		}
 	}
 
@@ -121,13 +135,14 @@ public class PropertyHolder {
 		if (negateable) {
 			try {
 				BigDecimal bigDecimal = (BigDecimal)readMethod.invoke(source);
+				int scale = (column != null)?column.scale():2;
 				if (bigDecimal != null) {
 					BigDecimal bigDecimalTotal = (BigDecimal)readMethod.invoke(totals);
 					if (bigDecimalTotal == null) {
-						bigDecimalTotal = new BigDecimal(0).setScale(column.scale(),BigDecimal.ROUND_HALF_DOWN);
+						bigDecimalTotal = new BigDecimal(0).setScale(scale,BigDecimal.ROUND_HALF_DOWN);
 					}
 					bigDecimalTotal = bigDecimalTotal.add(bigDecimal);
-					writeMethod.invoke(totals, bigDecimalTotal.setScale(column.scale(),BigDecimal.ROUND_HALF_DOWN));
+					writeMethod.invoke(totals, bigDecimalTotal.setScale(scale,BigDecimal.ROUND_HALF_DOWN));
 				}
 			} catch (Exception e) {
 				throw new RuntimeException(e);
@@ -137,7 +152,10 @@ public class PropertyHolder {
 	}
 
 	public void copy(Object source, Object target) {
-		if (negateable) {
+		if (idColumn) {
+			return;
+		}
+		if (columnType == BigDecimal.class) {
 			try {
 				BigDecimal bigDecimal = (BigDecimal)readMethod.invoke(source);
 				if (bigDecimal == null) {
@@ -147,6 +165,13 @@ public class PropertyHolder {
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
+			return;
+		}
+		try {
+			Object o = readMethod.invoke(source);
+			writeMethod.invoke(target, o);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 

@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.harmoney.ims.core.database.LoanAccountDAO;
 import com.harmoney.ims.core.database.descriptors.Result;
@@ -42,49 +43,46 @@ public class LoanAccountProcessor {
         	log.warn("Unexpected event status: {}",eventType);
         }
     }
-    
+    @Transactional
     private void processCreateOrUpdate(Map<String, Map<String, Object>> message) {
-    	LoanAccount target = DAO.unpackMessage(message.get("sobject"));
-    	String createdDate = message.get("event").get("createdDate").toString();
-    	LoanAccount original = DAO.getById(target.getId());
+    	LoanAccount sobject = DAO.unpackMessage(message.get("sobject"));
+    	String eventDate = message.get("event").get("createdDate").toString();
+    	LoanAccount original = DAO.getById(sobject.getId());
         boolean statusClosed = false;
         boolean statusWaived = false;
         boolean statusActive = false;
         if (original == null) {
         	// Never seen this before, no previous status
-        	if ((target.getStatus() == LoanAccountStatus.CLOSED_OBLIGATIONS_MET || target.getStatus() == LoanAccountStatus.CLOSED_WRITTEN_OFF)) {
+        	if ((sobject.getStatus() == LoanAccountStatus.CLOSED_OBLIGATIONS_MET || sobject.getStatus() == LoanAccountStatus.CLOSED_WRITTEN_OFF)) {
         		statusClosed = true;
         	}
-        	if ((target.getStatus() == LoanAccountStatus.ACTIVE_GOOD_STANDING)) {
+        	if ((sobject.getStatus() == LoanAccountStatus.ACTIVE_GOOD_STANDING)) {
         		statusActive = true;
         	}
-        	DAO.create(target);
+        	DAO.create(sobject);
         } else {
-        	if ((target.getStatus() == LoanAccountStatus.CLOSED_OBLIGATIONS_MET || target.getStatus() == LoanAccountStatus.CLOSED_WRITTEN_OFF) &&
+        	if ((sobject.getStatus() == LoanAccountStatus.CLOSED_OBLIGATIONS_MET || sobject.getStatus() == LoanAccountStatus.CLOSED_WRITTEN_OFF) &&
         			(original.getStatus() == LoanAccountStatus.ACTIVE_GOOD_STANDING || original.getStatus() == LoanAccountStatus.ACTIVE_BAD_STANDING)) {
         		statusClosed = true;
         	}
-        	if ((target.getStatus() == LoanAccountStatus.ACTIVE_GOOD_STANDING) &&
+        	if ((sobject.getStatus() == LoanAccountStatus.ACTIVE_GOOD_STANDING) &&
         			(original.getStatus() == LoanAccountStatus.APPROVED)) {
         		statusActive = true;
         	}
-        	target.setImsid(original.getImsid());
-        	DAO.merge(target);
+        	sobject.setImsid(original.getImsid());
+        	DAO.copy(sobject,original);
         }
         if (statusClosed) {
         	
-        	if (target.getStatus() == LoanAccountStatus.CLOSED_OBLIGATIONS_MET && target.isWaived()) {
+        	if (sobject.getStatus() == LoanAccountStatus.CLOSED_OBLIGATIONS_MET && sobject.isWaived()) {
         		statusWaived = true;
         	}
-        	amortizationScheduleProcessor.loanAccountStatusClosed(target.getId(),statusWaived,createdDate);
+        	amortizationScheduleProcessor.loanAccountStatusClosed(sobject.getId(),statusWaived,eventDate);
         	return;
         }
         if (statusActive) {
         	
-        	if (target.getStatus() == LoanAccountStatus.CLOSED_OBLIGATIONS_MET && target.isWaived()) {
-        		statusWaived = true;
-        	}
-        	amortizationScheduleProcessor.loanAccountStatusActive(target.getId());
+        	amortizationScheduleProcessor.loanAccountStatusActive(sobject.getId());
         	return;
         }
     	

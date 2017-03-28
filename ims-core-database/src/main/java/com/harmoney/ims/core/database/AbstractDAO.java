@@ -15,6 +15,7 @@ import org.springframework.util.Assert;
 
 import com.harmoney.ims.core.database.descriptors.ObjectDescriptor;
 import com.harmoney.ims.core.database.descriptors.ObjectDescriptorGenerator;
+import com.harmoney.ims.core.instances.LoanAccount;
 
 abstract class AbstractDAO<T> {
 
@@ -108,6 +109,12 @@ abstract class AbstractDAO<T> {
 	public List<String> getSalesforceFields() {
 		return objectDescriptor.getSalesForceFields();
 	}
-	
+	@Transactional
+	public void copy(T source, T target) {
+		objectDescriptor.copy(source, target);
+		entityManager.merge(target);
+		entityManager.flush();
+	}
+
 
 }

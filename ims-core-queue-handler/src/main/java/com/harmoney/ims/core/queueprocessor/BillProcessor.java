@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.harmoney.ims.core.database.BillDAO;
 import com.harmoney.ims.core.database.descriptors.Result;
@@ -41,27 +42,30 @@ public class BillProcessor {
         	log.warn("Unexpected event status: {}",eventType);
         }
     }
-    
+    @Transactional
     private void processCreateOrUpdate(Map<String, Map<String, Object>> message) {
-        Bill target = DAO.unpackMessage(message.get("sobject"));
-        Bill original = DAO.getById(target.getId());
+        Bill sobject = DAO.unpackMessage(message.get("sobject"));
+        Bill original = DAO.getById(sobject.getId());
         if (original == null) {
         	// no previous version
-        	DAO.create(target);
-        	amortizationScheduleProcessor.billCreated(target.getLoanAccountId(), target.getDueDate());
-        	if (target.isPaymentSatisfied()) {
+        	DAO.create(sobject);
+        	if (sobject.isPaymentSatisfied()) {
         		// satisfied was set on create (unlikely unless we are back filling)
-            	amortizationScheduleProcessor.billPaymentSatisfied(target.getLoanAccountId(), target.isWaiverApplied(),target.getDueDate());
+            	amortizationScheduleProcessor.billPaymentSatisfied(sobject.getLoanAccountId(), sobject.isWaiverApplied(),sobject.getDueDate());
+        	} else {
+        		// Bill created normally: This will create the PRRs and fill with Management and Sales Commission.
+            	amortizationScheduleProcessor.billCreated(sobject.getLoanAccountId(), sobject.getDueDate());
         	}
         } else {
-        	target.setImsid(original.getImsid());
-        	DAO.merge(target);
-        	if (target.isPaymentSatisfied() != original.isPaymentSatisfied()) {
-            	if (target.isPaymentSatisfied()) {
-            		// satisfied was set on create (unlikely unless we are back filling)
-                	amortizationScheduleProcessor.billPaymentSatisfied(target.getLoanAccountId(), target.isWaiverApplied(),target.getDueDate());
+        	boolean satisfiedFlagChanged = sobject.isPaymentSatisfied() != original.isPaymentSatisfied();
+        	sobject.setImsid(original.getImsid());
+        	DAO.copy(sobject, original);
+        	if (satisfiedFlagChanged) {
+        		// If the satisfaction flag changed then go process it.
+            	if (sobject.isPaymentSatisfied()) {
+                	amortizationScheduleProcessor.billPaymentSatisfied(sobject.getLoanAccountId(), sobject.isWaiverApplied(),sobject.getDueDate());
             	} else {
-                	amortizationScheduleProcessor.billPaymentUnsatisfied(target.getLoanAccountId(), target.isWaiverApplied(),target.getDueDate());
+                	amortizationScheduleProcessor.billPaymentUnsatisfied(sobject.getLoanAccountId(), sobject.isWaiverApplied(),sobject.getDueDate());
             	}
         	}
         }

@@ -87,18 +87,6 @@ public class ObjectDescriptor {
 //				log.warn(ret.warn("property {} was null",salesforceName));
 				return false;
 			}
-//			if (salesforceName.equals("Id")) {
-//				log.debug("SF Record id={}",value);
-//			}
-//			if (salesforceName.equals("Protect_Realised__c")) {
-//				log.debug("Protect_Realised__c={}",value);
-//			}
-//			if (salesforceName.equals("Management_Fee_Realised__c")) {
-//				log.debug("Management_Fee_Realised__c={}",value);
-//			}
-//			if (salesforceName.equals("Sales_Commission_Fee_Realised__c")) {
-//				log.debug("Sales_Commission_Fee_Realised__c={}",value);
-//			}
 			Class<?> columnType = propertyHolder.getColumnType();
 			if (value instanceof Double) {
 				//convert double to bigdecimal
@@ -108,7 +96,12 @@ public class ObjectDescriptor {
 			} else if (columnType.equals(BigDecimal.class)) {
 				// We want a BigDecimal output but input was clearly not a Double
 				// Assume it is a string.
-				int scale = propertyHolder.getColumn().scale();
+				int scale;
+				try {
+					scale = propertyHolder.getColumn().scale();
+				} catch (NullPointerException e) {
+					scale=2;
+				}
 				value = new BigDecimal((String)value).setScale(scale,BigDecimal.ROUND_HALF_DOWN);
 			} else if (columnType.equals(Date.class)) {
 				// Dates arrive as strings which we convert to java.sql.Date
@@ -122,6 +115,8 @@ public class ObjectDescriptor {
 				value = ConvertUtils.convertToCalendar(LocalDateTime.parse(d));
 			} else if (columnType.isEnum()) {
 				value = propertyHolder.valueOf((String) value);
+			} else if (columnType.equals(Boolean.TYPE)) {
+				value = Boolean.valueOf((String) value);
 			}
 			Method writeMethod = propertyHolder.getWriteMethod();
 			try {

@@ -5,6 +5,7 @@ package com.harmoney.ims.core.database;
 
 import java.util.Date;
 
+import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
 import org.springframework.stereotype.Repository;
@@ -32,6 +33,10 @@ public class ProtectRealisedRevenueDAO extends AbstractSimpleDAO<ProtectRealised
 				  entityManager.createNamedQuery("ProtectRealisedRevenue.investmentOrderIdAndDueDate", ProtectRealisedRevenue.class);
 		query.setParameter("investmentOrderId", investmentOrderId);
 		query.setParameter("dueDate", dueDate);
-		return query.getSingleResult();
+		try {
+			return query.getSingleResult();
+		} catch (NoResultException e) {
+			return null;
+		}
 	}
 }
