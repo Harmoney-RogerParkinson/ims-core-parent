@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -39,7 +40,7 @@ public class InvestorFundTransactionBalanceForwardTest {
 	@Autowired DatabaseLoader databaseLoader;
     private static final String dbLocation = "balanceforward.xml";
 
-	@Test
+	@Test @Ignore
 	public void processBalanceForward() throws Exception {
 		
 		databaseLoader.loadDatabase(dbLocation);

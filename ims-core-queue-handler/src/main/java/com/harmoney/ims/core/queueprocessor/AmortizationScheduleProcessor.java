@@ -65,7 +65,7 @@ public class AmortizationScheduleProcessor {
 			throw new ProtectRealisedException(e);
 		}
 		if (records.length == 0) {
-			String message = MessageFormatter.format("failed to find any Amortization Schedule entry for {}. Ignoring.", loanAccountId).toString();
+			String message = "failed to find any Amortization Schedule entry for "+loanAccountId+" "+createdDate+". Ignoring.";
 			log.error(message);
 			throw new ProtectRealisedException(message);
 		}

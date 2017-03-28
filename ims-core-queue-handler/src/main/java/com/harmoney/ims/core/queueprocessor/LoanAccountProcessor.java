@@ -46,7 +46,7 @@ public class LoanAccountProcessor {
     @Transactional
     private void processCreateOrUpdate(Map<String, Map<String, Object>> message) {
     	LoanAccount sobject = DAO.unpackMessage(message.get("sobject"));
-    	String eventDate = message.get("event").get("createdDate").toString();
+    	String eventDate = message.get("event").get("createdDate").toString().substring(0,10);
     	LoanAccount original = DAO.getById(sobject.getId());
         boolean statusClosed = false;
         boolean statusWaived = false;

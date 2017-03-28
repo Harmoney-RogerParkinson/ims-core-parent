@@ -1478,6 +1478,8 @@
 			<xsd:enumeration value="Canceled" />
 			<xsd:enumeration value="Closed - Obligations met" />
 			<xsd:enumeration value="Closed- Written Off" />
+			<xsd:enumeration value="Active - Marked for Closure" />
+			<xsd:enumeration value="Cancellation in progress" />
 			<xsd:enumeration value="Partial Application" />
 		</xsd:restriction>
 	</xsd:simpleType>

@@ -73,7 +73,7 @@ public class QueryIT {
 		}
 	}
 	
-	@Test
+	@Test @Ignore
 	public void testExtractQuery() throws Exception {
 		String queryString = "Select Id ,Name ,CreatedDate  ,loan__Account__c ,loan__Loan__c  ,loan__Investment_Amount__c ,HM_Investment_Amount__c  ,Protect_Investment_Amount__c ,loan__Charged_Off_Principal__c ,loan__Charged_Off_Date__c  ,loan__Loan_Status__c ,loan__Share__c	 ,Payment_Protect_Management_Fees__c ,Payment_Protect_Sales_Commission_Fees__c ,Payment_Protect_Fee__c ,Payment_Protect_Rebated_Amount__c  ,HM_Rollup_Outstanding_Principal__c From loan__Investor_Loan__c where Protect_Investment_Amount__c > 0 and CreatedDate > 2016-01-01T03:34:33.000Z and loan__Account__c ='001p0000001oGUrAAM' order by CreatedDate";
 
@@ -102,7 +102,7 @@ public class QueryIT {
 		writer = new XMLWriter(System.out, format);
 		writer.write(document);
 	}	
-	@Test
+	@Test @Ignore
 	public void testExtractQuery2() throws Exception {
 		{
 			String fieldList = "Id,Name,loan__Loan_Account__c,loan__Due_Date__c,Protect_Realised__c,Sales_Commission_Realised__c,Management_Fee_Realised__c";
@@ -144,8 +144,5 @@ public class QueryIT {
 		log.info("\n{}",sb);
 
 	}
-	//INSERT INTO users VALUES (3, 'joel', 'joel@gmail.com');
-	
-	//Select Id ,Name ,CreatedDate  ,loan__Account__c ,loan__Loan__c  ,loan__Investment_Amount__c ,HM_Investment_Amount__c  ,Protect_Investment_Amount__c ,loan__Charged_Off_Principal__c ,loan__Charged_Off_Date__c  ,loan__Loan_Status__c ,loan__Share__c	 ,Payment_Protect_Management_Fees__c ,Payment_Protect_Sales_Commission_Fees__c ,Payment_Protect_Fee__c ,Payment_Protect_Rebated_Amount__c  ,HM_Rollup_Outstanding_Principal__c From loan__Investor_Loan__c where Protect_Investment_Amount__c > 0 and CreatedDate > 2016-01-01T03:34:33.000Z and loan__Account__c ='001p0000001oGUrAAM' order by CreatedDate
 
 }

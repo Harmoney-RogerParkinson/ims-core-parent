@@ -116,7 +116,9 @@ public class ObjectDescriptor {
 			} else if (columnType.isEnum()) {
 				value = propertyHolder.valueOf((String) value);
 			} else if (columnType.equals(Boolean.TYPE)) {
-				value = Boolean.valueOf((String) value);
+				if (!(value instanceof Boolean)) {
+					value = Boolean.valueOf((String) value);
+				}
 			}
 			Method writeMethod = propertyHolder.getWriteMethod();
 			try {
