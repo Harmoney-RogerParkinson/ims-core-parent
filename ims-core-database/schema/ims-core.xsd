@@ -1393,6 +1393,13 @@
 					</documentation>
 				</xsd:annotation>
 			</element>
+			<element name="protectRealisedDate" type="date">
+				<xsd:annotation>
+					<documentation>
+					 Date the ProtectRealised field was set
+					</documentation>
+				</xsd:annotation>
+			</element>
 			<element name="ProtectRealised" type="tns:currency">
 				<xsd:annotation>
 					<documentation>
