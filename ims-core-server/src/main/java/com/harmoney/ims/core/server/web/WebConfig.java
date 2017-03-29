@@ -18,7 +18,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.ws.config.annotation.EnableWs;
 import org.springframework.ws.config.annotation.WsConfigurerAdapter;
 import org.springframework.ws.wsdl.wsdl11.DefaultWsdl11Definition;
@@ -29,16 +28,17 @@ import com.harmoney.ims.core.messages.MessageProcessorSpringConfig;
 import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
 import com.harmoney.ims.core.queries.QuerySpringConfig;
 import com.harmoney.ims.core.queuehandler.QueueHandlerSpringConfig;
+import com.harmoney.ims.core.server.scheduled.SchedulerConfig;
 
 @Configuration
 @EnableWs
-@EnableScheduling
 @PropertySource("classpath:default.properties")
 @ComponentScan({ "com.harmoney.ims.core.server.web","com.harmoney.ims.core.server.endpoints" })
 @Import({MessageProcessorSpringConfig.class,
 		PartnerConnectionSpringConfig.class,
 		QueueHandlerSpringConfig.class,
 		DatabaseSpringConfig.class,
+//		SchedulerConfig.class,
 		QuerySpringConfig.class})
 public class WebConfig extends WsConfigurerAdapter {
 

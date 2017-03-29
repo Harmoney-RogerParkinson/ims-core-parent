@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.harmoney.ims.core.server.web;
+package com.harmoney.ims.core.server.scheduled;
 
 import java.time.LocalDate;
 
