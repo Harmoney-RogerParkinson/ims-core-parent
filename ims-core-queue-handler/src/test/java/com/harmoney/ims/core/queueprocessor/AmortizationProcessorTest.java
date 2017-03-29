@@ -4,6 +4,8 @@
 package com.harmoney.ims.core.queueprocessor;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -134,9 +136,10 @@ public class AmortizationProcessorTest {
 		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// No PRRS created
 		assertEquals(0,createdPRRs.size());
-		assertEquals(new BigDecimal(0),sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(0),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(0),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		assertTrue(allNullDates(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectRealised(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ManagementFeeRealised(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_SalesCommissionFeeRealised(createdPRRs));
 		
 		// New Bill is created with satisfied=false
 		billProcessor.receiveMessage(getMap(
@@ -146,18 +149,19 @@ public class AmortizationProcessorTest {
 		// 3 PRRs but since this was not a satisfied Bill the ProtectRealised is not yet added
 		// ManagementFeeRealised should be updated though.
 		assertEquals(3,createdPRRs.size());
-		assertEquals(new BigDecimal(0),sumPRR_ProtectRealised(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
 
 		// Update the bill with satisfied=true
 		billProcessor.receiveMessage(getMap(
-				"createdDate=2016-02-27T22:10:02.789Z, replayId=400, type=created",
+				"createdDate=2016-02-27T22:10:02.789Z, replayId=400, type=updated",
 				"loan__Payment_Satisfied__c=true, loan__Loan_Account__c=001p0000001oGUrAAM, CreatedDate=2016-02-27T01:26:22.000Z, loan__Due_Amt__c=353.77, loan__waiver_applied__c=false, loan__Due_Date__c=2016-02-27T00:00:00.000Z, Id=a4np0000000000WAAQ, loan__Transaction_Date__c=2016-02-27T00:00:00.000Z, Name=PCN-0000041405"));
 		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// Satisfying the Bill updates its PRR with a ProtectRealised figure, the other Management Fee
 		// remains unchanged.
 		assertEquals(3,createdPRRs.size());
+		assertFalse(allNullDates(createdPRRs));
 		assertEquals(new BigDecimal(2.27).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
@@ -172,6 +176,7 @@ public class AmortizationProcessorTest {
 		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// Closing the loan creates another PRR which is the sum of the remaining amortisation
 		assertEquals(6,createdPRRs.size());
+		assertFalse(allNullDates(createdPRRs));
 		assertEquals(new BigDecimal(6.82).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
 		assertEquals(new BigDecimal(2.17).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
 		assertEquals(new BigDecimal(1.55).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
@@ -203,9 +208,10 @@ public class AmortizationProcessorTest {
 		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// No PRRS created
 		assertEquals(0,createdPRRs.size());
-		assertEquals(new BigDecimal(0),sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(0),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(0),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		assertTrue(allNullDates(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectRealised(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ManagementFeeRealised(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_SalesCommissionFeeRealised(createdPRRs));
 		
 		// New Bill is created with satisfied=true
 		billProcessor.receiveMessage(getMap(
@@ -215,6 +221,7 @@ public class AmortizationProcessorTest {
 		// 3 PRRs but since this was a satisfied Bill the ProtectRealised is already added
 		// ManagementFeeRealised should be updated though.
 		assertEquals(3,createdPRRs.size());
+		assertFalse(allNullDates(createdPRRs));
 		assertEquals(new BigDecimal(2.27).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
@@ -227,6 +234,7 @@ public class AmortizationProcessorTest {
 		// Satisfying the Bill updates its PRR with a ProtectRealised figure, the other Management Fee
 		// remains unchanged.
 		assertEquals(3,createdPRRs.size());
+		assertFalse(allNullDates(createdPRRs));
 		assertEquals(new BigDecimal(2.27).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
@@ -241,6 +249,7 @@ public class AmortizationProcessorTest {
 		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// Closing the loan creates another PRR which is the sum of the remaining amortisation
 		assertEquals(6,createdPRRs.size());
+		assertFalse(allNullDates(createdPRRs));
 		assertEquals(new BigDecimal(6.82).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
 		assertEquals(new BigDecimal(2.17).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
 		assertEquals(new BigDecimal(1.55).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
@@ -272,9 +281,10 @@ public class AmortizationProcessorTest {
 		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// No PRRS created
 		assertEquals(0,createdPRRs.size());
-		assertEquals(new BigDecimal(0),sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(0),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(0),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		assertTrue(allNullDates(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectRealised(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ManagementFeeRealised(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_SalesCommissionFeeRealised(createdPRRs));
 		
 		// New Bill is created with satisfied=false
 		billProcessor.receiveMessage(getMap(
@@ -284,7 +294,8 @@ public class AmortizationProcessorTest {
 		// 3 PRRs but since this was not a satisfied Bill the ProtectRealised is not yet added
 		// ManagementFeeRealised should be updated though.
 		assertEquals(3,createdPRRs.size());
-		assertEquals(new BigDecimal(0),sumPRR_ProtectRealised(createdPRRs));
+		assertTrue(allNullDates(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
 
@@ -296,6 +307,7 @@ public class AmortizationProcessorTest {
 		// Satisfying the Bill updates its PRR with a ProtectRealised figure, the other Management Fee
 		// remains unchanged.
 		assertEquals(3,createdPRRs.size());
+		assertFalse(allNullDates(createdPRRs));
 		assertEquals(new BigDecimal(2.27).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectWaived(createdPRRs));
 		assertEquals(new BigDecimal(2.27).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
@@ -311,6 +323,7 @@ public class AmortizationProcessorTest {
 		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// Closing the loan creates another PRR which is the sum of the remaining amortisation
 		assertEquals(6,createdPRRs.size());
+		assertFalse(allNullDates(createdPRRs));
 		assertEquals(new BigDecimal(2.27).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectWaived(createdPRRs));
 		assertEquals(new BigDecimal(6.82).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
 		assertEquals(new BigDecimal(2.17).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
@@ -343,9 +356,10 @@ public class AmortizationProcessorTest {
 		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// No PRRS created
 		assertEquals(0,createdPRRs.size());
-		assertEquals(new BigDecimal(0),sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(0),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(0),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		assertTrue(allNullDates(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectRealised(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ManagementFeeRealised(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_SalesCommissionFeeRealised(createdPRRs));
 		
 		// New Bill is created with satisfied=false
 		billProcessor.receiveMessage(getMap(
@@ -355,7 +369,8 @@ public class AmortizationProcessorTest {
 		// 3 PRRs but since this was not a satisfied Bill the ProtectRealised is not yet added
 		// ManagementFeeRealised should be updated though.
 		assertEquals(3,createdPRRs.size());
-		assertEquals(new BigDecimal(0),sumPRR_ProtectRealised(createdPRRs));
+		assertTrue(allNullDates(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
 
@@ -367,7 +382,8 @@ public class AmortizationProcessorTest {
 		// Satisfying the Bill updates its PRR with a ProtectRealised figure, the other Management Fee
 		// remains unchanged.
 		assertEquals(3,createdPRRs.size());
-		assertEquals(new BigDecimal(0),sumPRR_ProtectWaived(createdPRRs));
+		assertFalse(allNullDates(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectWaived(createdPRRs));
 		assertEquals(new BigDecimal(2.27).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
@@ -382,6 +398,7 @@ public class AmortizationProcessorTest {
 		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// Closing the loan creates another PRR which is the sum of the remaining amortisation
 		assertEquals(6,createdPRRs.size());
+		assertFalse(allNullDates(createdPRRs));
 		assertEquals(new BigDecimal(4.55).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectWaived(createdPRRs));
 		assertEquals(new BigDecimal(6.82).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
 		assertEquals(new BigDecimal(2.17).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
@@ -414,9 +431,10 @@ public class AmortizationProcessorTest {
 		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// No PRRS created
 		assertEquals(0,createdPRRs.size());
-		assertEquals(new BigDecimal(0),sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(0),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(0),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		assertTrue(allNullDates(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectRealised(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ManagementFeeRealised(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_SalesCommissionFeeRealised(createdPRRs));
 		
 		// New Bill is created with satisfied=false
 		billProcessor.receiveMessage(getMap(
@@ -426,7 +444,9 @@ public class AmortizationProcessorTest {
 		// 3 PRRs but since this was not a satisfied Bill the ProtectRealised is not yet added
 		// ManagementFeeRealised should be updated though.
 		assertEquals(3,createdPRRs.size());
-		assertEquals(new BigDecimal(0),sumPRR_ProtectRealised(createdPRRs));
+		assertTrue(allNullDates(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectWaived(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
 
@@ -438,7 +458,8 @@ public class AmortizationProcessorTest {
 		// Satisfying the Bill updates its PRR with a ProtectRealised figure, the other Management Fee
 		// remains unchanged.
 		assertEquals(3,createdPRRs.size());
-		assertEquals(new BigDecimal(0),sumPRR_ProtectWaived(createdPRRs));
+		assertFalse(allNullDates(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectWaived(createdPRRs));
 		assertEquals(new BigDecimal(2.27).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
@@ -451,8 +472,9 @@ public class AmortizationProcessorTest {
 		// Unsatisfying the Bill updates its PRR with a zero ProtectRealised figure, the other Management Fee
 		// remains unchanged.
 		assertEquals(3,createdPRRs.size());
-		assertEquals(new BigDecimal(0.00).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectWaived(createdPRRs));
-		assertEquals(new BigDecimal(0.00).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
+		assertTrue(allNullDates(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectWaived(createdPRRs));
+		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
 		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
 
@@ -466,6 +488,7 @@ public class AmortizationProcessorTest {
 		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// Closing the loan creates another PRR which is the sum of the remaining amortisation
 		assertEquals(6,createdPRRs.size());
+		assertFalse(allNullDates(createdPRRs));
 		assertEquals(new BigDecimal(4.55).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectWaived(createdPRRs));
 		assertEquals(new BigDecimal(4.55).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
 		assertEquals(new BigDecimal(2.17).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
@@ -473,7 +496,7 @@ public class AmortizationProcessorTest {
 	}
 	
 	private BigDecimal sumPRR_ProtectRealised(List<ProtectRealisedRevenue> createdPRRs) {
-		BigDecimal ret = new BigDecimal(0);
+		BigDecimal ret = AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED;
 		for (ProtectRealisedRevenue prr : createdPRRs) {
 			if (prr.getProtectRealised() != null) {
 				ret = ret.add(prr.getProtectRealised());
@@ -483,7 +506,7 @@ public class AmortizationProcessorTest {
 	}
 	
 	private BigDecimal sumPRR_ManagementFeeRealised(List<ProtectRealisedRevenue> createdPRRs) {
-		BigDecimal ret = new BigDecimal(0);
+		BigDecimal ret = AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED;
 		for (ProtectRealisedRevenue prr : createdPRRs) {
 			if (prr.getManagementFeeRealised() != null) {
 				ret = ret.add(prr.getManagementFeeRealised());
@@ -492,7 +515,7 @@ public class AmortizationProcessorTest {
 		return ret;
 	}
 	private BigDecimal sumPRR_SalesCommissionFeeRealised(List<ProtectRealisedRevenue> createdPRRs) {
-		BigDecimal ret = new BigDecimal(0);
+		BigDecimal ret = AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED;
 		for (ProtectRealisedRevenue prr : createdPRRs) {
 			if (prr.getSalesCommissionFeeRealised() != null) {
 				ret = ret.add(prr.getSalesCommissionFeeRealised());
@@ -501,13 +524,22 @@ public class AmortizationProcessorTest {
 		return ret;
 	}
 	private BigDecimal sumPRR_ProtectWaived(List<ProtectRealisedRevenue> createdPRRs) {
-		BigDecimal ret = new BigDecimal(0);
+		BigDecimal ret = AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED;
 		for (ProtectRealisedRevenue prr : createdPRRs) {
 			if (prr.getProtectWaived() != null) {
 				ret = ret.add(prr.getProtectWaived());
 			}
 		}
 		return ret;
+	}
+	
+	private boolean allNullDates(List<ProtectRealisedRevenue> createdPRRs) {
+		for (ProtectRealisedRevenue prr : createdPRRs) {
+			if (prr.getProtectRealisedDate() != null) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	private Map<String, Map<String, Object>> getMap(String eventStr, String sobjectStr) {

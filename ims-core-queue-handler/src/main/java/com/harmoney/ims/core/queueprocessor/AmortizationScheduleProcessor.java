@@ -6,7 +6,6 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.helpers.MessageFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,10 +29,10 @@ public class AmortizationScheduleProcessor {
     private static final Logger log = LoggerFactory.getLogger(InvestmentOrderProcessor.class);
 	
 	@Autowired private AmortizationScheduleDAO amortizationScheduleDAO;
-	@Autowired private InvestmentOrderDAO investmentOrderDAO;
 	@Autowired private ProtectRealisedRevenueDAO protectRealisedRevenueDAO;
 	@Autowired private PartnerConnectionWrapper partnerConnection;
 	@Autowired private UnpackHelper unpackHelper;
+	public static BigDecimal BIG_DECIMAL_ZERO_SCALED = BigDecimal.ZERO.setScale(2);
 
 	@Transactional
 	public void processQuery(SObject[] records) {
@@ -53,9 +52,9 @@ public class AmortizationScheduleProcessor {
 	 * @throws ConnectionException
 	 */
 	@Transactional
-	public void loanAccountStatusClosed(String loanAccountId, boolean statusWaived, String createdDate) {
+	public void loanAccountStatusClosed(String loanAccountId, boolean statusWaived, String eventDate) {
 		String queryString = AmortizationScheduleQuery.SOQL
-				+ "WHERE loan__Loan_Account__c = '"+loanAccountId+"' and loan__Due_Date__c >='"+createdDate+"' order by loan__Due_Date__c";
+				+ "WHERE loan__Loan_Account__c = '"+loanAccountId+"' and loan__Due_Date__c >='"+eventDate+"' order by loan__Due_Date__c";
 
 		SObject[] records;
 		try {
@@ -65,7 +64,7 @@ public class AmortizationScheduleProcessor {
 			throw new ProtectRealisedException(e);
 		}
 		if (records.length == 0) {
-			String message = "failed to find any Amortization Schedule entry for "+loanAccountId+" "+createdDate+". Ignoring.";
+			String message = "failed to find any Amortization Schedule entry for "+loanAccountId+" "+eventDate+". Ignoring.";
 			log.error(message);
 			throw new ProtectRealisedException(message);
 		}
@@ -78,7 +77,7 @@ public class AmortizationScheduleProcessor {
 				total.setDueDate(amortizationSchedule.getDueDate());
 			}
 		}
-		createOrUpdateProtectRealisedRevenue(loanAccountId,total, true, statusWaived);
+		createOrUpdateProtectRealisedRevenue(loanAccountId,total, true, statusWaived, ConvertUtils.parseDate(eventDate));
 	}
 	/**
 	 * Bill record had PaymentSatisfied flag set to false
@@ -91,10 +90,10 @@ public class AmortizationScheduleProcessor {
 	 */
 	@Transactional
 	public void billPaymentUnsatisfied(String loanAccountId,
-			boolean waiverApplied, Date dueDate) {
+			boolean waiverApplied, Date dueDate, Date eventDate) {
 		AmortizationSchedule amortizationSchedule = getAmortizationSchedule(loanAccountId, dueDate);
 		amortizationSchedule.setProtectRealised(new BigDecimal(0));
-		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule, true, true);
+		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule, true, true,null);
 	}
 
 	/**
@@ -108,9 +107,9 @@ public class AmortizationScheduleProcessor {
 	 */
 	@Transactional
 	public void billPaymentSatisfied(String loanAccountId,
-			boolean waiverApplied, Date dueDate) {
+			boolean waiverApplied, Date dueDate, Date eventDate) {
 		AmortizationSchedule amortizationSchedule = getAmortizationSchedule(loanAccountId, dueDate);
-		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule, true, waiverApplied);
+		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule, true, waiverApplied,eventDate);
 	}
 	
 
@@ -123,9 +122,9 @@ public class AmortizationScheduleProcessor {
 	 * @throws ConnectionException
 	 */
 	@Transactional
-	public void billCreated(String loanAccountId, Date dueDate) {
+	public void billCreated(String loanAccountId, Date dueDate, Date eventDate) {
 		AmortizationSchedule amortizationSchedule = getAmortizationSchedule(loanAccountId, dueDate);
-		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule);
+		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule, eventDate);
 	}
 
 	/**
@@ -165,7 +164,7 @@ public class AmortizationScheduleProcessor {
 	 * @param amortizationSchedule
 	 * @throws ConnectionException
 	 */
-	private void createOrUpdateProtectRealisedRevenue(String loanAccountId, AmortizationSchedule amortizationSchedule, boolean full, boolean waiver) {
+	private void createOrUpdateProtectRealisedRevenue(String loanAccountId, AmortizationSchedule amortizationSchedule, boolean full, boolean waiver, Date eventDate) {
 		SObject[] records;
 		try {
 			records = partnerConnection.query(InvestmentOrderQuery.SOQL2
@@ -190,18 +189,23 @@ public class AmortizationScheduleProcessor {
 			protectRealisedRevenue.setSalesCommissionFeeRealised(safeDivide(amortizationSchedule.getSalesCommissionRealised(),proportion));
 			if (full) {
 				protectRealisedRevenue.setProtectRealised(safeDivide(amortizationSchedule.getProtectRealised(),proportion));
+				protectRealisedRevenue.setProtectRealisedDate(eventDate);
 				if (waiver) {
 					protectRealisedRevenue.setProtectWaived(protectRealisedRevenue.getProtectRealised());
 				} else {
-					protectRealisedRevenue.setProtectWaived(BigDecimal.ZERO);
+					protectRealisedRevenue.setProtectWaived(BIG_DECIMAL_ZERO_SCALED);
 				}
+			} else {
+				protectRealisedRevenue.setProtectRealised(BIG_DECIMAL_ZERO_SCALED);
+				protectRealisedRevenue.setProtectWaived(BIG_DECIMAL_ZERO_SCALED);
+				protectRealisedRevenue.setProtectRealisedDate(null);
 			}
 			protectRealisedRevenueDAO.merge(protectRealisedRevenue);
 		}
 	}
 	private BigDecimal safeDivide(BigDecimal value, BigDecimal proportion) {
 		if (value == null || proportion == null || proportion.doubleValue() < 0.001D) {
-			return BigDecimal.ZERO;
+			return BIG_DECIMAL_ZERO_SCALED;
 		}
 		try {
 			return value.divide(proportion,2, RoundingMode.HALF_UP);
@@ -209,8 +213,8 @@ public class AmortizationScheduleProcessor {
 			throw e;
 		}
 	}
-	private void createOrUpdateProtectRealisedRevenue(String loanAccountId, AmortizationSchedule amortizationSchedule) {
-		createOrUpdateProtectRealisedRevenue(loanAccountId, amortizationSchedule, false, false);
+	private void createOrUpdateProtectRealisedRevenue(String loanAccountId, AmortizationSchedule amortizationSchedule, Date eventDate) {
+		createOrUpdateProtectRealisedRevenue(loanAccountId, amortizationSchedule, false, false, eventDate);
 	}
 
 	private AmortizationSchedule getAmortizationSchedule(String loanAccountId, Date dueDate) {

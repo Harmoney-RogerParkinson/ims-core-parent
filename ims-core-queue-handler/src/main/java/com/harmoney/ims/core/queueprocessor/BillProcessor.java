@@ -1,6 +1,7 @@
 package com.harmoney.ims.core.queueprocessor;
 
 
+import java.util.Date;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.harmoney.ims.core.database.BillDAO;
+import com.harmoney.ims.core.database.ConvertUtils;
 import com.harmoney.ims.core.database.descriptors.Result;
 import com.harmoney.ims.core.instances.Bill;
 import com.sforce.soap.partner.sobject.SObject;
@@ -44,6 +46,7 @@ public class BillProcessor {
     }
     @Transactional
     private void processCreateOrUpdate(Map<String, Map<String, Object>> message) {
+    	Date eventDate = ConvertUtils.parseDate(message.get("event").get("createdDate").toString().substring(0,10));
         Bill sobject = DAO.unpackMessage(message.get("sobject"));
         Bill original = DAO.getById(sobject.getId());
         if (original == null) {
@@ -51,10 +54,10 @@ public class BillProcessor {
         	DAO.create(sobject);
         	if (sobject.isPaymentSatisfied()) {
         		// satisfied was set on create (unlikely unless we are back filling)
-            	amortizationScheduleProcessor.billPaymentSatisfied(sobject.getLoanAccountId(), sobject.isWaiverApplied(),sobject.getDueDate());
+            	amortizationScheduleProcessor.billPaymentSatisfied(sobject.getLoanAccountId(), sobject.isWaiverApplied(),sobject.getDueDate(),eventDate);
         	} else {
         		// Bill created normally: This will create the PRRs and fill with Management and Sales Commission.
-            	amortizationScheduleProcessor.billCreated(sobject.getLoanAccountId(), sobject.getDueDate());
+            	amortizationScheduleProcessor.billCreated(sobject.getLoanAccountId(), sobject.getDueDate(),eventDate);
         	}
         } else {
         	boolean satisfiedFlagChanged = sobject.isPaymentSatisfied() != original.isPaymentSatisfied();
@@ -63,9 +66,9 @@ public class BillProcessor {
         	if (satisfiedFlagChanged) {
         		// If the satisfaction flag changed then go process it.
             	if (sobject.isPaymentSatisfied()) {
-                	amortizationScheduleProcessor.billPaymentSatisfied(sobject.getLoanAccountId(), sobject.isWaiverApplied(),sobject.getDueDate());
+                	amortizationScheduleProcessor.billPaymentSatisfied(sobject.getLoanAccountId(), sobject.isWaiverApplied(),sobject.getDueDate(),eventDate);
             	} else {
-                	amortizationScheduleProcessor.billPaymentUnsatisfied(sobject.getLoanAccountId(), sobject.isWaiverApplied(),sobject.getDueDate());
+                	amortizationScheduleProcessor.billPaymentUnsatisfied(sobject.getLoanAccountId(), sobject.isWaiverApplied(),sobject.getDueDate(),eventDate);
             	}
         	}
         }
