@@ -139,7 +139,7 @@ Database.delete(pts);
 
 PushTopic pushTopic = new PushTopic();
 pushTopic.Name = 'LOANACCOUNT';
-pushTopic.Query = 'SELECT harMoney_Account_Number__c,Id,loan__Loan_Status__c,Name FROM loan__Loan_Account__c  where loan__Protect_Enabled__c = true';
+pushTopic.Query = 'SELECT harMoney_Account_Number__c,Id,test__c,loan__Loan_Status__c,Name FROM loan__Loan_Account__c  where loan__Protect_Enabled__c = true';
 pushTopic.ApiVersion = 38.0;
 pushTopic.NotifyForOperationCreate = true;
 pushTopic.NotifyForOperationUpdate = true;

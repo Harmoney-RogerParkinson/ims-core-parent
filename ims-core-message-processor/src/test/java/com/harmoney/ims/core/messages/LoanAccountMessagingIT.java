@@ -71,7 +71,7 @@ public class LoanAccountMessagingIT {
 	private int updateInvestorLoanTransaction() throws ConnectionException {
 		
 		String testValue = "RJP"+LocalDateTime.now().toLocalTime().toString();
-		QueryResult qr = partnerConnection.query("SELECT Id,test__c FROM loan__Loan_Account__c");
+		QueryResult qr = partnerConnection.query("SELECT Id,test__c FROM loan__Loan_Account__c where loan__Protect_Enabled__c = true");
 		qr.getSize();
 		List<SObject> updates = new ArrayList<>();
 		int count = 0;
