@@ -24,19 +24,7 @@ To find your current ip address Google: my ip address
 
 https://developer.salesforce.com/docs/atlas.en-us.api_streaming.meta/api_streaming/create_a_pushtopic.htm
 
-```
-PushTopic pushTopic = new PushTopic();
-pushTopic.Name = 'ILTIMS';
-pushTopic.Query = 'SELECT Id,Name,CreatedDate, Loan_Payment_Transaction_Remark__c, Original_Protect_Realised__c, Loan_Payment_Transaction_Protect_Realise__c, Share_Rounded__c, LastModifiedDate, isDeleted, loan__Investor_Loan__c, loan__Principal_Paid__c,loan__Interest_Paid__c, loan__Late_Fees_Paid__c,loan__Tax__c, loan__Total_Service_Charge__c,loan__Charged_Off_Date__c,Extra_Protect_Realised__c,HP_Management_Fee__c, Protect_Fee_Amount__c,Protect_Realised_Active__c,Protect_Charge_Off__c,HP_Sale_Commission_Fee__c,Protect_Enabled__c,loan__Charged_Off_Fees__c,loan__Charged_Off_Interest__c, loan__Charged_Off_Principal__c,Investor_Txn_Fee__c, loan__Txn_Code__c,loan__Waived__c, loan__Protect_Principal__c, loan__Txn_Type__c, loan__Rebate_Amount_On_Payoff__c  FROM loan__Investor_Loan_Account_Txns__c where LastModifiedDate > 1990-10-08T01:02:03Z';pushTopic.ApiVersion = 38.0;
-pushTopic.NotifyForOperationCreate = true;
-pushTopic.NotifyForOperationUpdate = true;
-pushTopic.NotifyForOperationUndelete = true;
-pushTopic.NotifyForOperationDelete = true;
-pushTopic.NotifyForFields = 'Referenced';
-insert pushTopic;
-```
-
-note that it does *not* like the query split over multiple lines and it does not like
+Note that it does *not* like the query split over multiple lines and it does not like
 references to attached objects, eg querying the account id through the attached account record doesn't work.
 For some reason it also doesn't like these fields:
 
@@ -52,7 +40,7 @@ Format of message is (roughly):
 {event={createdDate=2017-02-21T08:20:09.181Z, replayId=33, type=created}, 
 sobject={Description__c=whatever, Id=a6fN00000008giLIAQ, Status__c=Open, Name=INV-0033}}
 
-This is a HashMap whose values are HashMaps. All the keys are Strings. The values are whatever data type is suitable, often a String but could be a Date, Long etc. Currency is a String, number() is a double. What is date? Percentage?
+This is a HashMap whose values are HashMaps. All the keys are Strings. The values are whatever data type is suitable, often a String but could be a Date, Long etc. Currency is a String, number() is a double.
 Date is a string, percentage is double.
 The event section has a type field:
 created, updated
@@ -67,7 +55,7 @@ List<PushTopic> pts = [SELECT Id FROM PushTopic WHERE Name = 'ILTIMS'];
 Database.delete(pts);
 ``` 
 
-for the rjpsandbox there is a new test object created and the pushtopic looks like this:
+for intsb there is a new test object created and the pushtopic looks like this (add test__c to the select list for testing):
 
 ```
 List<PushTopic> pts = [SELECT Id FROM PushTopic WHERE Name = 'ILTIMS'];
@@ -81,7 +69,7 @@ pushTopic.NotifyForOperationCreate = true;
 pushTopic.NotifyForOperationUpdate = true;
 pushTopic.NotifyForOperationUndelete = true;
 pushTopic.NotifyForOperationDelete = true;
-pushTopic.NotifyForFields = 'All';
+pushTopic.NotifyForFields = 'Select';
 insert pushTopic;
 ``` 
 extra fields I had to create in SF to overcome the IF in the formulae:
@@ -105,7 +93,7 @@ loan__Investor_Loan__r.loan__Loan_Status__c Investment_Order_Status__c
 
 ```
 
-PushTopic for the InvestorFundTransaction
+PushTopic for the InvestorFundTransaction (add loan__Reject_Reason__c for testing)
 
 ```
 List<PushTopic> pts = [SELECT Id FROM PushTopic WHERE Name = 'IFTIMS'];
@@ -119,10 +107,11 @@ pushTopic.NotifyForOperationCreate = true;
 pushTopic.NotifyForOperationUpdate = true;
 pushTopic.NotifyForOperationUndelete = true;
 pushTopic.NotifyForOperationDelete = true;
-pushTopic.NotifyForFields = 'All';
+pushTopic.NotifyForFields = 'Select';
 insert pushTopic;
 ```
-*The Salesforce Apex window where you enter this code only accepts one topic at a time. It looks like 'execute highlight' will work but it doesn't*
+*The Salesforce Apex window where you enter this code only accepts one topic at a time. It looks like 'execute highlight' will work but it doesn't
+also it does not like queries split across multiple lines*
 
 PushTopic for Bill
 
@@ -132,13 +121,13 @@ Database.delete(pts);
 
 PushTopic pushTopic = new PushTopic();
 pushTopic.Name = 'BILL';
-pushTopic.Query = 'SELECT  Id,Name,loan__Loan_Account__c, loan__Transaction_Date__c,CreatedDate, loan__Due_Date__c, loan__Due_Amt__c,loan__Payment_Satisfied__c,loan__waiver_applied__c FROM loan__Loan_account_Due_Details__c';
+pushTopic.Query = 'SELECT  Id,Name,loan__Loan_Account__c, loan__Transaction_Date__c,CreatedDate, loan__Due_Date__c, loan__Due_Amt__c,loan__Payment_Satisfied__c,loan__waiver_applied__c,Protect_Enabled__c FROM loan__Loan_account_Due_Details__c  where Protect_Enabled__c = true';
 pushTopic.ApiVersion = 38.0;
 pushTopic.NotifyForOperationCreate = true;
 pushTopic.NotifyForOperationUpdate = true;
 pushTopic.NotifyForOperationUndelete = true;
 pushTopic.NotifyForOperationDelete = true;
-pushTopic.NotifyForFields = 'All';
+pushTopic.NotifyForFields = 'Select';
 insert pushTopic;
 ```
 
@@ -150,13 +139,13 @@ Database.delete(pts);
 
 PushTopic pushTopic = new PushTopic();
 pushTopic.Name = 'LOANACCOUNT';
-pushTopic.Query = 'SELECT harMoney_Account_Number__c,Id,loan__Loan_Status__c,Name FROM loan__Loan_Account__c';
+pushTopic.Query = 'SELECT harMoney_Account_Number__c,Id,loan__Loan_Status__c,Name FROM loan__Loan_Account__c  where loan__Protect_Enabled__c = true';
 pushTopic.ApiVersion = 38.0;
 pushTopic.NotifyForOperationCreate = true;
 pushTopic.NotifyForOperationUpdate = true;
 pushTopic.NotifyForOperationUndelete = true;
 pushTopic.NotifyForOperationDelete = true;
-pushTopic.NotifyForFields = 'All';
+pushTopic.NotifyForFields = 'Select';
 insert pushTopic;
 ```
 
