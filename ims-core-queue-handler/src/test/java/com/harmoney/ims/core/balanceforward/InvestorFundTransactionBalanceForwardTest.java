@@ -74,7 +74,7 @@ public class InvestorFundTransactionBalanceForwardTest {
 	 * Runs the balance forward processing for the period contained by the date given.
 	 * The object returned is a summary of the accounts processed and their balfwd totals
 	 * (the balfwd totals is suppressed unless we are in test mode).
-	 * Analyse that the counts of balfwd records found on the database matches the number the process thing=ks there are
+	 * Analyse that the counts of balfwd records found on the database matches the number the process thinks there are
 	 * and, depending on our mode (put is true or false) store the current final balfwd value or compare the
 	 * final value with the one previously put.
 	 * 
