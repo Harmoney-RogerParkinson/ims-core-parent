@@ -189,7 +189,7 @@
 				<transformationSets>
 					<transformationSet>
 						<dir>${basedir}/schema</dir>
-						<stylesheet>file://${basedir}/ims-core.xsl</stylesheet>
+						<stylesheet>${basedir}/ims-core.xsl</stylesheet>
 						<outputDir>${project.build.directory}/generated-sources/xjc</outputDir>
 					</transformationSet>
 				</transformationSets>
