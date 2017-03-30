@@ -2,6 +2,9 @@ package com.harmoney.ims.core.queueprocessor;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 
 import org.slf4j.Logger;
@@ -12,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.harmoney.ims.core.database.AmortizationScheduleDAO;
 import com.harmoney.ims.core.database.ConvertUtils;
-import com.harmoney.ims.core.database.InvestmentOrderDAO;
 import com.harmoney.ims.core.database.ProtectRealisedRevenueDAO;
 import com.harmoney.ims.core.database.UnpackHelper;
 import com.harmoney.ims.core.database.descriptors.Result;
@@ -123,8 +125,17 @@ public class AmortizationScheduleProcessor {
 	 */
 	@Transactional
 	public void billCreated(String loanAccountId, Date dueDate, Date eventDate) {
-		AmortizationSchedule amortizationSchedule = getAmortizationSchedule(loanAccountId, dueDate);
-		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule, eventDate);
+		AmortizationSchedule amortizationSchedule = getAmortizationSchedule(loanAccountId, addAMonthRoundingToEOM(dueDate));
+		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule);
+	}
+	
+	private Date addAMonthRoundingToEOM(Date in) {
+        ZoneId defaultZoneId = ZoneId.systemDefault();
+        Instant instant = Instant.ofEpochMilli(in.getTime());
+		LocalDate d = instant.atZone(defaultZoneId).toLocalDate();
+		d = d.plusMonths(1);
+		instant = d.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+		return Date.from(instant);
 	}
 
 	/**
@@ -135,25 +146,25 @@ public class AmortizationScheduleProcessor {
 	 * @param loanAccountId
 	 * @throws ConnectionException 
 	 */
-//	@Transactional
+	@Transactional
 	public void loanAccountStatusActive(String loanAccountId) {
-//		String queryString = AmortizationScheduleQuery.SOQL
-//				+ "WHERE loan__Loan_Account__c = '"+loanAccountId+"' order by loan__Due_Date__c";
-//
-//		SObject[] records;
-//		try {
-//			records = partnerConnection.query(queryString);
-//		} catch (ConnectionException e) {
-//			log.error(e.getMessage());
-//			throw new ProtectRealisedException(e);
-//		}
-//		if (records.length == 0) {
-//			String message = "failed to find any Amortization Schedule entry for "+loanAccountId+". Ignoring.";
-//			log.error(message);
-//			throw new ProtectRealisedException(message);
-//		}
-//		AmortizationSchedule amortizationSchedule = amortizationScheduleDAO.unpack(records[0]); // only interested in the first one
-//		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule);
+		String queryString = AmortizationScheduleQuery.SOQL
+				+ "WHERE loan__Loan_Account__c = '"+loanAccountId+"' order by loan__Due_Date__c";
+
+		SObject[] records;
+		try {
+			records = partnerConnection.query(queryString);
+		} catch (ConnectionException e) {
+			log.error(e.getMessage());
+			throw new ProtectRealisedException(e);
+		}
+		if (records.length == 0) {
+			String message = "failed to find any Amortization Schedule entry for "+loanAccountId+". Ignoring.";
+			log.error(message);
+			throw new ProtectRealisedException(message);
+		}
+		AmortizationSchedule amortizationSchedule = amortizationScheduleDAO.unpack(records[0]); // only interested in the first one
+		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule);
 	}
 	
 	/**
@@ -213,8 +224,8 @@ public class AmortizationScheduleProcessor {
 			throw e;
 		}
 	}
-	private void createOrUpdateProtectRealisedRevenue(String loanAccountId, AmortizationSchedule amortizationSchedule, Date eventDate) {
-		createOrUpdateProtectRealisedRevenue(loanAccountId, amortizationSchedule, false, false, eventDate);
+	private void createOrUpdateProtectRealisedRevenue(String loanAccountId, AmortizationSchedule amortizationSchedule) {
+		createOrUpdateProtectRealisedRevenue(loanAccountId, amortizationSchedule, false, false, null);
 	}
 
 	private AmortizationSchedule getAmortizationSchedule(String loanAccountId, Date dueDate) {

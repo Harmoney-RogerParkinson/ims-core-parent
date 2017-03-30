@@ -52,12 +52,12 @@ public class BillProcessor {
         if (original == null) {
         	// no previous version
         	DAO.create(sobject);
+    		// Bill created: This will create the PRRs and fill with Management and Sales Commission.
+        	amortizationScheduleProcessor.billCreated(sobject.getLoanAccountId(), sobject.getDueDate(),eventDate);
         	if (sobject.isPaymentSatisfied()) {
-        		// satisfied was set on create (unlikely unless we are back filling)
+        		// satisfied was set on create: go figure the protect realised values
             	amortizationScheduleProcessor.billPaymentSatisfied(sobject.getLoanAccountId(), sobject.isWaiverApplied(),sobject.getDueDate(),eventDate);
         	} else {
-        		// Bill created normally: This will create the PRRs and fill with Management and Sales Commission.
-            	amortizationScheduleProcessor.billCreated(sobject.getLoanAccountId(), sobject.getDueDate(),eventDate);
         	}
         } else {
         	boolean satisfiedFlagChanged = sobject.isPaymentSatisfied() != original.isPaymentSatisfied();

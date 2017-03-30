@@ -133,25 +133,30 @@ public class AmortizationProcessorTest {
 				"loan__Loan_Status__c=Active - Good Standing, Id=001p0000001oGUrAAM, harMoney_Account_Number__c=C0284207, Name=LAI-00033933, Waived__c=false"));
 		loanAccount = loanAccountDAO.getByHarmoneyAccountNumber("C0284207");
 		assertEquals(LoanAccountStatus.ACTIVE_GOOD_STANDING,loanAccount.getStatus());
-		createdPRRs = protectRealisedRevenueDAO.getAll();
-		// No PRRS created
-		assertEquals(0,createdPRRs.size());
-		assertTrue(allNullDates(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				3,		// size
+				0.00,	// protect waived
+				0.00,	// protect realized
+				0.72,	// management fee realised
+				0.52,	// sales commision fee realised
+				true	// all dates are null
+				);	
 		
 		// New Bill is created with satisfied=false
 		billProcessor.receiveMessage(getMap(
-				"createdDate=2016-02-27T22:10:02.789Z, replayId=400, type=created",
-				"loan__Payment_Satisfied__c=false, loan__Loan_Account__c=001p0000001oGUrAAM, CreatedDate=2016-02-27T01:26:22.000Z, loan__Due_Amt__c=353.77, loan__waiver_applied__c=false, loan__Due_Date__c=2016-02-27T00:00:00.000Z, Id=a4np0000000000WAAQ, loan__Transaction_Date__c=2016-02-27T00:00:00.000Z, Name=PCN-0000041405"));
+				"createdDate=2016-01-27T22:10:02.789Z, replayId=400, type=created",
+				"loan__Payment_Satisfied__c=false, loan__Loan_Account__c=001p0000001oGUrAAM, CreatedDate=2016-01-27T01:26:22.000Z, loan__Due_Amt__c=353.77, loan__waiver_applied__c=false, loan__Due_Date__c=2016-01-27T00:00:00.000Z, Id=a4np0000000000WAAQ, loan__Transaction_Date__c=2016-01-27T00:00:00.000Z, Name=PCN-0000041405"));
 		createdPRRs = protectRealisedRevenueDAO.getAll();
-		// 3 PRRs but since this was not a satisfied Bill the ProtectRealised is not yet added
-		// ManagementFeeRealised should be updated though.
-		assertEquals(3,createdPRRs.size());
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		// 6 PRRs but since this was not a satisfied Bill the ProtectRealised is not yet added
+		// ManagementFeeRealised should be updated though. We have now 2xsets of three, both with just fees.
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				6,		// size
+				0.00,	// protect waived
+				0.00,	// protect realized
+				1.44,	// management fee realised
+				1.04,	// sales commision fee realised
+				true	// all dates are null
+				);	
 
 		// Update the bill with satisfied=true
 		billProcessor.receiveMessage(getMap(
@@ -160,11 +165,14 @@ public class AmortizationProcessorTest {
 		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// Satisfying the Bill updates its PRR with a ProtectRealised figure, the other Management Fee
 		// remains unchanged.
-		assertEquals(3,createdPRRs.size());
-		assertFalse(allNullDates(createdPRRs));
-		assertEquals(new BigDecimal(2.27).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				6,		// size
+				0.00,	// protect waived
+				2.27,	// protect realized
+				1.44,	// management fee realised
+				1.04,	// sales commision fee realised
+				false	// all dates are null
+				);	
 
 		// Change the Loan Account status to Closed-Obligations met
 		loanAccountProcessor.receiveMessage(getMap(
@@ -174,12 +182,15 @@ public class AmortizationProcessorTest {
 		loanAccount = loanAccountDAO.getByHarmoneyAccountNumber("C0284207");
 		assertEquals(LoanAccountStatus.CLOSED_OBLIGATIONS_MET,loanAccount.getStatus());
 		createdPRRs = protectRealisedRevenueDAO.getAll();
-		// Closing the loan creates another PRR which is the sum of the remaining amortisation
-		assertEquals(6,createdPRRs.size());
-		assertFalse(allNullDates(createdPRRs));
-		assertEquals(new BigDecimal(6.82).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(2.17).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(1.55).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		// Closing the loan creates another PRR set which is the sum of the remaining amortisation
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				9,		// size
+				0.00,	// protect waived
+				6.82,	// protect realized
+				2.89,	// management fee realised
+				2.07,	// sales commision fee realised
+				false	// all dates are null
+				);	
 	}
 	
 	/**
@@ -205,39 +216,43 @@ public class AmortizationProcessorTest {
 				"loan__Loan_Status__c=Active - Good Standing, Id=001p0000001oGUrAAM, harMoney_Account_Number__c=C0284207, Name=LAI-00033933, Waived__c=false"));
 		loanAccount = loanAccountDAO.getByHarmoneyAccountNumber("C0284207");
 		assertEquals(LoanAccountStatus.ACTIVE_GOOD_STANDING,loanAccount.getStatus());
-		createdPRRs = protectRealisedRevenueDAO.getAll();
-		// No PRRS created
-		assertEquals(0,createdPRRs.size());
-		assertTrue(allNullDates(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				3,		// size
+				0.00,	// protect waived
+				0.00,	// protect realized
+				0.72,	// management fee realised
+				0.52,	// sales commision fee realised
+				true	// all dates are null
+				);	
 		
 		// New Bill is created with satisfied=true
 		billProcessor.receiveMessage(getMap(
 				"createdDate=2016-02-27T22:10:02.789Z, replayId=400, type=created",
 				"loan__Payment_Satisfied__c=true, loan__Loan_Account__c=001p0000001oGUrAAM, CreatedDate=2016-02-27T01:26:22.000Z, loan__Due_Amt__c=353.77, loan__waiver_applied__c=false, loan__Due_Date__c=2016-02-27T00:00:00.000Z, Id=a4np0000000000WAAQ, loan__Transaction_Date__c=2016-02-27T00:00:00.000Z, Name=PCN-0000041405"));
-		createdPRRs = protectRealisedRevenueDAO.getAll();
-		// 3 PRRs but since this was a satisfied Bill the ProtectRealised is already added
-		// ManagementFeeRealised should be updated though.
-		assertEquals(3,createdPRRs.size());
-		assertFalse(allNullDates(createdPRRs));
-		assertEquals(new BigDecimal(2.27).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		// 9 PRRs but since this was a satisfied Bill the ProtectRealised is already added
+		// to the first set, Fees are in all 6.
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				9,		// size
+				0.00,	// protect waived
+				2.27,	// protect realized
+				2.16,	// management fee realised
+				1.56,	// sales commision fee realised
+				false	// all dates are null
+				);	
 
 		// Update the bill with satisfied=true
 		billProcessor.receiveMessage(getMap(
 				"createdDate=2016-02-27T22:10:02.789Z, replayId=400, type=created",
 				"loan__Payment_Satisfied__c=true, loan__Loan_Account__c=001p0000001oGUrAAM, CreatedDate=2016-02-27T01:26:22.000Z, loan__Due_Amt__c=353.77, loan__waiver_applied__c=false, loan__Due_Date__c=2016-02-27T00:00:00.000Z, Id=a4np0000000000WAAQ, loan__Transaction_Date__c=2016-02-27T00:00:00.000Z, Name=PCN-0000041405"));
-		createdPRRs = protectRealisedRevenueDAO.getAll();
-		// Satisfying the Bill updates its PRR with a ProtectRealised figure, the other Management Fee
-		// remains unchanged.
-		assertEquals(3,createdPRRs.size());
-		assertFalse(allNullDates(createdPRRs));
-		assertEquals(new BigDecimal(2.27).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		// Satisfying this Bill changes nothing 'cos it was already satisfied
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				9,		// size
+				0.00,	// protect waived
+				2.27,	// protect realized
+				2.16,	// management fee realised
+				1.56,	// sales commision fee realised
+				false	// all dates are null
+				);	
 
 		// Change the Loan Account status to Closed-Obligations met
 		loanAccountProcessor.receiveMessage(getMap(
@@ -248,11 +263,14 @@ public class AmortizationProcessorTest {
 		assertEquals(LoanAccountStatus.CLOSED_OBLIGATIONS_MET,loanAccount.getStatus());
 		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// Closing the loan creates another PRR which is the sum of the remaining amortisation
-		assertEquals(6,createdPRRs.size());
-		assertFalse(allNullDates(createdPRRs));
-		assertEquals(new BigDecimal(6.82).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(2.17).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(1.55).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				12,		// size
+				0.00,	// protect waived
+				6.82,	// protect realized
+				3.61,	// management fee realised
+				2.59,	// sales commision fee realised
+				false	// all dates are null
+				);	
 	}
 	
 	/**
@@ -278,40 +296,45 @@ public class AmortizationProcessorTest {
 				"loan__Loan_Status__c=Active - Good Standing, Id=001p0000001oGUrAAM, harMoney_Account_Number__c=C0284207, Name=LAI-00033933, Waived__c=false"));
 		loanAccount = loanAccountDAO.getByHarmoneyAccountNumber("C0284207");
 		assertEquals(LoanAccountStatus.ACTIVE_GOOD_STANDING,loanAccount.getStatus());
-		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// No PRRS created
-		assertEquals(0,createdPRRs.size());
-		assertTrue(allNullDates(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				0,		// size
+				0.00,	// protect waived
+				0.00,	// protect realized
+				0.00,	// management fee realised
+				0.00,	// sales commision fee realised
+				true	// all dates are null
+				);	
 		
 		// New Bill is created with satisfied=false
 		billProcessor.receiveMessage(getMap(
 				"createdDate=2016-02-27T22:10:02.789Z, replayId=400, type=created",
 				"loan__Payment_Satisfied__c=false, loan__Loan_Account__c=001p0000001oGUrAAM, CreatedDate=2016-02-27T01:26:22.000Z, loan__Due_Amt__c=353.77, loan__waiver_applied__c=false, loan__Due_Date__c=2016-02-27T00:00:00.000Z, Id=a4np0000000000WAAQ, loan__Transaction_Date__c=2016-02-27T00:00:00.000Z, Name=PCN-0000041405"));
-		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// 3 PRRs but since this was not a satisfied Bill the ProtectRealised is not yet added
 		// ManagementFeeRealised should be updated though.
-		assertEquals(3,createdPRRs.size());
-		assertTrue(allNullDates(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				3,		// size
+				0.00,	// protect waived
+				0.00,	// protect realized
+				0.72,	// management fee realised
+				0.52,	// sales commision fee realised
+				true	// all dates are null
+				);	
 
 		// Update the bill with satisfied=true waiver=true
 		billProcessor.receiveMessage(getMap(
 				"createdDate=2016-02-27T22:10:02.789Z, replayId=400, type=created",
 				"loan__Payment_Satisfied__c=true, loan__Loan_Account__c=001p0000001oGUrAAM, CreatedDate=2016-02-27T01:26:22.000Z, loan__Due_Amt__c=353.77, loan__waiver_applied__c=true, loan__Due_Date__c=2016-02-27T00:00:00.000Z, Id=a4np0000000000WAAQ, loan__Transaction_Date__c=2016-02-27T00:00:00.000Z, Name=PCN-0000041405"));
-		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// Satisfying the Bill updates its PRR with a ProtectRealised figure, the other Management Fee
 		// remains unchanged.
-		assertEquals(3,createdPRRs.size());
-		assertFalse(allNullDates(createdPRRs));
-		assertEquals(new BigDecimal(2.27).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectWaived(createdPRRs));
-		assertEquals(new BigDecimal(2.27).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				3,		// size
+				2.27,	// protect waived
+				2.27,	// protect realized
+				0.72,	// management fee realised
+				0.52,	// sales commision fee realised
+				true	// all dates are null
+				);	
 
 		// Change the Loan Account status to Closed-Obligations met
 		loanAccountProcessor.receiveMessage(getMap(
@@ -320,14 +343,15 @@ public class AmortizationProcessorTest {
 		// By this time there should be PRR records for this loan and the loan itself is closed.
 		loanAccount = loanAccountDAO.getByHarmoneyAccountNumber("C0284207");
 		assertEquals(LoanAccountStatus.CLOSED_OBLIGATIONS_MET,loanAccount.getStatus());
-		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// Closing the loan creates another PRR which is the sum of the remaining amortisation
-		assertEquals(6,createdPRRs.size());
-		assertFalse(allNullDates(createdPRRs));
-		assertEquals(new BigDecimal(2.27).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectWaived(createdPRRs));
-		assertEquals(new BigDecimal(6.82).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(2.17).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(1.55).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				6,		// size
+				2.27,	// protect waived
+				6.82,	// protect realized
+				2.17,	// management fee realised
+				1.55,	// sales commision fee realised
+				false	// all dates are null
+				);	
 	}
 	
 	/**
@@ -353,40 +377,45 @@ public class AmortizationProcessorTest {
 				"loan__Loan_Status__c=Active - Good Standing, Id=001p0000001oGUrAAM, harMoney_Account_Number__c=C0284207, Name=LAI-00033933, Waived__c=false"));
 		loanAccount = loanAccountDAO.getByHarmoneyAccountNumber("C0284207");
 		assertEquals(LoanAccountStatus.ACTIVE_GOOD_STANDING,loanAccount.getStatus());
-		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// No PRRS created
-		assertEquals(0,createdPRRs.size());
-		assertTrue(allNullDates(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				0,		// size
+				0.00,	// protect waived
+				0.00,	// protect realized
+				0.00,	// management fee realised
+				0.00,	// sales commision fee realised
+				true	// all dates are null
+				);	
 		
 		// New Bill is created with satisfied=false
 		billProcessor.receiveMessage(getMap(
 				"createdDate=2016-02-27T22:10:02.789Z, replayId=400, type=created",
 				"loan__Payment_Satisfied__c=false, loan__Loan_Account__c=001p0000001oGUrAAM, CreatedDate=2016-02-27T01:26:22.000Z, loan__Due_Amt__c=353.77, loan__waiver_applied__c=false, loan__Due_Date__c=2016-02-27T00:00:00.000Z, Id=a4np0000000000WAAQ, loan__Transaction_Date__c=2016-02-27T00:00:00.000Z, Name=PCN-0000041405"));
-		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// 3 PRRs but since this was not a satisfied Bill the ProtectRealised is not yet added
 		// ManagementFeeRealised should be updated though.
-		assertEquals(3,createdPRRs.size());
-		assertTrue(allNullDates(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				3,		// size
+				0.00,	// protect waived
+				0.00,	// protect realized
+				0.72,	// management fee realised
+				0.52,	// sales commision fee realised
+				true	// all dates are null
+				);	
 
 		// Update the bill with satisfied=true
 		billProcessor.receiveMessage(getMap(
 				"createdDate=2016-02-27T22:10:02.789Z, replayId=400, type=created",
 				"loan__Payment_Satisfied__c=true, loan__Loan_Account__c=001p0000001oGUrAAM, CreatedDate=2016-02-27T01:26:22.000Z, loan__Due_Amt__c=353.77, loan__waiver_applied__c=false, loan__Due_Date__c=2016-02-27T00:00:00.000Z, Id=a4np0000000000WAAQ, loan__Transaction_Date__c=2016-02-27T00:00:00.000Z, Name=PCN-0000041405"));
-		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// Satisfying the Bill updates its PRR with a ProtectRealised figure, the other Management Fee
 		// remains unchanged.
-		assertEquals(3,createdPRRs.size());
-		assertFalse(allNullDates(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectWaived(createdPRRs));
-		assertEquals(new BigDecimal(2.27).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				3,		// size
+				0.00,	// protect waived
+				2.27,	// protect realized
+				0.72,	// management fee realised
+				0.52,	// sales commision fee realised
+				false	// all dates are null
+				);	
 
 		// Change the Loan Account status to Closed-Obligations met and waived=true
 		loanAccountProcessor.receiveMessage(getMap(
@@ -395,14 +424,15 @@ public class AmortizationProcessorTest {
 		// By this time there should be PRR records for this loan and the loan itself is closed.
 		loanAccount = loanAccountDAO.getByHarmoneyAccountNumber("C0284207");
 		assertEquals(LoanAccountStatus.CLOSED_OBLIGATIONS_MET,loanAccount.getStatus());
-		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// Closing the loan creates another PRR which is the sum of the remaining amortisation
-		assertEquals(6,createdPRRs.size());
-		assertFalse(allNullDates(createdPRRs));
-		assertEquals(new BigDecimal(4.55).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectWaived(createdPRRs));
-		assertEquals(new BigDecimal(6.82).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(2.17).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(1.55).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				6,		// size
+				4.55,	// protect waived
+				6.82,	// protect realized
+				2.17,	// management fee realised
+				1.55,	// sales commision fee realised
+				false	// all dates are null
+				);	
 	}
 	
 	/**
@@ -428,55 +458,60 @@ public class AmortizationProcessorTest {
 				"loan__Loan_Status__c=Active - Good Standing, Id=001p0000001oGUrAAM, harMoney_Account_Number__c=C0284207, Name=LAI-00033933, Waived__c=false"));
 		loanAccount = loanAccountDAO.getByHarmoneyAccountNumber("C0284207");
 		assertEquals(LoanAccountStatus.ACTIVE_GOOD_STANDING,loanAccount.getStatus());
-		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// No PRRS created
-		assertEquals(0,createdPRRs.size());
-		assertTrue(allNullDates(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				0,		// size
+				0.00,	// protect waived
+				0.00,	// protect realized
+				0.00,	// management fee realised
+				0.00,	// sales commision fee realised
+				true	// all dates are null
+				);	
 		
 		// New Bill is created with satisfied=false
 		billProcessor.receiveMessage(getMap(
 				"createdDate=2016-02-27T22:10:02.789Z, replayId=400, type=created",
 				"loan__Payment_Satisfied__c=false, loan__Loan_Account__c=001p0000001oGUrAAM, CreatedDate=2016-02-27T01:26:22.000Z, loan__Due_Amt__c=353.77, loan__waiver_applied__c=false, loan__Due_Date__c=2016-02-27T00:00:00.000Z, Id=a4np0000000000WAAQ, loan__Transaction_Date__c=2016-02-27T00:00:00.000Z, Name=PCN-0000041405"));
-		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// 3 PRRs but since this was not a satisfied Bill the ProtectRealised is not yet added
 		// ManagementFeeRealised should be updated though.
-		assertEquals(3,createdPRRs.size());
-		assertTrue(allNullDates(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectWaived(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				3,		// size
+				0.00,	// protect waived
+				0.00,	// protect realized
+				0.72,	// management fee realised
+				0.52,	// sales commision fee realised
+				true	// all dates are null
+				);	
 
 		// Update the bill with satisfied=true
 		billProcessor.receiveMessage(getMap(
 				"createdDate=2016-02-27T22:10:02.789Z, replayId=400, type=created",
 				"loan__Payment_Satisfied__c=true, loan__Loan_Account__c=001p0000001oGUrAAM, CreatedDate=2016-02-27T01:26:22.000Z, loan__Due_Amt__c=353.77, loan__waiver_applied__c=false, loan__Due_Date__c=2016-02-27T00:00:00.000Z, Id=a4np0000000000WAAQ, loan__Transaction_Date__c=2016-02-27T00:00:00.000Z, Name=PCN-0000041405"));
-		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// Satisfying the Bill updates its PRR with a ProtectRealised figure, the other Management Fee
 		// remains unchanged.
-		assertEquals(3,createdPRRs.size());
-		assertFalse(allNullDates(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectWaived(createdPRRs));
-		assertEquals(new BigDecimal(2.27).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				3,		// size
+				0.00,	// protect waived
+				2.27,	// protect realized
+				0.72,	// management fee realised
+				0.52,	// sales commision fee realised
+				false	// all dates are null
+				);	
 
 		// Update the bill with satisfied=false
 		billProcessor.receiveMessage(getMap(
 				"createdDate=2016-02-27T22:10:02.789Z, replayId=400, type=updated",
 				"loan__Payment_Satisfied__c=false, loan__Loan_Account__c=001p0000001oGUrAAM, CreatedDate=2016-02-27T01:26:22.000Z, loan__Due_Amt__c=353.77, loan__waiver_applied__c=false, loan__Due_Date__c=2016-02-27T00:00:00.000Z, Id=a4np0000000000WAAQ, loan__Transaction_Date__c=2016-02-27T00:00:00.000Z, Name=PCN-0000041405"));
-		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// Unsatisfying the Bill updates its PRR with a zero ProtectRealised figure, the other Management Fee
 		// remains unchanged.
-		assertEquals(3,createdPRRs.size());
-		assertTrue(allNullDates(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectWaived(createdPRRs));
-		assertEquals(AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED,sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.72).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(0.52).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				3,		// size
+				0.00,	// protect waived
+				0.00,	// protect realized
+				0.72,	// management fee realised
+				0.52,	// sales commision fee realised
+				true	// all dates are null
+				);	
 
 		// Change the Loan Account status to Closed-Obligations met and waived=true
 		loanAccountProcessor.receiveMessage(getMap(
@@ -485,14 +520,15 @@ public class AmortizationProcessorTest {
 		// By this time there should be PRR records for this loan and the loan itself is closed.
 		loanAccount = loanAccountDAO.getByHarmoneyAccountNumber("C0284207");
 		assertEquals(LoanAccountStatus.CLOSED_OBLIGATIONS_MET,loanAccount.getStatus());
-		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// Closing the loan creates another PRR which is the sum of the remaining amortisation
-		assertEquals(6,createdPRRs.size());
-		assertFalse(allNullDates(createdPRRs));
-		assertEquals(new BigDecimal(4.55).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectWaived(createdPRRs));
-		assertEquals(new BigDecimal(4.55).setScale(2, RoundingMode.HALF_UP),sumPRR_ProtectRealised(createdPRRs));
-		assertEquals(new BigDecimal(2.17).setScale(2, RoundingMode.HALF_UP),sumPRR_ManagementFeeRealised(createdPRRs));
-		assertEquals(new BigDecimal(1.55).setScale(2, RoundingMode.HALF_UP),sumPRR_SalesCommissionFeeRealised(createdPRRs));
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				6,		// size
+				4.55,	// protect waived
+				4.55,	// protect realized
+				2.17,	// management fee realised
+				1.55,	// sales commision fee realised
+				false	// all dates are null
+				);	
 	}
 	
 	private BigDecimal sumPRR_ProtectRealised(List<ProtectRealisedRevenue> createdPRRs) {
@@ -560,5 +596,8 @@ public class AmortizationProcessorTest {
 			ret.put((String)e.getKey(), (String)e.getValue());
 		}
 		return ret;
+	}
+	protected static BigDecimal makeBigDecimal(double d) {
+		return new BigDecimal(d).setScale(2, RoundingMode.HALF_UP);
 	}
 }
