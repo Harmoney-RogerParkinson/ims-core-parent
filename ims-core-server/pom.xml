@@ -156,6 +156,11 @@
 			<artifactId>h2</artifactId>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
+	    <dependency>
+	      <groupId>com.papertrailapp</groupId>
+	      <artifactId>logback-syslog4j</artifactId>
+	      <version>1.0.0</version>
+	    </dependency>
+    </dependencies>
 	
 </project>

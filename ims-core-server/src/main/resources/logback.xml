@@ -6,11 +6,29 @@
 			<pattern>%-20(%d{HH:mm:ss.SSS} [%thread]) %-5level %logger{35} - %F:%L %msg%n</pattern>
 		</encoder>
 	</appender>
+  <appender name="SYSLOG-TLS" class="com.papertrailapp.logback.Syslog4jAppender">
+    <layout class="ch.qos.logback.classic.PatternLayout">
+      <pattern>%-20(%d{HH:mm:ss.SSS} [%thread]) %-5level %logger{35} - %F:%L %msg%n</pattern>
+    </layout>
+
+    <syslogConfig class="org.productivity.java.syslog4j.impl.net.tcp.ssl.SSLTCPNetSyslogConfig">
+      <!-- remote system to log to -->
+      <host>logs2.papertrailapp.com</host>
+      <!-- remote port to log to -->
+      <port>54613</port>
+      <!-- program name to log as -->
+      <ident>harmoney-ims</ident>
+      <!-- max log message length in bytes -->
+      <maxMessageLength>128000</maxMessageLength>
+    </syslogConfig>
+  </appender>
+
 	<logger name="com.harmoney.ims" level="info" />
 <!-- 	<logger name="org.springframework.ws" level="debug" /> -->
 	
 	<root level="warn">
 		<appender-ref ref="STDOUT" />
+		<appender-ref ref="SYSLOG-TLS" />
 	</root>
 </configuration>
 
