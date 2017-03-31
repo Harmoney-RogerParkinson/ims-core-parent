@@ -4,6 +4,7 @@
 package com.harmoney.ims.core.database;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
@@ -38,5 +39,12 @@ public class ProtectRealisedRevenueDAO extends AbstractSimpleDAO<ProtectRealised
 		} catch (NoResultException e) {
 			return null;
 		}
+	}
+
+	public List<Date> getUniqueDueDatesUnsatisfied(String loanAccountId) {
+		TypedQuery<Date> query =
+				  entityManager.createNamedQuery("ProtectRealisedRevenue.uniqueDueDatesUnsatisfied", Date.class);
+		query.setParameter("loanAccountId", loanAccountId);
+		return query.getResultList();
 	}
 }

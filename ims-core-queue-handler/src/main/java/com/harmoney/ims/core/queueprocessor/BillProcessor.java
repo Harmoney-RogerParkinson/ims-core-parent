@@ -1,6 +1,9 @@
 package com.harmoney.ims.core.queueprocessor;
 
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
 
@@ -48,12 +51,12 @@ public class BillProcessor {
     private void processCreateOrUpdate(Map<String, Map<String, Object>> message) {
     	Date eventDate = ConvertUtils.parseDate(message.get("event").get("createdDate").toString().substring(0,10));
         Bill sobject = DAO.unpackMessage(message.get("sobject"));
-        Bill original = DAO.getById(sobject.getId());
+		Bill original = DAO.getByLoanAccountIdDueDate(sobject.getLoanAccountId(),sobject.getDueDate());
         if (original == null) {
         	// no previous version
         	DAO.create(sobject);
     		// Bill created: This will create the PRRs and fill with Management and Sales Commission.
-        	amortizationScheduleProcessor.billCreated(sobject.getLoanAccountId(), sobject.getDueDate(),eventDate);
+        	amortizationScheduleProcessor.billPaymentUnsatisfied(sobject.getLoanAccountId(),sobject.isWaiverApplied(), addAMonthRoundingToEOM(sobject.getDueDate()));
         	if (sobject.isPaymentSatisfied()) {
         		// satisfied was set on create: go figure the protect realised values
             	amortizationScheduleProcessor.billPaymentSatisfied(sobject.getLoanAccountId(), sobject.isWaiverApplied(),sobject.getDueDate(),eventDate);
@@ -68,10 +71,19 @@ public class BillProcessor {
             	if (sobject.isPaymentSatisfied()) {
                 	amortizationScheduleProcessor.billPaymentSatisfied(sobject.getLoanAccountId(), sobject.isWaiverApplied(),sobject.getDueDate(),eventDate);
             	} else {
-                	amortizationScheduleProcessor.billPaymentUnsatisfied(sobject.getLoanAccountId(), sobject.isWaiverApplied(),sobject.getDueDate(),eventDate);
+                	amortizationScheduleProcessor.billPaymentUnsatisfied(sobject.getLoanAccountId(), sobject.isWaiverApplied(),sobject.getDueDate());
             	}
         	}
         }
     }
+	private Date addAMonthRoundingToEOM(Date in) {
+        ZoneId defaultZoneId = ZoneId.systemDefault();
+        Instant instant = Instant.ofEpochMilli(in.getTime());
+		LocalDate d = instant.atZone(defaultZoneId).toLocalDate();
+		d = d.plusMonths(1);
+		instant = d.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+		return Date.from(instant);
+	}
+
 
 }

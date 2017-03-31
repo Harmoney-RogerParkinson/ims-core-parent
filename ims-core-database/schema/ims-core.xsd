@@ -959,6 +959,12 @@
 							name="Bill.id" query="select i from Bill i where i.id=:id">
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
+							name="Bill.loanAccountId" query="select i from Bill i where i.loanAccountId=:loanAccountId order by dueDate">
+						</annox:annotate>
+						<annox:annotate annox:class="javax.persistence.NamedQuery"
+							name="Bill.loanAccountIdDueDate" query="select i from Bill i where i.loanAccountId=:loanAccountId and i.dueDate=:dueDate">
+						</annox:annotate>
+						<annox:annotate annox:class="javax.persistence.NamedQuery"
 							name="Bill.all" query="select i from Bill i">
 						</annox:annotate>
 					</annox:annotate>
@@ -1135,7 +1141,7 @@
 					</appinfo>
 				</annotation>
 			</element>
-			<element name="accountId" type="string">
+			<element name="LoanAccountId" type="string">
 				<annotation>
 					<appinfo>
 						<annox:annotate>
@@ -1294,7 +1300,7 @@
 					</appinfo>
 				</annotation>
 			</element>
-			<element name="accountId" type="string">
+			<element name="LoanAccountId" type="string">
 				<annotation>
 					<appinfo>
 						<annox:annotate>
@@ -1353,10 +1359,14 @@
 							name="ProtectRealisedRevenue.imsid" query="select i from ProtectRealisedRevenue i where i.imsid=:imsid">
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
-							name="ProtectRealisedRevenue.all" query="select i from ProtectRealisedRevenue i">
+							name="ProtectRealisedRevenue.all" query="select i from ProtectRealisedRevenue i order by dueDate">
 						</annox:annotate>
 						<annox:annotate annox:class="javax.persistence.NamedQuery"
 							name="ProtectRealisedRevenue.investmentOrderIdAndDueDate" query="select i from ProtectRealisedRevenue i where i.investmentOrderId=:investmentOrderId and i.dueDate=:dueDate">
+						</annox:annotate>
+						<annox:annotate annox:class="javax.persistence.NamedQuery"
+							name="ProtectRealisedRevenue.uniqueDueDatesUnsatisfied" 
+							query="select i.dueDate from ProtectRealisedRevenue i where i.loanAccountId=:loanAccountId and i.protectRealisedDate is null group by dueDate">
 						</annox:annotate>
 					</annox:annotate>
 				</annox:annotate>
@@ -1382,7 +1392,14 @@
 			<element name="investmentOrderId" type="string">
 				<xsd:annotation>
 					<documentation>
-					this should 15 digit salesforce  investment order ID
+					15 digit salesforce investment order ID
+					</documentation>
+				</xsd:annotation>
+			</element>
+			<element name="loanAccountId" type="string">
+				<xsd:annotation>
+					<documentation>
+					15 digit salesforce loan account ID
 					</documentation>
 				</xsd:annotation>
 			</element>
@@ -1400,7 +1417,7 @@
 					</documentation>
 				</xsd:annotation>
 			</element>
-			<element name="ProtectRealised" type="tns:currency">
+			<element name="protectRealised" type="tns:currency">
 				<xsd:annotation>
 					<documentation>
 					Protect Fee Realised value copied from Amortization schedule object in Salesforce. 
@@ -1423,7 +1440,7 @@
 					</appinfo>
 				</xsd:annotation>
 			</element>
-			<element name="SalesCommissionFeeRealised" type="tns:currency">
+			<element name="salesCommissionFeeRealised" type="tns:currency">
 				<xsd:annotation>
 					<documentation>
 					Sales Commission Fee Realised value copied from Amortization schedule object in Salesforce. For the first month, 
@@ -1437,7 +1454,7 @@
 					</appinfo>
 				</xsd:annotation>
 			</element>
-			<element name="ManagementFeeRealised" type="tns:currency">
+			<element name="managementFeeRealised" type="tns:currency">
 				<xsd:annotation>
 					<documentation>
 					Management Fee Realised value copied from Amortization schedule object in Salesforce. For the first month, this 
@@ -1451,7 +1468,7 @@
 					</appinfo>
 				</xsd:annotation>
 			</element>
-			<element name="ProtectWaived" type="tns:currency">
+			<element name="protectWaived" type="tns:currency">
 				<xsd:annotation>
 					<documentation>
 					When a Bill gets Satisfied (loan__Payment_Satisfied__c) and Waived (loan__waiver_applied__c), this field should 

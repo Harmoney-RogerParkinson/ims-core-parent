@@ -48,44 +48,52 @@ public class LoanAccountProcessor {
     	LoanAccount sobject = DAO.unpackMessage(message.get("sobject"));
     	String eventDate = message.get("event").get("createdDate").toString().substring(0,10);
     	LoanAccount original = DAO.getById(sobject.getId());
-        boolean statusClosed = false;
         boolean statusWaived = false;
-        boolean statusActive = false;
+        LoanAccountStatus loanAccountStatus = LoanAccountStatus.PARTIAL_APPLICATION;
         if (original == null) {
         	// Never seen this before, no previous status
         	if ((sobject.getStatus() == LoanAccountStatus.CLOSED_OBLIGATIONS_MET || sobject.getStatus() == LoanAccountStatus.CLOSED_WRITTEN_OFF)) {
-        		statusClosed = true;
+        		loanAccountStatus = LoanAccountStatus.CLOSED_OBLIGATIONS_MET;
         	}
         	if ((sobject.getStatus() == LoanAccountStatus.ACTIVE_GOOD_STANDING)) {
-        		statusActive = true;
+        		loanAccountStatus = LoanAccountStatus.ACTIVE_GOOD_STANDING;
+        	}
+        	if ((sobject.getStatus() == LoanAccountStatus.CANCELED)) {
+        		loanAccountStatus = LoanAccountStatus.CANCELED;
         	}
         	DAO.create(sobject);
         } else {
         	if ((sobject.getStatus() == LoanAccountStatus.CLOSED_OBLIGATIONS_MET || sobject.getStatus() == LoanAccountStatus.CLOSED_WRITTEN_OFF) &&
         			(original.getStatus() == LoanAccountStatus.ACTIVE_GOOD_STANDING || original.getStatus() == LoanAccountStatus.ACTIVE_BAD_STANDING)) {
-        		statusClosed = true;
+        		loanAccountStatus = LoanAccountStatus.CLOSED_OBLIGATIONS_MET;
         	}
         	if ((sobject.getStatus() == LoanAccountStatus.ACTIVE_GOOD_STANDING) &&
         			(original.getStatus() == LoanAccountStatus.APPROVED)) {
-        		statusActive = true;
+        		loanAccountStatus = LoanAccountStatus.ACTIVE_GOOD_STANDING;
+        	}
+        	if ((sobject.getStatus() == LoanAccountStatus.CANCELED) &&
+        			(original.getStatus() == LoanAccountStatus.ACTIVE_GOOD_STANDING)) {
+        		loanAccountStatus = LoanAccountStatus.CANCELED;
         	}
         	sobject.setImsid(original.getImsid());
         	DAO.copy(sobject,original);
         }
-        if (statusClosed) {
-        	
+        switch (loanAccountStatus) {
+        case CANCELED:
+        	// TODO: PRR Sales Comm and Management Fee should be wiped out
+        	break;
+        case CLOSED_OBLIGATIONS_MET:
         	if (sobject.getStatus() == LoanAccountStatus.CLOSED_OBLIGATIONS_MET && sobject.isWaived()) {
         		statusWaived = true;
         	}
         	amortizationScheduleProcessor.loanAccountStatusClosed(sobject.getId(),statusWaived,eventDate);
-        	return;
-        }
-        if (statusActive) {
-        	
+        	break;
+        case ACTIVE_GOOD_STANDING:
         	amortizationScheduleProcessor.loanAccountStatusActive(sobject.getId());
-        	return;
+        	break;
+		default:
+			break;
         }
-    	
     }
 
 }

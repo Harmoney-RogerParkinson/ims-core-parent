@@ -6,6 +6,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,11 +17,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.harmoney.ims.core.database.AmortizationScheduleDAO;
+import com.harmoney.ims.core.database.BillDAO;
 import com.harmoney.ims.core.database.ConvertUtils;
 import com.harmoney.ims.core.database.ProtectRealisedRevenueDAO;
 import com.harmoney.ims.core.database.UnpackHelper;
 import com.harmoney.ims.core.database.descriptors.Result;
 import com.harmoney.ims.core.instances.AmortizationSchedule;
+import com.harmoney.ims.core.instances.Bill;
 import com.harmoney.ims.core.instances.ProtectRealisedRevenue;
 import com.harmoney.ims.core.queries.AmortizationScheduleQuery;
 import com.harmoney.ims.core.queries.InvestmentOrderQuery;
@@ -30,6 +35,7 @@ public class AmortizationScheduleProcessor {
 
     private static final Logger log = LoggerFactory.getLogger(InvestmentOrderProcessor.class);
 	
+	@Autowired private BillDAO billDAO;
 	@Autowired private AmortizationScheduleDAO amortizationScheduleDAO;
 	@Autowired private ProtectRealisedRevenueDAO protectRealisedRevenueDAO;
 	@Autowired private PartnerConnectionWrapper partnerConnection;
@@ -56,7 +62,7 @@ public class AmortizationScheduleProcessor {
 	@Transactional
 	public void loanAccountStatusClosed(String loanAccountId, boolean statusWaived, String eventDate) {
 		String queryString = AmortizationScheduleQuery.SOQL
-				+ "WHERE loan__Loan_Account__c = '"+loanAccountId+"' and loan__Due_Date__c >='"+eventDate+"' order by loan__Due_Date__c";
+				+ "WHERE loan__Loan_Account__c = '"+loanAccountId+"' order by loan__Due_Date__c";
 
 		SObject[] records;
 		try {
@@ -66,20 +72,34 @@ public class AmortizationScheduleProcessor {
 			throw new ProtectRealisedException(e);
 		}
 		if (records.length == 0) {
-			String message = "failed to find any Amortization Schedule entry for "+loanAccountId+" "+eventDate+". Ignoring.";
+			String message = "failed to find any Amortization Schedule entry for "+loanAccountId+". Ignoring.";
 			log.error(message);
 			throw new ProtectRealisedException(message);
 		}
-		AmortizationSchedule total = new AmortizationSchedule();
-		total.setAccountId(loanAccountId);
+		Map<Date,AmortizationSchedule> amortizationMap = new HashMap<>();
 		for (SObject sobject: records) {
 			AmortizationSchedule amortizationSchedule = amortizationScheduleDAO.unpack(sobject);
-			amortizationScheduleDAO.accumulate(amortizationSchedule,total);
-			if (total.getDueDate()==null) {
-				total.setDueDate(amortizationSchedule.getDueDate());
-			}
+			amortizationMap.put(amortizationSchedule.getDueDate(),amortizationSchedule);
 		}
-		createOrUpdateProtectRealisedRevenue(loanAccountId,total, true, statusWaived, ConvertUtils.parseDate(eventDate));
+		AmortizationSchedule amortizationScheduleFinal = null;
+		BigDecimal totalProtectRealised = BIG_DECIMAL_ZERO_SCALED;
+		List<Date> dateList = protectRealisedRevenueDAO.getUniqueDueDatesUnsatisfied(loanAccountId);
+		for (Date date: dateList) {
+			amortizationScheduleFinal = amortizationMap.get(date);
+			totalProtectRealised = totalProtectRealised.add(amortizationScheduleFinal.getProtectRealised());
+		}
+//		List<Bill> billList = billDAO.getByLoanAccountId(loanAccountId);
+//		for (Bill bill:billList) {
+//			if (!bill.isPaymentSatisfied()) {
+//				amortizationScheduleFinal = amortizationMap.get(bill.getDueDate());
+//				totalProtectRealised = totalProtectRealised.add(amortizationScheduleFinal.getProtectRealised());
+//				bill.setPaymentSatisfied(true);
+//			}
+//		}
+		if (amortizationScheduleFinal != null) {
+			amortizationScheduleFinal.setProtectRealised(totalProtectRealised);
+			createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationScheduleFinal, true, statusWaived, ConvertUtils.parseDate(eventDate));
+		}
 	}
 	/**
 	 * Bill record had PaymentSatisfied flag set to false
@@ -92,10 +112,12 @@ public class AmortizationScheduleProcessor {
 	 */
 	@Transactional
 	public void billPaymentUnsatisfied(String loanAccountId,
-			boolean waiverApplied, Date dueDate, Date eventDate) {
+			boolean waiverApplied, Date dueDate) {
 		AmortizationSchedule amortizationSchedule = getAmortizationSchedule(loanAccountId, dueDate);
-		amortizationSchedule.setProtectRealised(new BigDecimal(0));
-		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule, true, true,null);
+		if (amortizationSchedule != null) {
+			amortizationSchedule.setProtectRealised(new BigDecimal(0));
+			createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule, true, true,null);
+		}
 	}
 
 	/**
@@ -115,29 +137,20 @@ public class AmortizationScheduleProcessor {
 	}
 	
 
-	/**
-	 * A new Bill was created. Find the equivalent record in the Amortization Schedule and use that to create
-	 * the ProtectRealisedRevenue records.
-	 * 
-	 * @param loanAccountId
-	 * @param dueDate
-	 * @throws ConnectionException
-	 */
-	@Transactional
-	public void billCreated(String loanAccountId, Date dueDate, Date eventDate) {
-		AmortizationSchedule amortizationSchedule = getAmortizationSchedule(loanAccountId, addAMonthRoundingToEOM(dueDate));
-		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule);
-	}
+//	/**
+//	 * A new Bill was created. Find the equivalent record in the Amortization Schedule and use that to create
+//	 * the ProtectRealisedRevenue records.
+//	 * 
+//	 * @param loanAccountId
+//	 * @param dueDate
+//	 * @throws ConnectionException
+//	 */
+//	@Transactional
+//	public void billCreated(String loanAccountId, Date dueDate) {
+//		AmortizationSchedule amortizationSchedule = getAmortizationSchedule(loanAccountId, addAMonthRoundingToEOM(dueDate));
+//		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule);
+//	}
 	
-	private Date addAMonthRoundingToEOM(Date in) {
-        ZoneId defaultZoneId = ZoneId.systemDefault();
-        Instant instant = Instant.ofEpochMilli(in.getTime());
-		LocalDate d = instant.atZone(defaultZoneId).toLocalDate();
-		d = d.plusMonths(1);
-		instant = d.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
-		return Date.from(instant);
-	}
-
 	/**
 	 * The Loan Account status has just been changed to 'Active - Good Standing'
 	 * Create the initial ProtectRealisedRevenue records but only populate them with fees.
@@ -164,9 +177,22 @@ public class AmortizationScheduleProcessor {
 			throw new ProtectRealisedException(message);
 		}
 		AmortizationSchedule amortizationSchedule = amortizationScheduleDAO.unpack(records[0]); // only interested in the first one
+//		createInitialBill(amortizationSchedule);
 		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule);
 	}
 	
+	private void createInitialBill(AmortizationSchedule amortizationSchedule) {
+		Bill bill = billDAO.getByLoanAccountIdDueDate(amortizationSchedule.getLoanAccountId(),amortizationSchedule.getDueDate());
+		if (bill == null) {
+			bill = new Bill();
+			bill.setLoanAccountId(amortizationSchedule.getLoanAccountId());
+			bill.setDueDate(amortizationSchedule.getDueDate());
+			bill.setPaymentSatisfied(false);
+			billDAO.create(bill);
+		}
+		
+	}
+
 	/**
 	 * Create a PRR record, but only update the fees fields unless the flags are set
 	 * Check if it is already there, and just update if it is.
@@ -184,6 +210,7 @@ public class AmortizationScheduleProcessor {
 			log.error(e.getMessage());
 			throw new ProtectRealisedException(e);
 		}
+		log.debug("creating/updating {} PRRs",records.length);
 		for (SObject sobject: records) {
 			String investmentOrderId = (String)sobject.getField("Id");
 			String investmentOrderLoanShare = (String)sobject.getField("loan__Share__c");
@@ -193,6 +220,7 @@ public class AmortizationScheduleProcessor {
 				protectRealisedRevenue = new ProtectRealisedRevenue();
 				protectRealisedRevenue.setInvestmentOrderId(investmentOrderId);
 				protectRealisedRevenue.setDueDate(amortizationSchedule.getDueDate());
+				protectRealisedRevenue.setLoanAccountId(loanAccountId);
 				protectRealisedRevenueDAO.create(protectRealisedRevenue);
 			}
 			BigDecimal proportion = new BigDecimal(investmentOrderLoanShare);
@@ -241,8 +269,9 @@ public class AmortizationScheduleProcessor {
 		}
 		if (records.length != 1) {
 			String message = "failed to find exactly one Amortization Schedule entry for "+loanAccountId+" "+ConvertUtils.printDate(dueDate)+", found "+records.length+". Ignoring.";
-			log.error(message);
-			throw new ProtectRealisedException(message);
+//			log.error(message);
+//			throw new ProtectRealisedException(message);
+			return null;
 		}
 		AmortizationSchedule amortizationSchedule = amortizationScheduleDAO.unpack(records[0]);
 		return amortizationSchedule;

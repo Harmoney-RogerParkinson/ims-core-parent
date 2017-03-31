@@ -4,13 +4,9 @@
 package com.harmoney.ims.core.queueprocessor;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,70 +45,15 @@ public class AmortizationProcessorTest {
 	@Autowired LoanAccountProcessor loanAccountProcessor;
 	@Autowired ProtectRealisedRevenueDAO protectRealisedRevenueDAO;
 	@Autowired private LoanAccountDAO loanAccountDAO;
-//	@Autowired PartnerConnectionWrapperMock partnerConnectionWrapperMock;
-//	@Autowired DataSource db;
 
-
-//	@Test
-//	public void createXML() throws ConnectionException, IOException {
-//		
-//		Document document = DocumentHelper.createDocument();
-//		Element root = document.addElement("root");
-//		query(root,"SELECT Id,Name, loan__Loan_Account__c,loan__Due_Date__c, Protect_Realised__c, "
-//				+ "Sales_Commission_Realised__c, Management_Fee_Realised__c "
-//				+ "FROM loan__Repayment_Schedule__c order by loan__Due_Date__c","loan__Repayment_Schedule__c");
-//		query(root,"SELECT Id,loan__Account__c,loan__Share__c,loan__Loan_Status__c FROM loan__Investor_Loan__c ","loan__Investor_Loan__c");
-//		OutputFormat format = OutputFormat.createPrettyPrint();
-//		XMLWriter writer = new XMLWriter( new FileWriter( "output.xml" ));
-//        writer.write( document );
-//        writer.close();
-//	}
-
-//	private void query(Element root,String queryString, String tableName)
-//			throws ConnectionException, IOException {
-//		String[] fieldList = StringUtils.stripAll(StringUtils.split(
-//				StringUtils.substringBetween(queryString, "SELECT ", " FROM"),
-//				','));
-//		Connection connection = null;
-//		ResultSet rs = null;
-//		try {
-//			connection = db.getConnection();
-//			rs = connection.prepareStatement(
-//					queryString.replaceAll("Name", "Name_")).executeQuery();
-//			ResultSetMetaData metaData = rs.getMetaData();
-//			int columns = metaData.getColumnCount();
-//			while (rs.next()) {
-//				Element row = root.addElement(tableName);
-//				for (int column = 1; column <= columns; column++) {
-//					Object value = rs.getObject(column);
-//					Element field = row.addElement(fieldList[column - 1]);
-//					if (value != null) {
-//						field.setText(value.toString());
-//					}
-//				}
-//			}
-//		} catch (SQLException e) {
-//			throw new RuntimeException(e);
-//		} finally {
-//			try {
-//				if (rs != null) {
-//					rs.close();
-//				}
-//				if (connection != null) {
-//					connection.close();
-//				}
-//			} catch (SQLException e) {
-//				throw new RuntimeException(e);
-//			}
-//		}
-//		return;
-//	}
-//	@Test
-//	public void testXMLQueries() throws ConnectionException {
-//		SObject[] sobjects = partnerConnectionWrapperMock.query(AmortizationScheduleQuery.SOQL
-//				+ "WHERE loan__Loan_Account__c = 'whatever' and loan__Due_Date__c >='2020-11-27' order by loan__Due_Date__c");
-//	}
-
+	/**
+	 * Not quite so simple. Create a loan account and change to active.
+	 * The create a Bill for its first month (which creates PRRs for its *second* month)
+	 * Then create a bill for the first month again (which does nothing 'cos it is already there)
+	 * Then update bill for month 1 with satisfied 
+	 * New bill for month 2 (unsatisfied) which creates PRRs for month 3
+	 * Finally close the loan which forces the unsatisfied months (2 & 3) to be summed into month 3 and satisfied.
+	 */
 	@Test
 	public void testSimpleSequence() {
 		
@@ -128,6 +69,7 @@ public class AmortizationProcessorTest {
 		assertEquals(LoanAccountStatus.APPROVED,loanAccount.getStatus());
 		
 		// Change the Loan Account status to Active - Good Standing
+		// That creates 3 PRRs and a Bill for month 1
 		loanAccountProcessor.receiveMessage(getMap(
 				"createdDate=2016-01-02T22:47:15.855Z, replayId=207, type=updated",
 				"loan__Loan_Status__c=Active - Good Standing, Id=001p0000001oGUrAAM, harMoney_Account_Number__c=C0284207, Name=LAI-00033933, Waived__c=false"));
@@ -137,40 +79,50 @@ public class AmortizationProcessorTest {
 				3,		// size
 				0.00,	// protect waived
 				0.00,	// protect realized
-				0.72,	// management fee realised
-				0.52,	// sales commision fee realised
+				0.72,	// management fee realized
+				0.52,	// sales commission fee realized
 				true	// all dates are null
 				);	
 		
-		// New Bill is created with satisfied=false
+		// New Bill is created with satisfied=false. PRRs created for the *following* month ie 2016-02
 		billProcessor.receiveMessage(getMap(
 				"createdDate=2016-01-27T22:10:02.789Z, replayId=400, type=created",
 				"loan__Payment_Satisfied__c=false, loan__Loan_Account__c=001p0000001oGUrAAM, CreatedDate=2016-01-27T01:26:22.000Z, loan__Due_Amt__c=353.77, loan__waiver_applied__c=false, loan__Due_Date__c=2016-01-27T00:00:00.000Z, Id=a4np0000000000WAAQ, loan__Transaction_Date__c=2016-01-27T00:00:00.000Z, Name=PCN-0000041405"));
-		createdPRRs = protectRealisedRevenueDAO.getAll();
-		// 6 PRRs but since this was not a satisfied Bill the ProtectRealised is not yet added
-		// ManagementFeeRealised should be updated though. We have now 2xsets of three, both with just fees.
 		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
 				6,		// size
 				0.00,	// protect waived
 				0.00,	// protect realized
-				1.44,	// management fee realised
-				1.04,	// sales commision fee realised
+				1.44,	// management fee realized
+				1.04,	// sales commission fee realized
 				true	// all dates are null
 				);	
 
 		// Update the bill with satisfied=true
+		// No new records but protect realized is updated.
 		billProcessor.receiveMessage(getMap(
-				"createdDate=2016-02-27T22:10:02.789Z, replayId=400, type=updated",
-				"loan__Payment_Satisfied__c=true, loan__Loan_Account__c=001p0000001oGUrAAM, CreatedDate=2016-02-27T01:26:22.000Z, loan__Due_Amt__c=353.77, loan__waiver_applied__c=false, loan__Due_Date__c=2016-02-27T00:00:00.000Z, Id=a4np0000000000WAAQ, loan__Transaction_Date__c=2016-02-27T00:00:00.000Z, Name=PCN-0000041405"));
-		createdPRRs = protectRealisedRevenueDAO.getAll();
+				"createdDate=2016-01-27T22:10:02.789Z, replayId=400, type=updated",
+				"loan__Payment_Satisfied__c=true, loan__Loan_Account__c=001p0000001oGUrAAM, CreatedDate=2016-01-27T01:26:22.000Z, loan__Due_Amt__c=353.77, loan__waiver_applied__c=false, loan__Due_Date__c=2016-01-27T00:00:00.000Z, Id=a4np0000000000WAAQ, loan__Transaction_Date__c=2016-02-27T00:00:00.000Z, Name=PCN-0000041405"));
 		// Satisfying the Bill updates its PRR with a ProtectRealised figure, the other Management Fee
 		// remains unchanged.
 		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
 				6,		// size
 				0.00,	// protect waived
 				2.27,	// protect realized
-				1.44,	// management fee realised
-				1.04,	// sales commision fee realised
+				1.44,	// management fee realized
+				1.04,	// sales commission fee realized
+				false	// all dates are null
+				);	
+
+		// New Bill is created with satisfied=false. The bill is created for the *next* month, ie 2016-03
+		billProcessor.receiveMessage(getMap(
+				"createdDate=2016-02-27T22:10:02.789Z, replayId=400, type=created",
+				"loan__Payment_Satisfied__c=false, loan__Loan_Account__c=001p0000001oGUrAAM, CreatedDate=2016-02-27T01:26:22.000Z, loan__Due_Amt__c=353.77, loan__waiver_applied__c=false, loan__Due_Date__c=2016-02-27T00:00:00.000Z, Id=a4np0000000000WAAQ, loan__Transaction_Date__c=2016-02-27T00:00:00.000Z, Name=PCN-0000041405"));
+		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
+				9,		// size
+				0.00,	// protect waived
+				2.27,	// protect realized
+				2.16,	// management fee realized
+				1.56,	// sales commission fee realized
 				false	// all dates are null
 				);	
 
@@ -181,14 +133,13 @@ public class AmortizationProcessorTest {
 		// By this time there should be PRR records for this loan and the loan itself is closed.
 		loanAccount = loanAccountDAO.getByHarmoneyAccountNumber("C0284207");
 		assertEquals(LoanAccountStatus.CLOSED_OBLIGATIONS_MET,loanAccount.getStatus());
-		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// Closing the loan creates another PRR set which is the sum of the remaining amortisation
 		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
 				9,		// size
 				0.00,	// protect waived
 				6.82,	// protect realized
-				2.89,	// management fee realised
-				2.07,	// sales commision fee realised
+				2.16,	// management fee realized
+				1.56,	// sales commission fee realized
 				false	// all dates are null
 				);	
 	}
@@ -261,7 +212,6 @@ public class AmortizationProcessorTest {
 		// By this time there should be PRR records for this loan and the loan itself is closed.
 		loanAccount = loanAccountDAO.getByHarmoneyAccountNumber("C0284207");
 		assertEquals(LoanAccountStatus.CLOSED_OBLIGATIONS_MET,loanAccount.getStatus());
-		createdPRRs = protectRealisedRevenueDAO.getAll();
 		// Closing the loan creates another PRR which is the sum of the remaining amortisation
 		new CreatedPRRsDTO(protectRealisedRevenueDAO.getAll(),
 				12,		// size
@@ -531,53 +481,6 @@ public class AmortizationProcessorTest {
 				);	
 	}
 	
-	private BigDecimal sumPRR_ProtectRealised(List<ProtectRealisedRevenue> createdPRRs) {
-		BigDecimal ret = AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED;
-		for (ProtectRealisedRevenue prr : createdPRRs) {
-			if (prr.getProtectRealised() != null) {
-				ret = ret.add(prr.getProtectRealised());
-			}
-		}
-		return ret;
-	}
-	
-	private BigDecimal sumPRR_ManagementFeeRealised(List<ProtectRealisedRevenue> createdPRRs) {
-		BigDecimal ret = AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED;
-		for (ProtectRealisedRevenue prr : createdPRRs) {
-			if (prr.getManagementFeeRealised() != null) {
-				ret = ret.add(prr.getManagementFeeRealised());
-			}
-		}
-		return ret;
-	}
-	private BigDecimal sumPRR_SalesCommissionFeeRealised(List<ProtectRealisedRevenue> createdPRRs) {
-		BigDecimal ret = AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED;
-		for (ProtectRealisedRevenue prr : createdPRRs) {
-			if (prr.getSalesCommissionFeeRealised() != null) {
-				ret = ret.add(prr.getSalesCommissionFeeRealised());
-			}
-		}
-		return ret;
-	}
-	private BigDecimal sumPRR_ProtectWaived(List<ProtectRealisedRevenue> createdPRRs) {
-		BigDecimal ret = AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED;
-		for (ProtectRealisedRevenue prr : createdPRRs) {
-			if (prr.getProtectWaived() != null) {
-				ret = ret.add(prr.getProtectWaived());
-			}
-		}
-		return ret;
-	}
-	
-	private boolean allNullDates(List<ProtectRealisedRevenue> createdPRRs) {
-		for (ProtectRealisedRevenue prr : createdPRRs) {
-			if (prr.getProtectRealisedDate() != null) {
-				return false;
-			}
-		}
-		return true;
-	}
-	
 	private Map<String, Map<String, Object>> getMap(String eventStr, String sobjectStr) {
 		Map<String, Map<String, Object>> map = new HashMap<>();
 		map.put("event",getMap(eventStr));
@@ -597,7 +500,54 @@ public class AmortizationProcessorTest {
 		}
 		return ret;
 	}
-	protected static BigDecimal makeBigDecimal(double d) {
-		return new BigDecimal(d).setScale(2, RoundingMode.HALF_UP);
-	}
+//	private BigDecimal sumPRR_ProtectRealised(List<ProtectRealisedRevenue> createdPRRs) {
+//		BigDecimal ret = AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED;
+//		for (ProtectRealisedRevenue prr : createdPRRs) {
+//			if (prr.getProtectRealised() != null) {
+//				ret = ret.add(prr.getProtectRealised());
+//			}
+//		}
+//		return ret;
+//	}
+//	
+//	private BigDecimal sumPRR_ManagementFeeRealised(List<ProtectRealisedRevenue> createdPRRs) {
+//		BigDecimal ret = AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED;
+//		for (ProtectRealisedRevenue prr : createdPRRs) {
+//			if (prr.getManagementFeeRealised() != null) {
+//				ret = ret.add(prr.getManagementFeeRealised());
+//			}
+//		}
+//		return ret;
+//	}
+//	private BigDecimal sumPRR_SalesCommissionFeeRealised(List<ProtectRealisedRevenue> createdPRRs) {
+//		BigDecimal ret = AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED;
+//		for (ProtectRealisedRevenue prr : createdPRRs) {
+//			if (prr.getSalesCommissionFeeRealised() != null) {
+//				ret = ret.add(prr.getSalesCommissionFeeRealised());
+//			}
+//		}
+//		return ret;
+//	}
+//	private BigDecimal sumPRR_ProtectWaived(List<ProtectRealisedRevenue> createdPRRs) {
+//		BigDecimal ret = AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED;
+//		for (ProtectRealisedRevenue prr : createdPRRs) {
+//			if (prr.getProtectWaived() != null) {
+//				ret = ret.add(prr.getProtectWaived());
+//			}
+//		}
+//		return ret;
+//	}
+//	
+//	private boolean allNullDates(List<ProtectRealisedRevenue> createdPRRs) {
+//		for (ProtectRealisedRevenue prr : createdPRRs) {
+//			if (prr.getProtectRealisedDate() != null) {
+//				return false;
+//			}
+//		}
+//		return true;
+//	}
+	
+//	protected static BigDecimal makeBigDecimal(double d) {
+//		return new BigDecimal(d).setScale(2, RoundingMode.HALF_UP);
+//	}
 }

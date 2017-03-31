@@ -17,10 +17,10 @@ public class CreatedPRRsDTO {
 	
     private static final Logger log = LoggerFactory.getLogger(CreatedPRRsDTO.class);
 
-	private BigDecimal protectRealised = AmortizationProcessorTest.makeBigDecimal(0.00);
-	private BigDecimal managementFeeRealised = AmortizationProcessorTest.makeBigDecimal(0.00);
-	private BigDecimal salesCommissionFeeRealised = AmortizationProcessorTest.makeBigDecimal(0.00);
-	private BigDecimal protectWaived = AmortizationProcessorTest.makeBigDecimal(0.00);
+	private BigDecimal protectRealised = AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED;
+	private BigDecimal managementFeeRealised = AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED;
+	private BigDecimal salesCommissionFeeRealised = AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED;
+	private BigDecimal protectWaived = AmortizationScheduleProcessor.BIG_DECIMAL_ZERO_SCALED;
 	private boolean nullDates = true; 
 	private int size=0;
 	
@@ -52,16 +52,16 @@ public class CreatedPRRsDTO {
 			}
 			size++;
 		}
-		log.info("---: {} {} {} {} {} {} {}","--","----------",protectWaived,protectRealised,managementFeeRealised,salesCommissionFeeRealised,nullDates);
+		log.info("---: {} {} {} {} {} {} {}",String.format("%2d", size),"----------",protectWaived,protectRealised,managementFeeRealised,salesCommissionFeeRealised,nullDates);
 	}
 
 	public void compare(int size, boolean nullDates, double protectWaived, double protectRealised, double managementFeeRealised, double salesCommissionFeeRealised) {
+		assertEquals(size,this.size);	
 		assertEquals(makeBigDecimal(protectWaived),this.protectWaived);
 		assertEquals(makeBigDecimal(protectRealised),this.protectRealised);
 		assertEquals(makeBigDecimal(managementFeeRealised),this.managementFeeRealised);
 		assertEquals(makeBigDecimal(salesCommissionFeeRealised),this.salesCommissionFeeRealised);
 		assertTrue(nullDates == this.nullDates);
-		assertEquals(size,this.size);	
 	}
 	private BigDecimal makeBigDecimal(double d) {
 		return new BigDecimal(d).setScale(2, RoundingMode.HALF_UP);
