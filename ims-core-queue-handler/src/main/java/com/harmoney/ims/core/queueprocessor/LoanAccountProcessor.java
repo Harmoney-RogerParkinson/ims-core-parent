@@ -80,7 +80,7 @@ public class LoanAccountProcessor {
         }
         switch (loanAccountStatus) {
         case CANCELED:
-        	// TODO: PRR Sales Comm and Management Fee should be wiped out
+        	amortizationScheduleProcessor.loanAccountStatusCancelled(sobject.getId(), statusWaived, eventDate);
         	break;
         case CLOSED_OBLIGATIONS_MET:
         	if (sobject.getStatus() == LoanAccountStatus.CLOSED_OBLIGATIONS_MET && sobject.isWaived()) {

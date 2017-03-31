@@ -101,6 +101,15 @@ public class AmortizationScheduleProcessor {
 			createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationScheduleFinal, true, statusWaived, ConvertUtils.parseDate(eventDate));
 		}
 	}
+	@Transactional
+	public void loanAccountStatusCancelled(String loanAccountId, boolean statusWaived,
+			String eventDate) {
+		List<ProtectRealisedRevenue> protectRealisedRevenueList = protectRealisedRevenueDAO.getByLoanAccountId(loanAccountId);
+		for (ProtectRealisedRevenue protectRealisedRevenue: protectRealisedRevenueList) {
+			protectRealisedRevenueDAO.delete(protectRealisedRevenue);
+		}
+		
+	}
 	/**
 	 * Bill record had PaymentSatisfied flag set to false
 	 * Go figure the ProtectRealised values and update them to zero
@@ -276,6 +285,7 @@ public class AmortizationScheduleProcessor {
 		AmortizationSchedule amortizationSchedule = amortizationScheduleDAO.unpack(records[0]);
 		return amortizationSchedule;
 	}
+
 
 
 }

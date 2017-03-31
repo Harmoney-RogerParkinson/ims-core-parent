@@ -15,7 +15,7 @@ import org.springframework.util.Assert;
 
 import com.harmoney.ims.core.database.descriptors.ObjectDescriptor;
 import com.harmoney.ims.core.database.descriptors.ObjectDescriptorGenerator;
-import com.harmoney.ims.core.instances.LoanAccount;
+import com.harmoney.ims.core.instances.ProtectRealisedRevenue;
 
 abstract class AbstractDAO<T> {
 
@@ -59,6 +59,10 @@ abstract class AbstractDAO<T> {
 	}
 	public void accumulate(T source, T totals) {
 		objectDescriptor.accumulate(source, totals);
+	}
+	public boolean delete(T entity) {
+		entityManager.remove(entity);
+		return true;
 	}
 	
 	@Transactional

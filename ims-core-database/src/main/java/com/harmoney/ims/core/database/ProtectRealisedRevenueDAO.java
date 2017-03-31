@@ -47,4 +47,12 @@ public class ProtectRealisedRevenueDAO extends AbstractSimpleDAO<ProtectRealised
 		query.setParameter("loanAccountId", loanAccountId);
 		return query.getResultList();
 	}
+
+	public List<ProtectRealisedRevenue> getByLoanAccountId(String loanAccountId) {
+		TypedQuery<ProtectRealisedRevenue> query =
+				  entityManager.createNamedQuery("ProtectRealisedRevenue.loanAccountId", ProtectRealisedRevenue.class);
+		query.setParameter("loanAccountId", loanAccountId);
+		return query.getResultList();
+	}
+
 }

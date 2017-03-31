@@ -1368,6 +1368,11 @@
 							name="ProtectRealisedRevenue.uniqueDueDatesUnsatisfied" 
 							query="select i.dueDate from ProtectRealisedRevenue i where i.loanAccountId=:loanAccountId and i.protectRealisedDate is null group by dueDate">
 						</annox:annotate>
+						<annox:annotate annox:class="javax.persistence.NamedQuery"
+							name="ProtectRealisedRevenue.loanAccountId" 
+							query="select i from ProtectRealisedRevenue i where i.loanAccountId=:loanAccountId">
+						</annox:annotate>
+						
 					</annox:annotate>
 				</annox:annotate>
 			</xsd:appinfo>
