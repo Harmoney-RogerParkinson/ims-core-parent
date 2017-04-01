@@ -28,7 +28,6 @@ import com.harmoney.ims.core.messages.MessageProcessorSpringConfig;
 import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
 import com.harmoney.ims.core.queries.QuerySpringConfig;
 import com.harmoney.ims.core.queuehandler.QueueHandlerSpringConfig;
-import com.harmoney.ims.core.server.scheduled.SchedulerConfig;
 
 @Configuration
 @EnableWs

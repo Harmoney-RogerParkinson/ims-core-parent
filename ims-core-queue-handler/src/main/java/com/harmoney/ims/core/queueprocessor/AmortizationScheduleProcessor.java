@@ -61,6 +61,7 @@ public class AmortizationScheduleProcessor {
 	 */
 	@Transactional
 	public void loanAccountStatusClosed(String loanAccountId, boolean statusWaived, String eventDate) {
+		log.debug("loanAccountStatusClosed: loanAccountId: {} statusWaived: {} eventDate: {}",loanAccountId,statusWaived,eventDate);
 		String queryString = AmortizationScheduleQuery.SOQL
 				+ "WHERE loan__Loan_Account__c = '"+loanAccountId+"' order by loan__Due_Date__c";
 
@@ -104,6 +105,7 @@ public class AmortizationScheduleProcessor {
 	@Transactional
 	public void loanAccountStatusCancelled(String loanAccountId, boolean statusWaived,
 			String eventDate) {
+		log.debug("loanAccountStatusCancelled: loanAccountId: {} statusWaived: {} eventDate: {}",loanAccountId,statusWaived,eventDate);
 		List<ProtectRealisedRevenue> protectRealisedRevenueList = protectRealisedRevenueDAO.getByLoanAccountId(loanAccountId);
 		for (ProtectRealisedRevenue protectRealisedRevenue: protectRealisedRevenueList) {
 			protectRealisedRevenueDAO.delete(protectRealisedRevenue);
@@ -122,10 +124,14 @@ public class AmortizationScheduleProcessor {
 	@Transactional
 	public void billPaymentUnsatisfied(String loanAccountId,
 			boolean waiverApplied, Date dueDate) {
+		log.debug("billPaymentUnsatisfied: loanAccountId: {} waiverApplied: {} dueDate: {}",loanAccountId,waiverApplied,dueDate);
 		AmortizationSchedule amortizationSchedule = getAmortizationSchedule(loanAccountId, dueDate);
 		if (amortizationSchedule != null) {
 			amortizationSchedule.setProtectRealised(new BigDecimal(0));
 			createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule, true, true,null);
+		} else {
+			log.warn("no amortisation records: loanAccountId: {} dueDate: {}",loanAccountId,dueDate);
+
 		}
 	}
 
@@ -141,35 +147,21 @@ public class AmortizationScheduleProcessor {
 	@Transactional
 	public void billPaymentSatisfied(String loanAccountId,
 			boolean waiverApplied, Date dueDate, Date eventDate) {
+		log.debug("billPaymentSatisfied: loanAccountId: {} waiverApplied: {} dueDate: {}",loanAccountId,waiverApplied,dueDate);
 		AmortizationSchedule amortizationSchedule = getAmortizationSchedule(loanAccountId, dueDate);
 		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule, true, waiverApplied,eventDate);
 	}
 	
-
-//	/**
-//	 * A new Bill was created. Find the equivalent record in the Amortization Schedule and use that to create
-//	 * the ProtectRealisedRevenue records.
-//	 * 
-//	 * @param loanAccountId
-//	 * @param dueDate
-//	 * @throws ConnectionException
-//	 */
-//	@Transactional
-//	public void billCreated(String loanAccountId, Date dueDate) {
-//		AmortizationSchedule amortizationSchedule = getAmortizationSchedule(loanAccountId, addAMonthRoundingToEOM(dueDate));
-//		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule);
-//	}
-	
 	/**
 	 * The Loan Account status has just been changed to 'Active - Good Standing'
 	 * Create the initial ProtectRealisedRevenue records but only populate them with fees.
-     * -- discarded in favour of doing it on Bill creation so this does nothing.
 	 * 
 	 * @param loanAccountId
 	 * @throws ConnectionException 
 	 */
 	@Transactional
 	public void loanAccountStatusActive(String loanAccountId) {
+		log.debug("loanAccountStatusActive: loanAccountId: {}",loanAccountId);
 		String queryString = AmortizationScheduleQuery.SOQL
 				+ "WHERE loan__Loan_Account__c = '"+loanAccountId+"' order by loan__Due_Date__c";
 
@@ -186,22 +178,9 @@ public class AmortizationScheduleProcessor {
 			throw new ProtectRealisedException(message);
 		}
 		AmortizationSchedule amortizationSchedule = amortizationScheduleDAO.unpack(records[0]); // only interested in the first one
-//		createInitialBill(amortizationSchedule);
 		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule);
 	}
 	
-	private void createInitialBill(AmortizationSchedule amortizationSchedule) {
-		Bill bill = billDAO.getByLoanAccountIdDueDate(amortizationSchedule.getLoanAccountId(),amortizationSchedule.getDueDate());
-		if (bill == null) {
-			bill = new Bill();
-			bill.setLoanAccountId(amortizationSchedule.getLoanAccountId());
-			bill.setDueDate(amortizationSchedule.getDueDate());
-			bill.setPaymentSatisfied(false);
-			billDAO.create(bill);
-		}
-		
-	}
-
 	/**
 	 * Create a PRR record, but only update the fees fields unless the flags are set
 	 * Check if it is already there, and just update if it is.

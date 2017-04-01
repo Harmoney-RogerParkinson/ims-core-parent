@@ -31,7 +31,7 @@ public class LoanAccountProcessor {
 	}
 
     public void receiveMessage(Map<String, Map<String, Object>> message) {
-        log.debug("Received <{}>", message);
+        log.info("Received <{}>", message);
         String eventType = (String)message.get("event").get("type");
         switch (eventType) {
         case "created":

@@ -57,13 +57,13 @@ public class ConfiguredDatabaseParameters {
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("\ndialect: ");
+		sb.append(" dialect: ");
 		sb.append(dialect);
-		sb.append("\ndatasourceClass: ");
+		sb.append(" datasourceClass: ");
 		sb.append(datasourceClass);
-		sb.append("\ndatasourceURL: ");
+		sb.append(" datasourceURL: ");
 		sb.append(datasourceURL);
-		sb.append("\nhbm2ddlAuto: ");
+		sb.append(" hbm2ddlAuto: ");
 		sb.append(hbm2ddlAuto);
 		return sb.toString();
 	}

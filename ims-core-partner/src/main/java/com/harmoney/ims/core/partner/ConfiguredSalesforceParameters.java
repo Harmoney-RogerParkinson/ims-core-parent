@@ -60,11 +60,11 @@ public class ConfiguredSalesforceParameters {
 	
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("\nsalesforceURL: ");
+		sb.append(" salesforceURL: ");
 		sb.append(salesforceURL);
-		sb.append("\nauthEndpoint: ");
+		sb.append(" authEndpoint: ");
 		sb.append(authEndpoint);
-		sb.append("\nusername: ");
+		sb.append(" username: ");
 		sb.append(username);
 		return sb.toString();
 	}

@@ -38,15 +38,15 @@ public class ConfiguredQueueParameters {
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("\nrabbitMQHost: ");
+		sb.append(" rabbitMQHost: ");
 		sb.append(rabbitMQHost);
-		sb.append("\nrabbitMQvHost: ");
+		sb.append(" rabbitMQvHost: ");
 		sb.append(rabbitMQvHost);
-		sb.append("\nrabbitmqPort: ");
+		sb.append(" rabbitmqPort: ");
 		sb.append(rabbitmqPort);
-		sb.append("\nrabbitmqUsername: ");
+		sb.append(" rabbitmqUsername: ");
 		sb.append(rabbitmqUsername);
-		sb.append("\nexchangeName: ");
+		sb.append(" exchangeName: ");
 		sb.append(exchangeName);
 		return sb.toString();
 	}
