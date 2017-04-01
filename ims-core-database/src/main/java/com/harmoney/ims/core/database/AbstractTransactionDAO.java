@@ -257,6 +257,8 @@ public abstract class AbstractTransactionDAO<T extends Transaction> extends Abst
     	}
     	if (secondBalfwd != null) {
     		// we have an end balance forward record so ensure it is updated
+    		iltTotals.setAccountId(secondBalfwd.getAccountId());
+    		iltTotals.setCreatedDate(secondBalfwd.getCreatedDate());
     		objectDescriptor.copy(iltTotals,secondBalfwd);
     		merge(secondBalfwd);
     		log.debug("Updated existing balfwd accountId: {}",accountId);

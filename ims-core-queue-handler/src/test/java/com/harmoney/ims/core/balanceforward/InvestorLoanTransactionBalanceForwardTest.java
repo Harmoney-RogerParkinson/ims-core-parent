@@ -40,7 +40,7 @@ public class InvestorLoanTransactionBalanceForwardTest {
 	@Autowired InvestorLoanTransactionDAO investorLoanTransactionDAO;
     private static final String dbLocation = "balanceforward.xml";
 
-	@Test @Ignore
+	@Test
 	public void processBalanceForward() throws Exception {
 
 		databaseLoader.loadDatabase(dbLocation);
