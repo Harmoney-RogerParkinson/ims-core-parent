@@ -164,7 +164,7 @@
 				<persistenceUnit>com.harmoney.ims.core.instances</persistenceUnit>
 				<wrapperFile>${basedir}/wrapper.sql</wrapperFile>
 				<dialect>org.hibernate.dialect.PostgreSQLDialect</dialect>
-				<drops>false</drops>
+				<drops>true</drops>
 			</configuration>
 			<dependencies>
 				<dependency>
