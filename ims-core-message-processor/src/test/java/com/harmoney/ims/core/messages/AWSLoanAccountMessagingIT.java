@@ -51,14 +51,18 @@ public class AWSLoanAccountMessagingIT {
 	@Autowired private PartnerConnection partnerConnection;
 
 	@Test
-	public void testSubscription() throws ConnectionException, InterruptedException {
-//		int saved = updateInvestorLoanTransaction();
-//		log.info("Processed {} LoanAccount records",saved);
+	public void testLoanAccountUpdate() throws ConnectionException, InterruptedException {
+		int saved = updateLoanAccount();
+		log.info("Processed {} LoanAccount records",saved);
+	}
+
+	@Test
+	public void testBillUpdate() throws ConnectionException, InterruptedException {
 		int saved1 = updateBills();
 		log.info("Processed {} Bill records",saved1);
 	}
 
-	private int updateInvestorLoanTransaction() throws ConnectionException {
+	private int updateLoanAccount() throws ConnectionException {
 		
 		String testValue = "RJP"+LocalDateTime.now().toLocalTime().toString();
 		QueryResult qr = partnerConnection.query("SELECT Id,test__c FROM loan__Loan_Account__c where loan__Protect_Enabled__c = true");
