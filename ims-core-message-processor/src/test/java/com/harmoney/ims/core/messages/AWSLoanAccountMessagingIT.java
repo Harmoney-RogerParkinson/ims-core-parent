@@ -1,13 +1,8 @@
 package com.harmoney.ims.core.messages;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -22,9 +17,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.StringUtils;
 
 import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
-import com.salesforce.emp.connector.EmpConnector;
-import com.sforce.soap.partner.Error;
 import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.soap.partner.Error;
 import com.sforce.soap.partner.QueryResult;
 import com.sforce.soap.partner.SaveResult;
 import com.sforce.soap.partner.sobject.SObject;
@@ -38,7 +32,7 @@ import com.sforce.ws.ConnectionException;
  * than the production 'prod' one. The mock message handler counts the message and interrupts
  * the main thread from its sleep.
  * 
- * It uses the loan__Investor_Loan_Account_Txns__c table and updates test__c to trigger the pushTopic.
+ * It uses the loan__Loan_Account__c table and updates test__c to trigger the pushTopic.
  * 
  * Uses the intsb sandbox.
  * 
@@ -48,31 +42,26 @@ import com.sforce.ws.ConnectionException;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource("/test2.properties")
-@ContextConfiguration(classes={MessageProcessorSpringConfig.class,PartnerConnectionSpringConfig.class})
+@ContextConfiguration(classes={PartnerConnectionSpringConfig.class})
 @ActiveProfiles("message-processor-dev")
-public class ILTMessagingIT {
+public class AWSLoanAccountMessagingIT {
 	
-    private static final Logger log = LoggerFactory.getLogger(ILTMessagingIT.class);
-	@Autowired private EmpConnector empConnector;
-	@Autowired private MessageHandlerMap messageHandlerMap;
+    private static final Logger log = LoggerFactory.getLogger(AWSLoanAccountMessagingIT.class);
 	
 	@Autowired private PartnerConnection partnerConnection;
 
-	@Test @Ignore
+	@Test
 	public void testSubscription() throws ConnectionException, InterruptedException {
-		assertNotNull(empConnector);
-		MessageHandler messageHandler = messageHandlerMap.getMessageHandler("/topic/ILTIMS");
-		int saved = updateInvestorLoanTransaction();
-		CountDownLatch latch = new CountDownLatch(saved);
-		messageHandler.setLatch(latch);
-		assertTrue("Did not reach expected count",latch.await(100000, TimeUnit.MILLISECONDS));
-		log.info("Processed {} records",saved);
+//		int saved = updateInvestorLoanTransaction();
+//		log.info("Processed {} LoanAccount records",saved);
+		int saved1 = updateBills();
+		log.info("Processed {} Bill records",saved1);
 	}
 
 	private int updateInvestorLoanTransaction() throws ConnectionException {
 		
 		String testValue = "RJP"+LocalDateTime.now().toLocalTime().toString();
-		QueryResult qr = partnerConnection.query("SELECT Id,test__c FROM loan__Investor_Loan_Account_Txns__c");
+		QueryResult qr = partnerConnection.query("SELECT Id,test__c FROM loan__Loan_Account__c where loan__Protect_Enabled__c = true");
 		qr.getSize();
 		List<SObject> updates = new ArrayList<>();
 		int count = 0;
@@ -83,8 +72,39 @@ public class ILTMessagingIT {
 			String t = (String)r.getField("test__c");
 			if (StringUtils.isEmpty(t) || t.startsWith("RJP")) {
 				SObject r1 = new SObject();
-				r1.setType("loan__Investor_Loan_Account_Txns__c");
+				r1.setType("loan__Loan_Account__c");
 				r1.setField("test__c", testValue);
+				r1.setField("Id", id);
+				updates.add(r1);
+				if (count++ > 0) {
+					saved += saveResults(updates);
+					count = 0;
+					updates.clear();
+					break;
+				}
+			}
+		}
+		if (count > 0) {
+			saved += saveResults(updates);
+		}
+		return saved;
+	}
+	private int updateBills() throws ConnectionException {
+		
+		String testValue = "RJP"+LocalDateTime.now().toLocalTime().toString();
+		QueryResult qr = partnerConnection.query("SELECT Id,loan__Remarks__c FROM loan__Loan_account_Due_Details__c where Protect_Enabled__c = true");
+		qr.getSize();
+		List<SObject> updates = new ArrayList<>();
+		int count = 0;
+		int saved = 0;
+		SObject[] records = qr.getRecords();
+		for (SObject r: records) {
+			String id = (String)r.getField("Id");
+			String t = (String)r.getField("loan__Remarks__c");
+			if (StringUtils.isEmpty(t) || t.startsWith("RJP")) {
+				SObject r1 = new SObject();
+				r1.setType("loan__Loan_account_Due_Details__c");
+				r1.setField("loan__Remarks__c", testValue);
 				r1.setField("Id", id);
 				updates.add(r1);
 				if (count++ > 0) {

@@ -92,6 +92,7 @@ public class LoanAccountProcessor {
         	amortizationScheduleProcessor.loanAccountStatusActive(sobject.getId());
         	break;
 		default:
+			log.debug("No action to take");
 			break;
         }
     }

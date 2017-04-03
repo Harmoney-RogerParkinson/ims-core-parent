@@ -22,6 +22,7 @@ import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.dbunit.ext.h2.H2DataTypeFactory;
 import org.dbunit.ext.postgresql.PostgresqlDataTypeFactory;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -95,7 +96,7 @@ public class SuperServerIT {
 	@Value("${com.harmoney.ims.core.server.test.SuperServerIT.saveData:/tmp/ims.xml}")
 	private String dbLocation;
 
-	@Test
+	@Test @Ignore
 	public void testEverythingFromSalesforce() throws Exception {
 		assertNotNull(empConnector);
 		

@@ -61,7 +61,7 @@ public class MessageHandlerMap {
 				};
 			connector.subscribe(thisTopic, configuredParameters.getReplayFrom(),
 					consumer).get(5, TimeUnit.SECONDS);
-			log.debug("subscription created: {} replayFrom {}",thisTopic, configuredParameters.replayFrom);
+			log.info("subscription created: {} replayFrom {} rabbit: {}",thisTopic, configuredParameters.replayFrom,thisMessageHandler.getRabbitQueue());
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			throw new MessageHandlerException("failed to subscribe",e);
 		}

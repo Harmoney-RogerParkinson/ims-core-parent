@@ -25,6 +25,8 @@
 
 	<logger name="com.harmoney.ims" level="info" />
 	<logger name="com.harmoney.ims.core.queueprocessor" level="debug" />
+ 	<logger name="com.harmoney.ims.core.partner.PartnerConnectionSpringConfig" level="debug" />
+	<logger name="com.harmoney.ims.core.messages" level="debug" />
 
 	<root level="warn">
 		<appender-ref ref="STDOUT" />

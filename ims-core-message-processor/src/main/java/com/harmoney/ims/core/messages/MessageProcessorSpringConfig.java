@@ -82,8 +82,8 @@ public class MessageProcessorSpringConfig {
 	@Bean
 	List<MessageConfigurationEntry> getMessageConfiguration() {
 		List<MessageConfigurationEntry> ret = new ArrayList<>();
-		ret.add(new MessageConfigurationEntry("/topic/ILTIMS","ilt-queue",new FieldResolverILT()));
-		ret.add(new MessageConfigurationEntry("/topic/IFTIMS","ift-queue"));
+//		ret.add(new MessageConfigurationEntry("/topic/ILTIMS","ilt-queue",new FieldResolverILT()));
+//		ret.add(new MessageConfigurationEntry("/topic/IFTIMS","ift-queue"));
 		ret.add(new MessageConfigurationEntry("/topic/BILL","bill-queue"));
 		ret.add(new MessageConfigurationEntry("/topic/LOANACCOUNT","loanaccount-queue"));
 		return ret;

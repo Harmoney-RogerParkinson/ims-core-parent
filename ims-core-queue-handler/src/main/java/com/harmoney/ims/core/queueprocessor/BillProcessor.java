@@ -61,6 +61,7 @@ public class BillProcessor {
         		// satisfied was set on create: go figure the protect realised values
             	amortizationScheduleProcessor.billPaymentSatisfied(sobject.getLoanAccountId(), sobject.isWaiverApplied(),sobject.getDueDate(),eventDate);
         	} else {
+        		log.debug("No action to take (other than create)");
         	}
         } else {
         	boolean satisfiedFlagChanged = sobject.isPaymentSatisfied() != original.isPaymentSatisfied();
@@ -73,6 +74,8 @@ public class BillProcessor {
             	} else {
                 	amortizationScheduleProcessor.billPaymentUnsatisfied(sobject.getLoanAccountId(), sobject.isWaiverApplied(),sobject.getDueDate());
             	}
+        	} else {
+        		log.debug("No action to take (other than update)");
         	}
         }
     }

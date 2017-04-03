@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 import com.sforce.soap.partner.PartnerConnection;
+import com.sforce.soap.partner.QueryResult;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 
@@ -41,13 +42,20 @@ public class PartnerConnectionSpringConfig {
 		log.info("Salesforce Connection...");
 		ConnectorConfig config = new ConnectorConfig();
 		config.setUsername(configuredParameters.getUsername());
-		config.setPassword(configuredParameters.getPassword());
+		config.setPassword(configuredParameters.getPassword()+configuredParameters.getSecurityToken());
 		config.setAuthEndpoint(configuredParameters.getAuthEndpoint());
 		connection = new PartnerConnection(config);
 
 		// display some current settings
-		log.info("Salesforce Connection:\nAuth EndPoint: {}\nService EndPoint: {}\nUsername: {}\nSessionId: {}",
+		log.info("Salesforce Partner Connection:\nAuth EndPoint: {}\nService EndPoint: {}\nUsername: {}\nSessionId: {}",
 				config.getAuthEndpoint(),config.getServiceEndpoint(),config.getUsername(),config.getSessionId());
+		if (log.isDebugEnabled()) {
+			QueryResult qr = connection.query("SELECT Id,test__c FROM loan__Loan_Account__c where loan__Protect_Enabled__c = true");
+			log.debug("found {} records in sample query",qr.getSize());
+			QueryResult qr1 = connection.query("SELECT  Id,Name,loan__Loan_Account__c, loan__Transaction_Date__c FROM loan__Loan_account_Due_Details__c where Protect_Enabled__c = true");
+			log.debug("found {} records in sample query",qr1.getSize());
+		}
+
 		return connection;
 	}
 

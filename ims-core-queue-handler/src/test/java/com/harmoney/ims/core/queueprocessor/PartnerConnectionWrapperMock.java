@@ -46,13 +46,13 @@ public class PartnerConnectionWrapperMock implements PartnerConnectionWrapper {
 			List<Element> elements = salesforceMock.getRootElement().elements("loan__Investor_Loan__c");
 			return makeSObjects(elements);
 		}
-		dueDate = extractParam(queryString,"loan__Due_Date__c >='");
+		dueDate = extractParam(queryString,"loan__Due_Date__c >= ");
 		if (dueDate != null) {
 			List<Element> elements = salesforceMock.getRootElement().selectNodes("//root/loan__Repayment_Schedule__c[translate(loan__Due_Date__c, \"-:T\", \"\") >= translate('"+dueDate+"', \"-:T\", \"\")]");
 			return makeSObjects(elements);
 
 		}
-		dueDate = extractParam(queryString,"loan__Due_Date__c = '");
+		dueDate = extractParam(queryString,"loan__Due_Date__c = ");
 		if (dueDate != null) {
 			List<Element> elements = salesforceMock.getRootElement().selectNodes("//root/loan__Repayment_Schedule__c[loan__Due_Date__c = '"+dueDate+"']");
 			return makeSObjects(elements);
@@ -66,7 +66,7 @@ public class PartnerConnectionWrapperMock implements PartnerConnectionWrapper {
 			return null;
 		}
 		i = i + previous.length();
-		int i1 = query.indexOf('\'',i);
+		int i1 = query.indexOf('T',i);
 		return query.substring(i,i1);
 	}
 

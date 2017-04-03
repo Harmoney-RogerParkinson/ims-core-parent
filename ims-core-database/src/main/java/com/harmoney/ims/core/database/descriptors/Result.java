@@ -45,5 +45,7 @@ public class Result {
 		errors.add(ret);
 		return ret;
 	}
-
+	public boolean isSuccess() {
+		return errors.size() == 0 && warnings.size() == 0;
+	}
 }

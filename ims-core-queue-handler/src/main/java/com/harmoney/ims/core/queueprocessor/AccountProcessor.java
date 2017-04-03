@@ -20,7 +20,9 @@ public class AccountProcessor {
 	public void processQuery(SObject[] records) {
 		for (SObject sobject: records) {
 			Result result = accountDAO.createOrUpdate(sobject);
-			log.debug("Result: {}",result);
+			if (!result.isSuccess()) {
+				log.debug("Result: {}",result);
+			}
 		}
 	}
 	

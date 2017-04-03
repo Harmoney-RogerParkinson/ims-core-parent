@@ -47,10 +47,10 @@ public class QueueHandlerSpringConfig {
 	    return factory;
 	}
 	// Only need this if we want to auto-create the queue and/or exchange
-	@Bean
-	RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
-		return new RabbitAdmin(connectionFactory);
-	}
+//	@Bean
+//	RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
+//		return new RabbitAdmin(connectionFactory);
+//	}
 	@Bean
 	TopicExchange exchange() {
 		return new TopicExchange(configuredQueueParameters.getExchangeName());

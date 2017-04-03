@@ -51,8 +51,11 @@ public class MessageHandlerMock implements com.harmoney.ims.core.messages.Messag
     }
 	@Override
 	public void setLatch(CountDownLatch latch) {
-		// TODO Auto-generated method stub
 		
+	}
+	@Override
+	public String getRabbitQueue() {
+		return null;
 	}
 
 }

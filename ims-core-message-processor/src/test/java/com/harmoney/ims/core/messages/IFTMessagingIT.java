@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -56,7 +57,7 @@ public class IFTMessagingIT {
 	
 	@Autowired private PartnerConnection partnerConnection;
 
-	@Test
+	@Test @Ignore
 	public void testSubscription() throws ConnectionException, InterruptedException {
 		assertNotNull(empConnector);
 		MessageHandler messageHandler = messageHandlerMap.getMessageHandler("/topic/IFTIMS");

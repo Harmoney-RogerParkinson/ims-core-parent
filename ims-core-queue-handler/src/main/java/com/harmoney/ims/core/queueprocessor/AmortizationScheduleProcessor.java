@@ -33,7 +33,7 @@ import com.sforce.ws.ConnectionException;
 @Component
 public class AmortizationScheduleProcessor {
 
-    private static final Logger log = LoggerFactory.getLogger(InvestmentOrderProcessor.class);
+    private static final Logger log = LoggerFactory.getLogger(AmortizationScheduleProcessor.class);
 	
 	@Autowired private BillDAO billDAO;
 	@Autowired private AmortizationScheduleDAO amortizationScheduleDAO;
@@ -246,7 +246,7 @@ public class AmortizationScheduleProcessor {
 
 	private AmortizationSchedule getAmortizationSchedule(String loanAccountId, Date dueDate) {
 		String queryString = AmortizationScheduleQuery.SOQL
-				+ "WHERE loan__Loan_Account__c = '"+loanAccountId+"' and loan__Due_Date__c = '"+ConvertUtils.printDate(dueDate)+"'";
+				+ "WHERE loan__Loan_Account__c = '"+loanAccountId+"' and loan__Due_Date__c = "+ConvertUtils.printDate(dueDate)+"T00:00:00.000Z";
 
 		SObject[] records;
 		try {

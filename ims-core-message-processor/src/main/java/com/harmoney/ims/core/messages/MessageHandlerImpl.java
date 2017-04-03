@@ -42,7 +42,7 @@ public class MessageHandlerImpl implements MessageHandler {
 		Map<String,Object> sobject = (Map<String,Object>)message.get("sobject");
 		fieldResolver.resolve(sobject);
 		if (log.isDebugEnabled()) {
-			log.debug("sobject:\n {}",getSobject(sobject));
+			log.debug("sobject: {}",getSobject(sobject));
 		}
 
 		if (latch != null) {
@@ -66,13 +66,18 @@ public class MessageHandlerImpl implements MessageHandler {
 			ret.append(entry.getKey());
 			ret.append('=');
 			ret.append(entry.getValue());
-			ret.append('\n');
+			ret.append(' ');
 		}
 		return ret.toString();
     }
 
 	public long getCount() {
 		return count;
+	}
+
+	@Override
+	public String getRabbitQueue() {
+		return rabbitQueue;
 	}
 
 }

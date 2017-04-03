@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ public class MessageSenderIT {
 	@Autowired
 	RabbitTemplate rabbitTemplate;
 
-	@Test
+	@Test @Ignore
 	public void test() throws Exception {
 		log.info("Sending message...");
 		// {event={createdDate=2017-02-23T00:24:29.976Z, replayId=3,

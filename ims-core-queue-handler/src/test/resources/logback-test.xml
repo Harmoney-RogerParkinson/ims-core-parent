@@ -15,6 +15,7 @@
 	<logger name="com.harmoney.ims.core.database.AbstractDAO" level="debug" />
 	<logger name="com.harmoney.ims.core.queueprocessor" level="debug" />
 	<logger name="com.harmoney.ims.core.database.InvestorLoanTransactionDAO" level="debug" />
+	<logger name="com.harmoney.ims.core.partner.PartnerConnectionSpringConfig" level="debug" />
 	<logger name="com.harmoney.ims" level="info" />
 	<root level="warn">
 		<appender-ref ref="STDOUT" />

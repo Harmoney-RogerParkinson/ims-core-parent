@@ -44,28 +44,44 @@ public class RabbitReceiver {
 	@AMPQReceiver(queueName="ilt-queue")
     public void receiveILTMessage(Map<String, Map<String, Object>> message) {
         log.debug("Received <{}>", message);
-        investorLoanTransactionProcessor.receiveMessage(message);
+        try {
+			investorLoanTransactionProcessor.receiveMessage(message);
+		} catch (Exception e) {
+			log.error("receiveILTMessage",e);
+		}
         count();
     }
 
     @AMPQReceiver(queueName="ift-queue")
     public void receiveIFTMessage(Map<String, Map<String, Object>> message) {
         log.debug("Received <{}>", message);
-        investorFundTransactionProcessor.receiveMessage(message);
+        try {
+			investorFundTransactionProcessor.receiveMessage(message);
+		} catch (Exception e) {
+			log.error("receiveIFTMessage",e);
+		}
         count();
     }
 
     @AMPQReceiver(queueName="bill-queue")
     public void receiveBillMessage(Map<String, Map<String, Object>> message) {
         log.debug("Received <{}>", message);
-        billProcessor.receiveMessage(message);
+        try {
+			billProcessor.receiveMessage(message);
+		} catch (Exception e) {
+			log.error("receiveBillMessage",e);
+		}
         count();
     }
 
     @AMPQReceiver(queueName="loanaccount-queue")
     public void receiveLoanAccountMessage(Map<String, Map<String, Object>> message) {
         log.debug("Received <{}>", message);
-        loanAccountProcessor.receiveMessage(message);
+        try {
+			loanAccountProcessor.receiveMessage(message);
+		} catch (Exception e) {
+			log.error("receiveLoanAccountMessage",e);
+		}
         count();
     }
 
