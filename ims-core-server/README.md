@@ -13,3 +13,14 @@ url (for the moment) is http://localhost:8080/ims-core-server/
 Displays a blank page with a title in the browser window title
 
 WSDL is at [http://localhost:8080/ims-core-server/endpoints/ims-core.wsdl](http://localhost:8080/ims-core-server/endpoints/ims-core.wsdl)
+
+#logback
+
+For production there ought to be an external logback file which can be edited outside the war file. Specify it using something like this:
+
+```
+-Dlogback.configurationFile=~/harmoney/external-logback.xml
+```
+
+Use the AWS environment instead of command line switches, of course. As long as the `scan="true"` is present on the root tag of the file it will reload every minute. [More details](https://logback.qos.ch/manual/configuration.html)
+

@@ -121,7 +121,7 @@ Database.delete(pts);
 
 PushTopic pushTopic = new PushTopic();
 pushTopic.Name = 'BILL';
-pushTopic.Query = 'SELECT  Id,Name,loan__Loan_Account__c, loan__Transaction_Date__c,CreatedDate, loan__Due_Date__c, loan__Due_Amt__c,loan__Payment_Satisfied__c,loan__waiver_applied__c,Protect_Enabled__c,loan__Remarks__c FROM loan__Loan_account_Due_Details__c  where Protect_Enabled__c = true';
+pushTopic.Query = 'SELECT  Id,Name,loan__Loan_Account__c, loan__Transaction_Date__c,CreatedDate, loan__Due_Date__c, loan__Due_Amt__c,loan__Payment_Satisfied__c,loan__waiver_applied__c,HM_Protect_Enabled__c,loan__Remarks__c FROM loan__Loan_account_Due_Details__c  where HM_Protect_Enabled__c = true';
 pushTopic.ApiVersion = 38.0;
 pushTopic.NotifyForOperationCreate = true;
 pushTopic.NotifyForOperationUpdate = true;
