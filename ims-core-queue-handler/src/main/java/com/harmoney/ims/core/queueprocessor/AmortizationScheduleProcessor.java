@@ -2,9 +2,6 @@ package com.harmoney.ims.core.queueprocessor;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -23,8 +20,8 @@ import com.harmoney.ims.core.database.ProtectRealisedRevenueDAO;
 import com.harmoney.ims.core.database.UnpackHelper;
 import com.harmoney.ims.core.database.descriptors.Result;
 import com.harmoney.ims.core.instances.AmortizationSchedule;
-import com.harmoney.ims.core.instances.Bill;
 import com.harmoney.ims.core.instances.ProtectRealisedRevenue;
+import com.harmoney.ims.core.partner.PartnerConnectionWrapper;
 import com.harmoney.ims.core.queries.AmortizationScheduleQuery;
 import com.harmoney.ims.core.queries.InvestmentOrderQuery;
 import com.sforce.soap.partner.sobject.SObject;
@@ -62,8 +59,7 @@ public class AmortizationScheduleProcessor {
 	@Transactional
 	public void loanAccountStatusClosed(String loanAccountId, boolean statusWaived, String eventDate) {
 		log.debug("loanAccountStatusClosed: loanAccountId: {} statusWaived: {} eventDate: {}",loanAccountId,statusWaived,eventDate);
-		String queryString = AmortizationScheduleQuery.SOQL
-				+ "WHERE loan__Loan_Account__c = '"+loanAccountId+"' order by loan__Due_Date__c";
+		String queryString = AmortizationScheduleQuery.getByLoanAccount(loanAccountId);
 
 		SObject[] records;
 		try {
@@ -162,8 +158,7 @@ public class AmortizationScheduleProcessor {
 	@Transactional
 	public void loanAccountStatusActive(String loanAccountId) {
 		log.debug("loanAccountStatusActive: loanAccountId: {}",loanAccountId);
-		String queryString = AmortizationScheduleQuery.SOQL
-				+ "WHERE loan__Loan_Account__c = '"+loanAccountId+"' order by loan__Due_Date__c";
+		String queryString = AmortizationScheduleQuery.getByLoanAccount(loanAccountId);
 
 		SObject[] records;
 		try {
@@ -192,8 +187,7 @@ public class AmortizationScheduleProcessor {
 	private void createOrUpdateProtectRealisedRevenue(String loanAccountId, AmortizationSchedule amortizationSchedule, boolean full, boolean waiver, Date eventDate) {
 		SObject[] records;
 		try {
-			records = partnerConnection.query(InvestmentOrderQuery.SOQL2
-					+ "WHERE loan__Account__c = '"+loanAccountId+"'");
+			records = partnerConnection.query(InvestmentOrderQuery.getByLoanAccount(loanAccountId));
 		} catch (ConnectionException e) {
 			log.error(e.getMessage());
 			throw new ProtectRealisedException(e);
@@ -245,8 +239,7 @@ public class AmortizationScheduleProcessor {
 	}
 
 	private AmortizationSchedule getAmortizationSchedule(String loanAccountId, Date dueDate) {
-		String queryString = AmortizationScheduleQuery.SOQL
-				+ "WHERE loan__Loan_Account__c = '"+loanAccountId+"' and loan__Due_Date__c = "+ConvertUtils.printDate(dueDate)+"T00:00:00.000Z";
+		String queryString = AmortizationScheduleQuery.getByLoanAccountDueDate(loanAccountId,dueDate);
 
 		SObject[] records;
 		try {
@@ -257,7 +250,7 @@ public class AmortizationScheduleProcessor {
 		}
 		if (records.length != 1) {
 			String message = "failed to find exactly one Amortization Schedule entry for "+loanAccountId+" "+ConvertUtils.printDate(dueDate)+", found "+records.length+". Ignoring.";
-//			log.error(message);
+			log.warn(message);
 //			throw new ProtectRealisedException(message);
 			return null;
 		}

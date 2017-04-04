@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -24,8 +23,6 @@ import com.harmoney.ims.core.database.InvestorFundTransactionDAO;
 import com.harmoney.ims.core.databaseloader.DatabaseLoader;
 import com.harmoney.ims.core.databaseloader.DatabaseLoaderSpringConfig;
 import com.harmoney.ims.core.instances.InvestorFundTransaction;
-import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
-import com.harmoney.ims.core.queries.QuerySpringConfig;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource("/H2Test.properties")

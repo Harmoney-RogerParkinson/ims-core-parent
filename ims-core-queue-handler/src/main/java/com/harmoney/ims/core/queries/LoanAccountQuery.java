@@ -6,8 +6,8 @@ package com.harmoney.ims.core.queries;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.harmoney.ims.core.partner.PartnerConnectionWrapper;
 import com.harmoney.ims.core.queueprocessor.LoanAccountProcessor;
-import com.harmoney.ims.core.queueprocessor.PartnerConnectionWrapper;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 

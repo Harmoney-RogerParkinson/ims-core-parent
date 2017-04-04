@@ -100,6 +100,7 @@ public class XMLBuilderTest {
 	}
 	@Test @Ignore
 	public void testXMLQueries() throws ConnectionException {
+		@SuppressWarnings("unused")
 		SObject[] sobjects = partnerConnectionWrapperMock.query(AmortizationScheduleQuery.SOQL
 				+ "WHERE loan__Loan_Account__c = 'whatever' and loan__Due_Date__c >='2020-11-27' order by loan__Due_Date__c");
 	}

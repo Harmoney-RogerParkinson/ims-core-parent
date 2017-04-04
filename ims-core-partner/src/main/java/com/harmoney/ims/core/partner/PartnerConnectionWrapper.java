@@ -1,4 +1,4 @@
-package com.harmoney.ims.core.queueprocessor;
+package com.harmoney.ims.core.partner;
 
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;

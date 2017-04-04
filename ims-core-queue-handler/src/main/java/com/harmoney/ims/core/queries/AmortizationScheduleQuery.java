@@ -3,11 +3,14 @@
  */
 package com.harmoney.ims.core.queries;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.harmoney.ims.core.database.ConvertUtils;
+import com.harmoney.ims.core.partner.PartnerConnectionWrapper;
 import com.harmoney.ims.core.queueprocessor.AmortizationScheduleProcessor;
-import com.harmoney.ims.core.queueprocessor.PartnerConnectionWrapper;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 
@@ -29,5 +32,14 @@ public class AmortizationScheduleQuery {
 		SObject[] records = partnerConnection.query(SOQL);
 		amortizationScheduleProcessor.processQuery(records);
 		return records.length;
+	}
+
+	public static String getByLoanAccount(String loanAccountId) {
+		return SOQL + "WHERE loan__Loan_Account__c = '"+loanAccountId+"' order by loan__Due_Date__c";
+	}
+
+	public static String getByLoanAccountDueDate(String loanAccountId,
+			Date dueDate) {
+		return SOQL	+ "WHERE loan__Loan_Account__c = '"+loanAccountId+"' and loan__Due_Date__c = "+ConvertUtils.printDate(dueDate);
 	}
 }

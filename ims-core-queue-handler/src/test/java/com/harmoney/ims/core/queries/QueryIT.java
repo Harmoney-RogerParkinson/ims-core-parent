@@ -24,7 +24,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.harmoney.ims.core.database.ConfiguredDatabaseParameters;
 import com.harmoney.ims.core.database.DatabaseSpringConfig;
 import com.harmoney.ims.core.partner.PartnerConnectionSpringConfig;
-import com.harmoney.ims.core.queueprocessor.PartnerConnectionWrapper;
+import com.harmoney.ims.core.partner.PartnerConnectionWrapper;
 import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.bind.XmlObject;
 
@@ -47,14 +47,12 @@ public class QueryIT {
 	@Test
 	public void testAccountSummaryQuery() throws Exception {
 		
-		log.info("Database hbm2ddlauto={} database dialect {}",configuredParameters.getHbm2ddlAuto(),configuredParameters.getDialect());
 		accountquery.doQuery();
 	}
 
 	@Test
 	public void testInvestmentOrderQuery() throws Exception {
 		
-		log.info("Database hbm2ddlauto={} database dialect {}",configuredParameters.getHbm2ddlAuto(),configuredParameters.getDialect());
 		investmentOrderquery.doQuery();
 	}
 	@Test @Ignore
