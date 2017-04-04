@@ -101,6 +101,12 @@ public class PartnerConnectionWrapperMock implements PartnerConnectionWrapper {
 			throw new RuntimeException(e);
 		}
 	}
+
+	@Override
+	public void logout() {
+		// do nothing
+		
+	}
 	
 //	private SObject[] loadQueryResult(String file) throws FileNotFoundException, DocumentException {
 //		List<SObject> ret = new ArrayList<>();

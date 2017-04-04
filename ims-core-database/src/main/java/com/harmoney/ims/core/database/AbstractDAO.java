@@ -15,7 +15,6 @@ import org.springframework.util.Assert;
 
 import com.harmoney.ims.core.database.descriptors.ObjectDescriptor;
 import com.harmoney.ims.core.database.descriptors.ObjectDescriptorGenerator;
-import com.harmoney.ims.core.instances.ProtectRealisedRevenue;
 
 abstract class AbstractDAO<T> {
 

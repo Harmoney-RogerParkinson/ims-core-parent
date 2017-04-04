@@ -33,12 +33,16 @@ public class PartnerConnectionWrapperImpl implements PartnerConnectionWrapper {
 		config.setUsername(configuredParameters.getUsername());
 		config.setPassword(configuredParameters.getPassword()+configuredParameters.getSecurityToken());
 		config.setAuthEndpoint(configuredParameters.getAuthEndpoint());
-		log.debug("Salesforce Partner Connection:\nAuth EndPoint: {}\nService EndPoint: {}\nUsername: {}\nSessionId: {}",
-				config.getAuthEndpoint(),config.getServiceEndpoint(),config.getUsername(),config.getSessionId());
+//		log.debug("Salesforce Partner Connection:\nAuth EndPoint: {}\nService EndPoint: {}\nUsername: {}\nSessionId: {}",
+//				config.getAuthEndpoint(),config.getServiceEndpoint(),config.getUsername(),config.getSessionId());
 		PartnerConnection partnerConnection = new PartnerConnection(config);
 		QueryResult qr = partnerConnection.query(queryString);
 		partnerConnection.logout();
 		return qr.getRecords();
 	}
+	
+	public void logout() {
+	}
+	
 
 }

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import com.harmoney.ims.core.balanceforward.InvestorFundTransactionBalanceForward;
 import com.harmoney.ims.core.balanceforward.InvestorLoanTransactionBalanceForward;
+import com.harmoney.ims.core.partner.PartnerConnectionWrapper;
 import com.harmoney.ims.core.queries.AccountQuery;
 import com.harmoney.ims.core.queries.InvestmentOrderQuery;
 import com.sforce.ws.ConnectionException;
@@ -33,6 +34,7 @@ public class Scheduler {
     private static final Logger log = LoggerFactory.getLogger(Scheduler.class);
 
 	@Autowired AccountQuery accountQuery;
+	@Autowired PartnerConnectionWrapper partnerConnection;
 	@Autowired InvestmentOrderQuery investmentOrderQuery;
 	@Autowired InvestorLoanTransactionBalanceForward investorLoanTransactionBalanceForward;
 	@Autowired InvestorFundTransactionBalanceForward investorFundTransactionBalanceForward;
@@ -49,16 +51,20 @@ public class Scheduler {
 	public void runQueries() {
 		log.info("starting scheduledQueries");
 		try {
-			accountQuery.doQuery();
-		} catch (ConnectionException e) {
-			log.error(e.getMessage(),e);
+			try {
+				accountQuery.doQuery();
+			} catch (ConnectionException e) {
+				log.error(e.getMessage(),e);
+			}
+			try {
+				investmentOrderQuery.doQuery();
+			} catch (ConnectionException e) {
+				log.error(e.getMessage(),e);
+			}
+			log.info("finished scheduledQueries");
+		} finally {
+			partnerConnection.logout();
 		}
-		try {
-			investmentOrderQuery.doQuery();
-		} catch (ConnectionException e) {
-			log.error(e.getMessage(),e);
-		}
-		log.info("finished scheduledQueries");
 	}
 	/**
 	 * Run the balanced forward processes. By default these run on the first of every month
@@ -72,15 +78,19 @@ public class Scheduler {
 	public void runBalanceForward() {
 		log.info("starting scheduledBalanceForward");
 		try {
-			investorLoanTransactionBalanceForward.processBalanceForward(LocalDate.now());
-		} catch (Exception e) {
-			log.error(e.getMessage(),e);
+			try {
+				investorLoanTransactionBalanceForward.processBalanceForward(LocalDate.now());
+			} catch (Exception e) {
+				log.error(e.getMessage(),e);
+			}
+			try {
+				investorFundTransactionBalanceForward.processBalanceForward(LocalDate.now());
+			} catch (Exception e) {
+				log.error(e.getMessage(),e);
+			}
+			log.info("finished scheduledBalanceForward");
+		} finally {
+			partnerConnection.logout();
 		}
-		try {
-			investorFundTransactionBalanceForward.processBalanceForward(LocalDate.now());
-		} catch (Exception e) {
-			log.error(e.getMessage(),e);
-		}
-		log.info("finished scheduledBalanceForward");
 	}
 }

@@ -41,7 +41,7 @@ import com.sforce.ws.ConnectionException;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @TestPropertySource("/test2.properties")
-@ContextConfiguration(classes={MessageProcessorSpringConfig.class,PartnerConnectionSpringConfig.class})
+@ContextConfiguration(classes={PartnerConnectionSpringConfig.class})
 @ActiveProfiles("message-processor-dev")
 public class AWSLoanAccountMessagingIT {
 	

@@ -1,6 +1,5 @@
 package com.harmoney.ims.core.server.web;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.jar.Manifest;
 

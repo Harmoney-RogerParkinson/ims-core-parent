@@ -61,30 +61,31 @@ public class AmortizationScheduleProcessor {
 		log.debug("loanAccountStatusClosed: loanAccountId: {} statusWaived: {} eventDate: {}",loanAccountId,statusWaived,eventDate);
 		String queryString = AmortizationScheduleQuery.getByLoanAccount(loanAccountId);
 
-		SObject[] records;
 		try {
-			records = partnerConnection.query(queryString);
-		} catch (ConnectionException e) {
-			log.error(e.getMessage());
-			throw new ProtectRealisedException(e);
-		}
-		if (records.length == 0) {
-			String message = "failed to find any Amortization Schedule entry for "+loanAccountId+". Ignoring.";
-			log.error(message);
-			throw new ProtectRealisedException(message);
-		}
-		Map<Date,AmortizationSchedule> amortizationMap = new HashMap<>();
-		for (SObject sobject: records) {
-			AmortizationSchedule amortizationSchedule = amortizationScheduleDAO.unpack(sobject);
-			amortizationMap.put(amortizationSchedule.getDueDate(),amortizationSchedule);
-		}
-		AmortizationSchedule amortizationScheduleFinal = null;
-		BigDecimal totalProtectRealised = BIG_DECIMAL_ZERO_SCALED;
-		List<Date> dateList = protectRealisedRevenueDAO.getUniqueDueDatesUnsatisfied(loanAccountId);
-		for (Date date: dateList) {
-			amortizationScheduleFinal = amortizationMap.get(date);
-			totalProtectRealised = totalProtectRealised.add(amortizationScheduleFinal.getProtectRealised());
-		}
+			SObject[] records;
+			try {
+				records = partnerConnection.query(queryString);
+			} catch (ConnectionException e) {
+				log.error(e.getMessage());
+				throw new ProtectRealisedException(e);
+			}
+			if (records.length == 0) {
+				String message = "failed to find any Amortization Schedule entry for "+loanAccountId+". Ignoring.";
+				log.error(message);
+				throw new ProtectRealisedException(message);
+			}
+			Map<Date,AmortizationSchedule> amortizationMap = new HashMap<>();
+			for (SObject sobject: records) {
+				AmortizationSchedule amortizationSchedule = amortizationScheduleDAO.unpack(sobject);
+				amortizationMap.put(amortizationSchedule.getDueDate(),amortizationSchedule);
+			}
+			AmortizationSchedule amortizationScheduleFinal = null;
+			BigDecimal totalProtectRealised = BIG_DECIMAL_ZERO_SCALED;
+			List<Date> dateList = protectRealisedRevenueDAO.getUniqueDueDatesUnsatisfied(loanAccountId);
+			for (Date date: dateList) {
+				amortizationScheduleFinal = amortizationMap.get(date);
+				totalProtectRealised = totalProtectRealised.add(amortizationScheduleFinal.getProtectRealised());
+			}
 //		List<Bill> billList = billDAO.getByLoanAccountId(loanAccountId);
 //		for (Bill bill:billList) {
 //			if (!bill.isPaymentSatisfied()) {
@@ -93,18 +94,25 @@ public class AmortizationScheduleProcessor {
 //				bill.setPaymentSatisfied(true);
 //			}
 //		}
-		if (amortizationScheduleFinal != null) {
-			amortizationScheduleFinal.setProtectRealised(totalProtectRealised);
-			createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationScheduleFinal, true, statusWaived, ConvertUtils.parseDate(eventDate));
+			if (amortizationScheduleFinal != null) {
+				amortizationScheduleFinal.setProtectRealised(totalProtectRealised);
+				createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationScheduleFinal, true, statusWaived, ConvertUtils.parseDate(eventDate));
+			}
+		} finally {
+			partnerConnection.logout();
 		}
 	}
 	@Transactional
 	public void loanAccountStatusCancelled(String loanAccountId, boolean statusWaived,
 			String eventDate) {
 		log.debug("loanAccountStatusCancelled: loanAccountId: {} statusWaived: {} eventDate: {}",loanAccountId,statusWaived,eventDate);
-		List<ProtectRealisedRevenue> protectRealisedRevenueList = protectRealisedRevenueDAO.getByLoanAccountId(loanAccountId);
-		for (ProtectRealisedRevenue protectRealisedRevenue: protectRealisedRevenueList) {
-			protectRealisedRevenueDAO.delete(protectRealisedRevenue);
+		try {
+			List<ProtectRealisedRevenue> protectRealisedRevenueList = protectRealisedRevenueDAO.getByLoanAccountId(loanAccountId);
+			for (ProtectRealisedRevenue protectRealisedRevenue: protectRealisedRevenueList) {
+				protectRealisedRevenueDAO.delete(protectRealisedRevenue);
+			}
+		} finally {
+			partnerConnection.logout();
 		}
 		
 	}
@@ -122,12 +130,15 @@ public class AmortizationScheduleProcessor {
 			boolean waiverApplied, Date dueDate) {
 		log.debug("billPaymentUnsatisfied: loanAccountId: {} waiverApplied: {} dueDate: {}",loanAccountId,waiverApplied,dueDate);
 		AmortizationSchedule amortizationSchedule = getAmortizationSchedule(loanAccountId, dueDate);
-		if (amortizationSchedule != null) {
-			amortizationSchedule.setProtectRealised(new BigDecimal(0));
-			createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule, true, true,null);
-		} else {
-			log.warn("no amortisation records: loanAccountId: {} dueDate: {}",loanAccountId,dueDate);
-
+		try {
+			if (amortizationSchedule != null) {
+				amortizationSchedule.setProtectRealised(new BigDecimal(0));
+				createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule, true, true,null);
+			} else {
+				log.warn("no amortisation records: loanAccountId: {} dueDate: {}",loanAccountId,dueDate);
+			}
+		} finally {
+			partnerConnection.logout();
 		}
 	}
 
@@ -144,8 +155,12 @@ public class AmortizationScheduleProcessor {
 	public void billPaymentSatisfied(String loanAccountId,
 			boolean waiverApplied, Date dueDate, Date eventDate) {
 		log.debug("billPaymentSatisfied: loanAccountId: {} waiverApplied: {} dueDate: {}",loanAccountId,waiverApplied,dueDate);
-		AmortizationSchedule amortizationSchedule = getAmortizationSchedule(loanAccountId, dueDate);
-		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule, true, waiverApplied,eventDate);
+		try {
+			AmortizationSchedule amortizationSchedule = getAmortizationSchedule(loanAccountId, dueDate);
+			createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule, true, waiverApplied,eventDate);
+		} finally {
+			partnerConnection.logout();
+		}
 	}
 	
 	/**
@@ -160,20 +175,24 @@ public class AmortizationScheduleProcessor {
 		log.debug("loanAccountStatusActive: loanAccountId: {}",loanAccountId);
 		String queryString = AmortizationScheduleQuery.getByLoanAccount(loanAccountId);
 
-		SObject[] records;
 		try {
-			records = partnerConnection.query(queryString);
-		} catch (ConnectionException e) {
-			log.error(e.getMessage());
-			throw new ProtectRealisedException(e);
+			SObject[] records;
+			try {
+				records = partnerConnection.query(queryString);
+			} catch (ConnectionException e) {
+				log.error(e.getMessage());
+				throw new ProtectRealisedException(e);
+			}
+			if (records.length == 0) {
+				String message = "failed to find any Amortization Schedule entry for "+loanAccountId+". Ignoring.";
+				log.error(message);
+				throw new ProtectRealisedException(message);
+			}
+			AmortizationSchedule amortizationSchedule = amortizationScheduleDAO.unpack(records[0]); // only interested in the first one
+			createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule);
+		} finally {
+			partnerConnection.logout();
 		}
-		if (records.length == 0) {
-			String message = "failed to find any Amortization Schedule entry for "+loanAccountId+". Ignoring.";
-			log.error(message);
-			throw new ProtectRealisedException(message);
-		}
-		AmortizationSchedule amortizationSchedule = amortizationScheduleDAO.unpack(records[0]); // only interested in the first one
-		createOrUpdateProtectRealisedRevenue(loanAccountId,amortizationSchedule);
 	}
 	
 	/**

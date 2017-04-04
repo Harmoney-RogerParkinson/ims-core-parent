@@ -7,5 +7,6 @@ public interface PartnerConnectionWrapper {
 
 	public abstract SObject[] query(String queryString)
 			throws ConnectionException;
+	public void logout();
 
 }

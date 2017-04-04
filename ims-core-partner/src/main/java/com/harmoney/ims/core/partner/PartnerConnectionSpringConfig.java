@@ -8,8 +8,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
-import com.sforce.ws.ConnectorConfig;
-
 /**
  * This is a Spring Configuration class that defines the beans needed for the
  * Enterprise connection, ie using the SOAP API to talk to the Salesforce database.
